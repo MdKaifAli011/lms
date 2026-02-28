@@ -1,0 +1,383 @@
+'use client'
+
+import React, { useState } from 'react'
+import {
+    Shield,
+    Clock,
+    Award,
+    AlertCircle,
+    CheckCircle2,
+    Camera,
+    Mic,
+    Wifi,
+    Battery,
+    Lock,
+    ArrowRight,
+    Brain,
+    Router,
+    X
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Header } from '../components/Header'
+import { ExamCategoriesBar } from '../components/ExamCategoriesBar'
+import { FooterComponent } from '../components/home/FooterComponent'
+
+export default function MockTestsPage() {
+    const [termsAccepted, setTermsAccepted] = useState(false)
+    const [cameraActive, setCameraActive] = useState(true)
+
+    return (
+        <>
+            <Header />
+            <ExamCategoriesBar />
+
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950 pt-20 sm:pt-24">
+                {/* Hero Header */}
+                <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 flex-wrap">
+                                <span className="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider">
+                                    Entrance 2024
+                                </span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-700"></span>
+                                <span className="text-slate-600 dark:text-slate-500 text-xs font-mono">ID: MOCK-2024-001</span>
+                            </div>
+
+                            <h1 className="text-4xl md:text-5xl font-serif italic text-gray-900 dark:text-white leading-tight">
+                                NEET AI-Predicted <span className="text-blue-600 dark:text-blue-400">Mock Test</span>
+                            </h1>
+
+                            <p className="text-slate-600 dark:text-slate-400 max-w-2xl text-lg font-light leading-relaxed">
+                                Verify your identity and system requirements. This test uses real-time AI invigilation for NEET/JEE standards compliance.
+                            </p>
+                        </div>
+
+                        <div className="glass-panel px-8 py-6 rounded-3xl flex flex-col items-center bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10">
+                            <span className="text-xs uppercase tracking-widest text-slate-600 dark:text-slate-500 font-bold mb-2">Time Limit</span>
+                            <span className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
+                                180<span className="text-lg text-slate-500 ml-1 font-medium">m</span>
+                            </span>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        {/* Main Content */}
+                        <div className="lg:col-span-8 space-y-8">
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <StatCard icon="quiz" label="Questions" value="180" suffix="Total" />
+                                <StatCard icon="grade" label="Max Marks" value="720" />
+                                <StatCard
+                                    icon="add_circle"
+                                    label="Correct"
+                                    value="+4"
+                                    color="text-green-400"
+                                    borderColor="border-l-green-500/30"
+                                />
+                                <StatCard
+                                    icon="do_not_disturb_on"
+                                    label="Negative"
+                                    value="-1"
+                                    color="text-red-400"
+                                    borderColor="border-l-red-500/30"
+                                />
+                            </div>
+
+                            {/* Exam Regulations */}
+                            <div className="bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl p-8 md:p-10">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                                        <Shield className="mr-3 text-blue-600 dark:text-blue-500" size={28} />
+                                        Exam Regulations
+                                    </h2>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <RegulationItem
+                                        number="01"
+                                        text="The examination follows a strict timer synchronization. The server clock will be the final authority for test completion."
+                                    />
+                                    <RegulationItem
+                                        number="02"
+                                        text={
+                                            <>
+                                                The Question Palette on the right will track your progress: <span className="text-green-400 font-semibold italic">Answered</span>, <span className="text-red-400 font-semibold italic">Unanswered</span>, and <span className="text-blue-400 font-semibold italic">Marked for Review</span>.
+                                            </>
+                                        }
+                                    />
+                                    <RegulationItem
+                                        number="03"
+                                        text="Leaving the full-screen mode or switching windows is prohibited. AI detection will flag any suspicious activity immediately."
+                                    />
+                                    <RegulationItem
+                                        number="04"
+                                        text="Your webcam must remain active throughout the session. Ensure adequate lighting on your face."
+                                        highlight
+                                    />
+                                </div>
+
+                                {/* Syllabus Coverage */}
+                                <div className="mt-12 pt-10 border-t border-white/5">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <h3 className="text-lg font-bold text-white">Syllabus Coverage</h3>
+                                        <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                        <SubjectCard
+                                            subject="Physics"
+                                            questions={45}
+                                            color="blue"
+                                        />
+                                        <SubjectCard
+                                            subject="Chemistry"
+                                            questions={45}
+                                            color="yellow"
+                                        />
+                                        <SubjectCard
+                                            subject="Biology"
+                                            questions={90}
+                                            color="red"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Sidebar - System Check */}
+                        <div className="lg:col-span-4 space-y-6">
+                            <div className="bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                                        <Router className="mr-2.5 text-blue-600 dark:text-blue-500" size={20} />
+                                        System Check
+                                    </h2>
+                                    <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                                </div>
+
+                                {/* Camera Preview */}
+                                <div className="relative rounded-3xl overflow-hidden bg-black ring-1 ring-white/10 shadow-2xl mb-4">
+                                    <div className="aspect-video flex items-center justify-center relative">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+                                        <div className="text-center p-6 z-20">
+                                            <Camera className="mx-auto text-slate-700 mb-2" size={40} />
+                                            <p className="text-xs text-slate-500 font-medium uppercase tracking-widest italic">
+                                                Video Stream Encrypted
+                                            </p>
+                                        </div>
+                                        <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-md">
+                                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                            <span className="text-xs font-bold text-green-500 uppercase tracking-tight">Live Camera</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* System Status */}
+                                <div className="space-y-3">
+                                    <SystemStatusItem
+                                        icon={<Wifi size={18} />}
+                                        title="Connectivity"
+                                        subtitle="22ms Latency"
+                                        status="STABLE"
+                                        statusColor="green"
+                                    />
+                                    <SystemStatusItem
+                                        icon={<Mic size={18} />}
+                                        title="Microphone"
+                                        subtitle="Standard Audio Device"
+                                        status="READY"
+                                        statusColor="gray"
+                                    />
+                                </div>
+
+                                {/* Battery Warning */}
+                                <div className="mt-4 p-4 rounded-2xl bg-red-500/5 border border-red-500/10">
+                                    <div className="flex gap-3">
+                                        <Battery className="text-red-500 shrink-0" size={16} />
+                                        <p className="text-xs text-slate-400 leading-relaxed italic">
+                                            Please ensure your device is connected to a <span className="text-red-400 font-semibold underline decoration-red-500/30">power source</span>. Battery failure is not grounds for a re-test.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* AI Proctoring Card */}
+                            <div className="bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden group">
+                                <div className="absolute -right-6 -bottom-6 text-slate-200/5 dark:text-white/5 group-hover:text-red-500/10 transition-colors duration-500">
+                                    <Brain className="w-36 h-36" />
+                                </div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="w-6 h-6 rounded bg-red-500/20 flex items-center justify-center">
+                                            <Lock className="text-red-400" size={14} />
+                                        </div>
+                                        <h3 className="font-bold text-sm text-gray-900 dark:text-white">AI Proctoring Active</h3>
+                                    </div>
+                                    <p className="text-xs text-slate-400 leading-relaxed">
+                                        Eye tracking, ambient noise analysis, and browser activity are monitored. Data is deleted after 48 hours of result verification.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Terms & Begin Section */}
+                    <div className="mt-12">
+                        <div className="bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                            <div className="flex items-start gap-5 max-w-2xl">
+                                <div className="relative flex items-center justify-center mt-1">
+                                    <input
+                                        className="h-6 w-6 rounded-lg border-2 border-slate-700 bg-gray-900 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-950 transition-all cursor-pointer"
+                                        id="terms"
+                                        type="checkbox"
+                                        checked={termsAccepted}
+                                        onChange={(e) => setTermsAccepted(e.target.checked)}
+                                    />
+                                </div>
+                                <label className="text-sm text-slate-400 leading-relaxed cursor-pointer select-none" htmlFor="terms">
+                                    I confirm that I am the authorized candidate taking this exam. I have read the instructions and agree that any <span className="text-white font-medium">academic dishonesty</span> will result in immediate disqualification and permanent ban from LMS Doors.
+                                </label>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                                <Button
+                                    variant="ghost"
+                                    className="px-8 py-4 text-sm font-bold text-slate-500 hover:text-white transition-all uppercase tracking-widest"
+                                >
+                                    Exit Test
+                                </Button>
+                                <Button
+                                    disabled={!termsAccepted}
+                                    className="px-14 py-6 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-bold text-lg shadow-[0_0_50px_rgba(220,38,38,0.2)] hover:shadow-[0_0_60px_rgba(220,38,38,0.4)] transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Begin Exam
+                                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <FooterComponent />
+        </>
+    )
+}
+
+function StatCard({
+    icon,
+    label,
+    value,
+    suffix,
+    color = "text-white",
+    borderColor = ""
+}: {
+    icon: string
+    label: string
+    value: string
+    suffix?: string
+    color?: string
+    borderColor?: string
+}) {
+    return (
+        <div className={`bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5 rounded-2xl ${borderColor} border-l-2`}>
+            <div className="flex items-center gap-2 mb-2 text-slate-600 dark:text-slate-500">
+                <span className="material-symbols-outlined text-sm">{icon}</span>
+                <span className="text-xs font-bold uppercase tracking-wider">{label}</span>
+            </div>
+            <div className={`text-2xl font-bold ${color}`}>
+                {value} {suffix && <span className="text-sm font-normal text-slate-500">{suffix}</span>}
+            </div>
+        </div>
+    )
+}
+
+function RegulationItem({
+    number,
+    text,
+    highlight = false
+}: {
+    number: string
+    text: React.ReactNode
+    highlight?: boolean
+}) {
+    return (
+        <div className="flex items-start">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-gray-800 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-400 mr-4 shrink-0">
+                {number}
+            </div>
+            <p className={`text-sm leading-relaxed ${highlight ? 'font-medium text-gray-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
+                {text}
+            </p>
+        </div>
+    )
+}
+
+function SubjectCard({
+    subject,
+    questions,
+    color
+}: {
+    subject: string
+    questions: number
+    color: 'blue' | 'yellow' | 'red'
+}) {
+    const colorClasses = {
+        blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/5',
+        yellow: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20 hover:bg-yellow-500/5',
+        red: 'text-red-400 bg-red-500/10 border-red-500/20 hover:bg-red-500/5'
+    }
+
+    return (
+        <div className={`bg-slate-100 dark:bg-gray-900/40 p-5 rounded-2xl border border-slate-200 dark:border-white/5 group transition-all ${colorClasses[color]}`}>
+            <div className="flex items-center justify-between mb-4">
+                <span className={`text-sm font-bold ${colorClasses[color].split(' ')[0]}`}>{subject}</span>
+                <span className={`text-xs font-bold px-2 py-0.5 ${colorClasses[color].split(' ')[1]} ${colorClasses[color].split(' ')[0]} rounded-full border ${colorClasses[color].split(' ')[2]}`}>
+                    PART A+B
+                </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                {questions} <span className="text-xs font-medium text-slate-500 ml-1">MCQs</span>
+            </div>
+        </div>
+    )
+}
+
+function SystemStatusItem({
+    icon,
+    title,
+    subtitle,
+    status,
+    statusColor
+}: {
+    icon: React.ReactNode
+    title: string
+    subtitle: string
+    status: string
+    statusColor: 'green' | 'gray'
+}) {
+    const statusClasses = {
+        green: 'text-green-500 bg-green-500/10',
+        gray: 'text-slate-400 bg-white/10'
+    }
+
+    return (
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/5">
+            <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg ${statusColor === 'green' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'} flex items-center justify-center`}>
+                    {icon}
+                </div>
+                <div>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white">{title}</p>
+                    <p className="text-xs text-slate-500">{subtitle}</p>
+                </div>
+            </div>
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${statusClasses[statusColor]}`}>
+                {status}
+            </span>
+        </div>
+    )
+}
