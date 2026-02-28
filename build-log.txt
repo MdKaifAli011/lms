@@ -1,0 +1,1443 @@
+﻿npx : ΓÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+At C:\Users\hello\AppData\Local\Temp\ps-script-319d1bdc-dbeb-4c76-aa1e-810faa7d3e13.ps1:82 char:55
++ ... \hello\OneDrive\Pictures\lmsdoors\admin"; npx next build 2>&1 | Out-F ...
++                                               ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ΓÜá Warning: Ne...not be correct.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ We detected multiple lockfiles and selected the directory of C:\Users\hello\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if 
+it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\hello\OneDrive\Pictures\lmsdoors\admin\package-lock.json
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Found 1 warning while optimizing generated CSS:
+
+[2mΓöé   background-color: rgba(150, 150, 150, 0.4);[22m
+[2mΓöé }[22m
+[2mΓöé[22m .emoji-inner::moz-selection {
+[2mΓöå[22m              [33m[2m^--[22m 'moz-selection' is not recognized as a valid pseudo-element. Did you mean 
+':moz-selection' (pseudo-class) or is this a typo?[39m
+[2mΓöå[22m
+[2mΓöé   color: transparent;[22m
+[2mΓöé   background-color: rgba(150, 150, 150, 0.4);[22m
+
+
+> Build error occurred
+Error: Turbopack build failed with 15 errors:
+./OneDrive/Pictures/lmsdoors/admin/editor/index.css:2:16987
+Parsing CSS source code failed
+[0m [90m 1 |[39m [90m/*! tailwindcss v4.2.0 | MIT License | https://tailwindcss.com */[39m
+[31m[1m>[22m[39m[90m 2 |[39m [33m@[39m[36mimport[39m [32m"https://fonts.googleapis.com/css?family=Reenie+Bea
+nie"[39m[33m;[39mbody{[33m-[39mwebkit[33m-[39mfont[33m-[39msmoothing[33m:[39mantialiased[33m;[39m[33m-[3
+9mmoz[33m-[39mosx[33m-[39mfont[33m-[39msmoothing[33m:[39mgrayscale[33m;[39mbackground[33m:[39m[33m#[39mee
+e[33m;[39mmargin[33m:[39m[35m0[39m[33m;[39mpadding[33m:[39m[35m0[39m [35m20[39mpx[33m;[39mfont[33m-[3
+9mfamily[33m:[39msystem[33m-[39mui[33m,[39m[33m-[39mapple[33m-[39msystem[33m,[39m[33mBlinkMacSystemFont[3
+9m[33m,[39m[37m[41m[1m\[22m[49m[39m[33m.[39m[33mSFNSText[39m[33m-[39m[33mRegular[39m[33m,[39msans[33
+m-[39mserif}header{justify[33m-[39mcontent[33m:[39mcenter[33m;[39mmax[33m-[39mwidth[33m:[39m[35m580[39mpx
+[33m;[39mmargin[33m:[39mauto[33m;[39mdisplay[33m:[39mflex[33m;[39mposition[33m:[39mrelative}header 
+a{max[33m-[39mwidth[33m:[39m[35m220[39mpx[33m;[39mmargin[33m:[39m[35m20[39mpx [35m0[39m 
+[35m0[39m[33m;[39mdisplay[33m:[39mblock}header img{width[33m:[39m[35m100[39m[33m%[39m[33m;[39mheight[33m
+:[39m[35m100[39m[33m%[39m[33m;[39mdisplay[33m:[39mblock}header h1{text[33m-[39malign[33m:[39mleft[33m;[3
+9mcolor[33m:[39m[33m#[39m[35m333[39m[33m;[39mmargin[33m:[39m[35m20[39mpx [35m0[39m [35m0[39m[33m;[39m
+display[33m:[39minline[33m-[39mblock}[33m.[39meditor[33m-[39mshell{color[33m:[39m[33m#[39m[35m000[39m[33
+m;[39mborder[33m-[39mradius[33m:[39m[35m2[39mpx[33m;[39mmax[33m-[39mwidth[33m:[39m[35m1100[39mpx[33m;[
+39mmargin[33m:[39m[35m20[39mpx auto[33m;[39mfont[33m-[39mweight[33m:[39m[35m400[39m[33m;[39mline[33m-[3
+9mheight[33m:[39m[35m1.7[39m[33m;[39mposition[33m:[39mrelative}[33m.[39meditor[33m-[39mshell [33m.[39medi
+tor[33m-[39mcontainer{background[33m:[39m[33m#[39mfff[33m;[39mborder[33m-[39mbottom[33m-[39mright[33m-[39
+mradius[33m:[39m[35m10[39mpx[33m;[39mborder[33m-[39mbottom[33m-[39mleft[33m-[39mradius[33m:[39m[35m10[3
+9mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mrelative}[33m.[39meditor[33m-[39mshell [33m.[
+39meditor[33m-[39mcontainer[33m.[39mtree[33m-[39mview{border[33m-[39mradius[33m:[39m[35m0[39m}[33m.[39med
+itor[33m-[39mshell [33m.[39meditor[33m-[39mcontainer[33m.[39mplain[33m-[39mtext{border[33m-[39mtop[33m-[3
+9mleft[33m-[39mradius[33m:[39m[35m10[39mpx[33m;[39mborder[33m-[39mtop[33m-[39mright[33m-[39mradius[33m:
+[39m[35m10[39mpx}[33m.[39meditor[33m-[39mscroller{z[33m-[39mindex[33m:[39m[35m0[39m[33m;[39mresize[33m:
+[39mvertical[33m;[39mborder[33m:[39m[35m0[39m[33m;[39moutline[33m:[39m[35m0[39m[33m;[39mmax[33m-[39mwid
+th[33m:[39m[35m100[39m[33m%[39m[33m;[39mmin[33m-[39mheight[33m:[39m[35m150[39mpx[33m;[39mdisplay[33m:
+[39mflex[33m;[39mposition[33m:[39mrelative}[33m.[39meditor{resize[33m:[39mvertical[33m;[39mz[33m-[39mindex
+[33m:[39m[33m-[39m[35m1[39m[33m;[39mflex[33m:[39mauto[33m;[39mmax[33m-[39mwidth[33m:[39m[35m100[39m[3
+3m%[39m[33m;[39mposition[33m:[39mrelative}[33m.[39mtest[33m-[39mrecorder[33m-[39moutput{width[33m:[39m[35
+m100[39m[33m%[39m[33m;[39mmargin[33m:[39m[35m20[39mpx auto}pre{color[33m:[39m[33m#[39mfff[33m;[39mbackgr
+ound[33m:[39m[33m#[39m[35m222[39m[33m;[39mmax[33m-[39mheight[33m:[39m[35m400[39mpx[33m;[39mmargin[33m:
+[39m[35m0[39m[33m;[39mpadding[33m:[39m[35m10[39mpx[33m;[39mfont[33m-[39msize[33m:[39m[35m12[39mpx[33m
+;[39mline[33m-[39mheight[33m:[39m[35m1.1[39m[33m;[39moverflow[33m:[39mauto}[33m.[39mtree[33m-[39mview[3
+3m-[39moutput{color[33m:[39m[33m#[39mfff[33m;[39mbackground[33m:[39m[33m#[39m[35m222[39m[33m;[39mborder
+[33m-[39mbottom[33m-[39mright[33m-[39mradius[33m:[39m[35m10[39mpx[33m;[39mborder[33m-[39mbottom[33m-[39m
+left[33m-[39mradius[33m:[39m[35m10[39mpx[33m;[39mmargin[33m:[39m[35m1[39mpx auto [35m10[39mpx[33m;[39mp
+adding[33m:[39m[35m0[39m[33m;[39mfont[33m-[39msize[33m:[39m[35m12[39mpx[33m;[39mdisplay[33m:[39mblock[
+33m;[39mposition[33m:[39mrelative[33m;[39moverflow[33m:[39mhidden}pre[33m:[39m[33m:[39m[33m-[39mwebkit[33
+m-[39mscrollbar{background[33m:[39m[35m0[39m [35m0[39m[33m;[39mwidth[33m:[39m[35m10[39mpx}pre[33m:[39m[
+33m:[39m[33m-[39mwebkit[33m-[39mscrollbar[33m-[39mthumb{background[33m:[39m[33m#[39m[35m999[39m}[33m.[39
+meditor[33m-[39mdev[33m-[39mbutton{cursor[33m:[39mpointer[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[
+39m[35m444[39m[33m;[39mborder[33m:[39mnone[33m;[39mborder[33m-[39mradius[33m:[39m[35m20[39mpx[33m;[39mo
+utline[33m:[39mnone[33m;[39mwidth[33m:[39m[35m40[39mpx[33m;[39mheight[33m:[39m[35m40[39mpx[33m;[39mfont
+[33m-[39msize[33m:[39m[35m12[39mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mrelative[33m;
+[39mbox[33m-[39mshadow[33m:[39m[35m0[39m [35m1[39mpx [35m10[39mpx [33m#[39m[35m0000004[39md}[33m.[39med
+itor[33m-[39mdev[33m-[39mbutton[33m:[39mafter{content[33m:[39m[32m""[39m[33m;[39mfilter[33m:[39minvert()
+[33m;[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mab
+solute[33m;[39minset[33m:[39m[35m10[39mpx}[33m.[39meditor[33m-[39mdev[33m-[39mbutton[33m:[39mhover{backgr
+ound[33m-[39mcolor[33m:[39m[33m#[39m[35m555[39m}[33m.[39meditor[33m-[39mdev[33m-[39mbutton[33m.[39macti
+ve{background[33m-[39mcolor[33m:[39m[33m#[39me92323}[33m.[39mtest[33m-[39mrecorder[33m-[39mtoolbar{display
+[33m:[39mflex}[33m.[39mtest[33m-[39mrecorder[33m-[39mbutton{cursor[33m:[39mpointer[33m;[39mbackground[33m-
+[39mcolor[33m:[39m[33m#[39m[35m222[39m[33m;[39mborder[33m:[39mnone[33m;[39mborder[33m-[39mradius[33m:[3
+9m[35m4[39mpx[33m;[39moutline[33m:[39mnone[33m;[39mwidth[33m:[39m[35m32[39mpx[33m;[39mheight[33m:[39m[
+35m32[39mpx[33m;[39mpadding[33m:[39m[35m6[39mpx[33m;[39mfont[33m-[39msize[33m:[39m[35m10[39mpx[33m;[39
+mtransition[33m:[39mbox[33m-[39mshadow [35m50[39mms ease[33m-[39mout[33m;[39mdisplay[33m:[39mblock[33m;[3
+9mposition[33m:[39mrelative[33m;[39mbox[33m-[39mshadow[33m:[39m[35m1[39mpx [35m2[39mpx [35m2[39mpx [33m#
+[39m[35m0006[39m}[33m.[39mtest[33m-[39mrecorder[33m-[39mbutton[33m:[39mactive{box[33m-[39mshadow[33m:[39
+m[35m1[39mpx [35m2[39mpx [35m4[39mpx [33m#[39m[35m0006[39m}[33m.[39mtest[33m-[39mrecorder[33m-[39mbutto
+n[33m+[39m[33m.[39mtest[33m-[39mrecorder[33m-[39mbutton{margin[33m-[39mleft[33m:[39m[35m4[39mpx}[33m.[3
+9mtest[33m-[39mrecorder[33m-[39mbutton[33m:[39mafter{content[33m:[39m[32m""[39m[33m;[39mfilter[33m:[39min
+vert()[33m;[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:
+[39mabsolute[33m;[39minset[33m:[39m[35m8[39mpx}[33m#[39moptions[33m-[39mbutton{position[33m:[39mfixed[33m
+;[39mbottom[33m:[39m[35m20[39mpx[33m;[39mleft[33m:[39m[35m20[39mpx}[33m#[39mtest[33m-[39mrecorder[33m-
+[39mbutton{position[33m:[39mfixed[33m;[39mbottom[33m:[39m[35m20[39mpx[33m;[39mleft[33m:[39m[35m70[39mpx}
+[33m#[39mpaste[33m-[39mlog[33m-[39mbutton{position[33m:[39mfixed[33m;[39mbottom[33m:[39m[35m20[39mpx[33m;
+[39mleft[33m:[39m[35m120[39mpx}[33m#[39mdocs[33m-[39mbutton{position[33m:[39mfixed[33m;[39mbottom[33m:[3
+9m[35m20[39mpx[33m;[39mleft[33m:[39m[35m170[39mpx}[33m#[39moptions[33m-[39mbutton[33m:[39mafter{backgroun
+d[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mgear[33m.[39msvg)}[33m#[39mtest[33m-[39mrecorder
+[33m-[39mbutton[33m:[39mafter{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mjournal[33
+m-[39mcode[33m.[39msvg)}[33m#[39mpaste[33m-[39mlog[33m-[39mbutton[33m:[39mafter{background[33m-[39mimage[
+33m:[39murl(images[33m/[39micons[33m/[39mclipboard[33m.[39msvg)}[33m#[39mdocs[33m-[39mbutton[33m:[39mafter
+{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mfile[33m-[39mearmark[33m-[39mtext[33m.
+[39msvg)}[33m#[39mtest[33m-[39mrecorder[33m-[39mbutton[33m-[39msnapshot{margin[33m-[39mright[33m:[39mauto}
+[33m#[39mtest[33m-[39mrecorder[33m-[39mbutton[33m-[39msnapshot[33m:[39mafter{background[33m-[39mimage[33m:
+[39murl(images[33m/[39micons[33m/[39mcamera[33m.[39msvg)}[33m#[39mtest[33m-[39mrecorder[33m-[39mbutton[33m
+-[39mcopy[33m:[39mafter{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mclipboard[33m.[3
+9msvg)}[33m#[39mtest[33m-[39mrecorder[33m-[39mbutton[33m-[39mdownload[33m:[39mafter{background[33m-[39mimag
+e[33m:[39murl(images[33m/[39micons[33m/[39mdownload[33m.[39msvg)}[33m.[39mtypeahead[33m-[39mpopover{backgro
+und[33m:[39m[33m#[39mfff[33m;[39mborder[33m-[39mradius[33m:[39m[35m8[39mpx[33m;[39mposition[33m:[39mrel
+ative[33m;[39mbox[33m-[39mshadow[33m:[39m[35m0[39m [35m5[39mpx [35m10[39mpx 
+[33m#[39m[35m0000004[39md}[33m.[39mtypeahead[33m-[39mpopover ul{border[33m-[39mradius[33m:[39m[35m8[39mpx
+[33m;[39mmax[33m-[39mheight[33m:[39m[35m200[39mpx[33m;[39mmargin[33m:[39m[35m0[39m[33m;[39mpadding[33m
+:[39m[35m0[39m[33m;[39mlist[33m-[39mstyle[33m:[39mnone[33m;[39moverflow[33m-[39my[33m:[39mscroll}[33m.
+[39mtypeahead[33m-[39mpopover ul[33m:[39m[33m:[39m[33m-[39mwebkit[33m-[39mscrollbar{display[33m:[39mnone}[
+33m.[39mtypeahead[33m-[39mpopover ul{[33m-[39mms[33m-[39moverflow[33m-[39mstyle[33m:[39mnone[33m;[39mscrol
+lbar[33m-[39mwidth[33m:[39mnone}[33m.[39mtypeahead[33m-[39mpopover ul li{cursor[33m:[39mpointer[33m;[39mbor
+der[33m-[39mradius[33m:[39m[35m8[39mpx[33m;[39moutline[33m:[39mnone[33m;[39mmin[33m-[39mwidth[33m:[39m
+[35m180[39mpx[33m;[39mmargin[33m:[39m[35m0[39m[33m;[39mfont[33m-[39msize[33m:[39m[35m14[39mpx}[33m.[39
+mtypeahead[33m-[39mpopover ul 
+li[33m.[39mselected{background[33m:[39m[33m#[39meee}[33m.[39mtypeahead[33m-[39mpopover li{color[33m:[39m[3
+3m#[39m[35m050505[39m[33m;[39mcursor[33m:[39mpointer[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39mf
+ff[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mborder[33m-[39mradius[33m:[39m[35m8[39mpx[33m;[39mflex[33m
+-[39mdirection[33m:[39mrow[33m;[39mflex[33m-[39mshrink[33m:[39m[35m0[39m[33m;[39malign[33m-[39mcontent[
+33m:[39mcenter[33m;[39mmargin[33m:[39m[35m0[39m [35m8[39mpx[33m;[39mpadding[33m:[39m[35m8[39mpx[33m;[3
+9mfont[33m-[39msize[33m:[39m[35m15[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m16[39mpx[33m;[39mdispl
+ay[33m:[39mflex}[33m.[39mtypeahead[33m-[39mpopover li[33m.[39mactive{background[33m-[39msize[33m:[39mcontai
+n[33m;[39mwidth[33m:[39m[35m20[39mpx[33m;[39mheight[33m:[39m[35m20[39mpx[33m;[39mdisplay[33m:[39mflex}
+[33m.[39mtypeahead[33m-[39mpopover 
+li[33m:[39mfirst[33m-[39mchild{border[33m-[39mradius[33m:[39m[35m8[39mpx [35m8[39mpx [35m0[39m 
+[35m0[39m}[33m.[39mtypeahead[33m-[39mpopover 
+li[33m:[39mlast[33m-[39mchild{border[33m-[39mradius[33m:[39m[35m0[39m [35m0[39m [35m8[39mpx 
+[35m8[39mpx}[33m.[39mtypeahead[33m-[39mpopover 
+li[33m:[39mhover{background[33m-[39mcolor[33m:[39m[33m#[39meee}[33m.[39mtypeahead[33m-[39mpopover li [33m.
+[39mtext{flex[33m-[39mgrow[33m:[39m[35m1[39m[33m;[39mmin[33m-[39mwidth[33m:[39m[35m150[39mpx[33m;[39ml
+ine[33m-[39mheight[33m:[39m[35m20[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mtypeahead[33m-[39mpopover 
+li [33m.[39micon{[33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m-[39mselect[33
+m:[39mnone[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m[33m%[39m[33m;[39mbackground[33m-[39mre
+peat[33m:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33m:[39m[35
+m20[39mpx[33m;[39mheight[33m:[39m[35m20[39mpx[33m;[39mmargin[33m-[39mright[33m:[39m[35m8[39mpx[33m;[39
+mline[33m-[39mheight[33m:[39m[35m16[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mcomponent[33m-[39mpicker
+[33m-[39mmenu{width[33m:[39m[35m200[39mpx}[33m.[39mmentions[33m-[39mmenu{width[33m:[39m[35m250[39mpx}[33m
+.[39mauto[33m-[39membed[33m-[39mmenu{width[33m:[39m[35m150[39mpx}[33m.[39memoji[33m-[39mmenu{width[33m:[
+39m[35m200[39mpx}i[33m.[39mpalette{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mpalett
+e[33m.[39msvg)}i[33m.[39mbucket{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mpaint[33
+m-[39mbucket[33m.[39msvg)}i[33m.[39mbold{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39
+mtype[33m-[39mbold[33m.[39msvg)}i[33m.[39mitalic{background[33m-[39mimage[33m:[39murl(images[33m/[39micons
+[33m/[39mtype[33m-[39mitalic[33m.[39msvg)}i[33m.[39mclear{background[33m-[39mimage[33m:[39murl(images[33m/
+[39micons[33m/[39mtrash[33m.[39msvg)}i[33m.[39mcode{background[33m-[39mimage[33m:[39murl(images[33m/[39mico
+ns[33m/[39mcode[33m.[39msvg)}i[33m.[39munderline{background[33m-[39mimage[33m:[39murl(images[33m/[39micons
+[33m/[39mtype[33m-[39munderline[33m.[39msvg)}i[33m.[39muppercase{background[33m-[39mimage[33m:[39murl(images
+[33m/[39micons[33m/[39mtype[33m-[39muppercase[33m.[39msvg)}i[33m.[39mlowercase{background[33m-[39mimage[33
+m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[39mlowercase[33m.[39msvg)}i[33m.[39mcapitalize{background[
+33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[39mcapitalize[33m.[39msvg)}i[33m.[39mstri
+kethrough{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[39mstrikethrough[33m.
+[39msvg)}i[33m.[39msubscript{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[39
+msubscript[33m.[39msvg)}i[33m.[39msuperscript{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/
+[39mtype[33m-[39msuperscript[33m.[39msvg)}i[33m.[39mhighlight{background[33m-[39mimage[33m:[39murl(images[3
+3m/[39micons[33m/[39mhighlighter[33m.[39msvg)}i[33m.[39mlink{background[33m-[39mimage[33m:[39murl(images[33
+m/[39micons[33m/[39mlink[33m.[39msvg)}i[33m.[39mhorizontal[33m-[39mrule{background[33m-[39mimage[33m:[39mu
+rl(images[33m/[39micons[33m/[39mhorizontal[33m-[39mrule[33m.[39msvg)}[33m.[39micon[33m.[39mplus{background
+[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mplus[33m.[39msvg)}[33m.[39micon[33m.[39mcaret[33m
+-[39mright{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mcaret[33m-[39mright[33m-[39mf
+ill[33m.[39msvg)}[33m.[39micon[33m.[39mdropdown[33m-[39mmore{background[33m-[39mimage[33m:[39murl(images[3
+3m/[39micons[33m/[39mdropdown[33m-[39mmore[33m.[39msvg)}[33m.[39micon[33m.[39mfont[33m-[39mcolor{backgroun
+d[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mfont[33m-[39mcolor[33m.[39msvg)}[33m.[39micon[3
+3m.[39mfont[33m-[39mfamily{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mfont[33m-[39m
+family[33m.[39msvg)}[33m.[39micon[33m.[39mbg[33m-[39mcolor{background[33m-[39mimage[33m:[39murl(images[33m
+/[39micons[33m/[39mbg[33m-[39mcolor[33m.[39msvg)}[33m.[39micon[33m.[39mtable{background[33m-[39mcolor[33m
+:[39m[33m#[39m[35m6[39mc757d[33m;[39m[33m-[39mwebkit[33m-[39mmask[33m-[39mimage[33m:[39murl(images[33m/
+[39micons[33m/[39mtable[33m.[39msvg)[33m;[39mmask[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39
+mtable[33m.[39msvg)[33m;[39m[33m-[39mwebkit[33m-[39mmask[33m-[39msize[33m:[39mcontain[33m;[39mmask[33m-
+[39msize[33m:[39mcontain[33m;[39m[33m-[39mwebkit[33m-[39mmask[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat[3
+3m;[39mmask[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat}i[33m.[39mimage{background[33m-[39mimage[33m:[39murl(
+images[33m/[39micons[33m/[39mfile[33m-[39mimage[33m.[39msvg)}i[33m.[39mtable{background[33m-[39mimage[33m:
+[39murl(images[33m/[39micons[33m/[39mtable[33m.[39msvg)}i[33m.[39mclose{background[33m-[39mimage[33m:[39mu
+rl(images[33m/[39micons[33m/[39mclose[33m.[39msvg)}i[33m.[39mfigma{background[33m-[39mimage[33m:[39murl(ima
+ges[33m/[39micons[33m/[39mfigma[33m.[39msvg)}i[33m.[39mpoll{background[33m-[39mimage[33m:[39murl(images[33
+m/[39micons[33m/[39mcard[33m-[39mchecklist[33m.[39msvg)}i[33m.[39mcolumns{background[33m-[39mimage[33m:[39
+murl(images[33m/[39micons[33m/[39m[35m3[39m[33m-[39mcolumns[33m.[39msvg)}i[33m.[39mx{background[33m-[39mi
+mage[33m:[39murl(images[33m/[39micons[33m/[39mx[33m.[39msvg)}i[33m.[39myoutube{background[33m-[39mimage[33
+m:[39murl(images[33m/[39micons[33m/[39myoutube[33m.[39msvg)}[33m.[39micon[33m.[39mleft[33m-[39malign[33m,
+[39mi[33m.[39mleft[33m-[39malign{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtext[3
+3m-[39mleft[33m.[39msvg)}[33m.[39micon[33m.[39mcenter[33m-[39malign[33m,[39mi[33m.[39mcenter[33m-[39mali
+gn{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtext[33m-[39mcenter[33m.[39msvg)}[33m
+.[39micon[33m.[39mright[33m-[39malign[33m,[39mi[33m.[39mright[33m-[39malign{background[33m-[39mimage[33m:
+[39murl(images[33m/[39micons[33m/[39mtext[33m-[39mright[33m.[39msvg)}[33m.[39micon[33m.[39mjustify[33m-[
+39malign[33m,[39mi[33m.[39mjustify[33m-[39malign{background[33m-[39mimage[33m:[39murl(images[33m/[39micons
+[33m/[39mjustify[33m.[39msvg)}[33m.[39micon[33m.[39mvertical[33m-[39mtop[33m,[39mi[33m.[39mleft[33m-[39m
+align{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mvertical[33m-[39mtop[33m.[39msvg)}
+[33m.[39micon[33m.[39mvertical[33m-[39mmiddle[33m,[39mi[33m.[39mcenter[33m-[39malign{background[33m-[39mim
+age[33m:[39murl(images[33m/[39micons[33m/[39mvertical[33m-[39mmiddle[33m.[39msvg)}[33m.[39micon[33m.[39mv
+ertical[33m-[39mbottom[33m,[39mi[33m.[39mright[33m-[39malign{background[33m-[39mimage[33m:[39murl(images[3
+3m/[39micons[33m/[39mvertical[33m-[39mbottom[33m.[39msvg)}i[33m.[39mindent{background[33m-[39mimage[33m:[3
+9murl(images[33m/[39micons[33m/[39mindent[33m.[39msvg)}i[33m.[39mmarkdown{background[33m-[39mimage[33m:[39m
+url(images[33m/[39micons[33m/[39mmarkdown[33m.[39msvg)}i[33m.[39moutdent{background[33m-[39mimage[33m:[39mu
+rl(images[33m/[39micons[33m/[39moutdent[33m.[39msvg)}i[33m.[39mundo{background[33m-[39mimage[33m:[39murl(im
+ages[33m/[39micons[33m/[39marrow[33m-[39mcounterclockwise[33m.[39msvg)}i[33m.[39mredo{background[33m-[39mim
+age[33m:[39murl(images[33m/[39micons[33m/[39marrow[33m-[39mclockwise[33m.[39msvg)}i[33m.[39msticky{backgrou
+nd[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39msticky[33m.[39msvg)}i[33m.[39mmic{background[33m
+-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mmic[33m.[39msvg)}i[33m.[39m[36mimport[39m{background[
+33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mupload[33m.[39msvg)}i[33m.[39m[36mexport[39m{backgr
+ound[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mdownload[33m.[39msvg)}i[33m.[39mshare{backgroun
+d[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39msend[33m.[39msvg)}i[33m.[39mdiagram[33m-[39m[35
+m2[39m{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mdiagram[33m-[39m[35m2.[39msvg)}i
+[33m.[39muser{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39muser[33m.[39msvg)}i[33m.[3
+9mequation{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mplus[33m-[39mslash[33m-[39mmin
+us[33m.[39msvg)}i[33m.[39mcalendar{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mcalend
+ar[33m.[39msvg)}i[33m.[39mgif{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mfiletype[3
+3m-[39mgif[33m.[39msvg)}i[33m.[39mcopy{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mc
+opy[33m.[39msvg)}i[33m.[39mpaste{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mclipboar
+d[33m.[39msvg)}i[33m.[39msuccess{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39msuccess
+[33m.[39msvg)}i[33m.[39mprettier{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mprettier
+[33m.[39msvg)}i[33m.[39mprettier[33m-[39merror{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33
+m/[39mprettier[33m-[39merror[33m.[39msvg)}i[33m.[39mpage[33m-[39m[36mbreak[39m[33m,[39m[33m.[39micon[33
+m.[39mpage[33m-[39m[36mbreak[39m{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mscissor
+s[33m.[39msvg)}[33m.[39mlink[33m-[39meditor [33m.[39mbutton[33m.[39mactive[33m,[39m[33m.[39mtoolbar [33m
+.[39mbutton[33m.[39mactive{background[33m-[39mcolor[33m:[39m[33m#[39mdfe8fa}[33m.[39mlink[33m-[39meditor 
+[33m.[39mlink[33m-[39minput{box[33m-[39msizing[33m:[39mborder[33m-[39mbox[33m;[39mcolor[33m:[39m[33m#[39
+m[35m050505[39m[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39meee[33m;[39mborder[33m:[39m[35m0[39m
+[33m;[39mborder[33m-[39mradius[33m:[39m[35m15[39mpx[33m;[39moutline[33m:[39m[35m0[39m[33m;[39mwidth[33m
+:[39mcalc([35m100[39m[33m%[39m [33m-[39m 
+[35m75[39mpx)[33m;[39mmargin[33m:[39m[35m12[39mpx[33m;[39mpadding[33m:[39m[35m8[39mpx [35m12[39mpx[33m
+;[39mfont[33m-[39mfamily[33m:[39minherit[33m;[39mfont[33m-[39msize[33m:[39m[35m15[39mpx[33m;[39mdisplay
+[33m:[39mblock[33m;[39mposition[33m:[39mrelative}[33m.[39mlink[33m-[39meditor [33m.[39mlink[33m-[39mview{c
+olor[33m:[39m[33m#[39m[35m050505[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mborder[33m-[39mradius[33
+m:[39m[35m15[39mpx[33m;[39moutline[33m:[39m[35m0[39m[33m;[39mwidth[33m:[39mcalc([35m100[39m[33m%[39m 
+[33m-[39m [35m24[39mpx)[33m;[39mmargin[33m:[39m[35m8[39mpx 
+[35m12[39mpx[33m;[39mpadding[33m:[39m[35m8[39mpx [35m12[39mpx[33m;[39mfont[33m-[39mfamily[33m:[39minher
+it[33m;[39mfont[33m-[39msize[33m:[39m[35m15[39mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[3
+9mrelative}[33m.[39mlink[33m-[39meditor [33m.[39mlink[33m-[39mview a{word[33m-[39m[36mbreak[39m[33m:[39m
+[36mbreak[39m[33m-[39mword[33m;[39mwidth[33m:[39mcalc([35m100[39m[33m%[39m [33m-[39m 
+[35m33[39mpx)[33m;[39mdisplay[33m:[39mblock}[33m.[39mlink[33m-[39meditor div[33m.[39mlink[33m-[39medit{ve
+rtical[33m-[39malign[33m:[39m[33m-[39m[35m.25[39mem[33m;[39mcursor[33m:[39mpointer[33m;[39mbackground[33
+m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mpencil[33m-[39mfill[33m.[39msvg)[33m;[39mbackground[
+33m-[39mposition[33m:[39m[35m50[39m[33m%[39m[33m;[39mbackground[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat
+[33m;[39mbackground[33m-[39msize[33m:[39m[35m16[39mpx[33m;[39mwidth[33m:[39m[35m35[39mpx[33m;[39mpositi
+on[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m0[39m[33m;[39mbottom[33m:[39m[35m0[39m[33m;[39mright[33m:
+[39m[35m30[39mpx}[33m.[39mlink[33m-[39meditor div[33m.[39mlink[33m-[39mtrash{vertical[33m-[39malign[33m:[
+39m[33m-[39m[35m.25[39mem[33m;[39mcursor[33m:[39mpointer[33m;[39mbackground[33m-[39mimage[33m:[39murl(ima
+ges[33m/[39micons[33m/[39mtrash[33m.[39msvg)[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m[33m%
+[39m[33m;[39mbackground[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m:[39
+m[35m16[39mpx[33m;[39mwidth[33m:[39m[35m35[39mpx[33m;[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m
+[35m0[39m[33m;[39mbottom[33m:[39m[35m0[39m[33m;[39mright[33m:[39m[35m0[39m}[33m.[39mlink[33m-[39medit
+or div[33m.[39mlink[33m-[39mcancel{vertical[33m-[39malign[33m:[39m[33m-[39m[35m.25[39mem[33m;[39mcursor[
+33m:[39mpointer[33m;[39mbackground[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mclose[33m.[39msv
+g)[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m[33m%[39m[33m;[39mbackground[33m-[39mrepeat[33m
+:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m:[39m[35m16[39mpx[33m;[39mwidth[33m:[39m[35m3
+5[39mpx[33m;[39mmargin[33m-[39mright[33m:[39m[35m28[39mpx[33m;[39mposition[33m:[39mabsolute[33m;[39mtop
+[33m:[39m[35m0[39m[33m;[39mbottom[33m:[39m[35m0[39m[33m;[39mright[33m:[39m[35m0[39m}[33m.[39mlink[33m
+-[39meditor div[33m.[39mlink[33m-[39mconfirm{vertical[33m-[39malign[33m:[39m[33m-[39m[35m.25[39mem[33m;[
+39mcursor[33m:[39mpointer[33m;[39mbackground[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39msuccess
+[33m-[39malt[33m.[39msvg)[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m[33m%[39m[33m;[39mbackg
+round[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m:[39m[35m16[39mpx[33m;
+[39mwidth[33m:[39m[35m35[39mpx[33m;[39mmargin[33m-[39mright[33m:[39m[35m2[39mpx[33m;[39mposition[33m:[
+39mabsolute[33m;[39mtop[33m:[39m[35m0[39m[33m;[39mbottom[33m:[39m[35m0[39m[33m;[39mright[33m:[39m[35m0
+[39m}[33m.[39mlink[33m-[39meditor [33m.[39mlink[33m-[39minput a{color[33m:[39m[33m#[39m[35m216[39mfdb[3
+3m;[39mwhite[33m-[39mspace[33m:[39mnowrap[33m;[39mtext[33m-[39moverflow[33m:[39mellipsis[33m;[39mmargin[3
+3m-[39mright[33m:[39m[35m30[39mpx[33m;[39mtext[33m-[39mdecoration[33m:[39munderline[33m;[39moverflow[33m:
+[39mhidden}[33m.[39mlink[33m-[39meditor [33m.[39mlink[33m-[39minput 
+a[33m:[39mhover{text[33m-[39mdecoration[33m:[39munderline}[33m.[39mlink[33m-[39meditor 
+[33m.[39mfont[33m-[39msize[33m-[39mwrapper[33m,[39m[33m.[39mlink[33m-[39meditor 
+[33m.[39mfont[33m-[39mfamily[33m-[39mwrapper{margin[33m:[39m[35m0[39m 
+[35m4[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mlink[33m-[39meditor select{background[33m-[39mcolor[33m:
+[39m[33m#[39m[35m00000013[39m[33m;[39mborder[33m:[39mnone[33m;[39mborder[33m-[39mradius[33m:[39m[35m4[
+39mpx[33m;[39mpadding[33m:[39m[35m6[39mpx}[33m.[39mmention[33m:[39mfocus{outline[33m:[39mnone[33m;[39mbox
+[33m-[39mshadow[33m:[39m[35m0[39m [35m0[39m [35m0[39m [35m2[39mpx [33m#[39mb4d5ff}[33m.[39mcharacters[
+33m-[39mlimit{color[33m:[39m[33m#[39m[35m888[39m[33m;[39mtext[33m-[39malign[33m:[39mright[33m;[39mfont[
+33m-[39msize[33m:[39m[35m12[39mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mabsolute[33m;[3
+9mbottom[33m:[39m[35m5[39mpx[33m;[39mleft[33m:[39m[35m12[39mpx}[33m.[39mcharacters[33m-[39mlimit[33m.[3
+9mcharacters[33m-[39mlimit[33m-[39mexceeded{color[33m:[39mred}[33m.[39mdropdown{z[33m-[39mindex[33m:[39m[3
+5m100[39m[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39mfff[33m;[39mborder[33m-[39mradius[33m:[39m[
+35m8[39mpx[33m;[39mmin[33m-[39mheight[33m:[39m[35m40[39mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mpositio
+n[33m:[39mfixed[33m;[39mbox[33m-[39mshadow[33m:[39m[35m0[39m [35m12[39mpx [35m28[39mpx 
+[33m#[39m[35m0003[39m[33m,[39m[35m0[39m [35m2[39mpx [35m4[39mpx 
+[33m#[39m[35m0000001[39ma[33m,[39minset [35m0[39m [35m0[39m [35m0[39m [35m1[39mpx 
+[33m#[39mffffff80}[33m.[39mdropdown [33m.[39mitem{color[33m:[39m[33m#[39m[35m050505[39m[33m;[39mcursor[3
+3m:[39mpointer[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39mfff[33m;[39mborder[33m:[39m[35m0[39m[3
+3m;[39mborder[33m-[39mradius[33m:[39m[35m8[39mpx[33m;[39mflex[33m-[39mdirection[33m:[39mrow[33m;[39mflex
+[33m-[39mshrink[33m:[39m[35m0[39m[33m;[39mplace[33m-[39mcontent[33m:[39mcenter space[33m-[39mbetween[33m
+;[39mmin[33m-[39mwidth[33m:[39m[35m100[39mpx[33m;[39mmax[33m-[39mwidth[33m:[39m[35m264[39mpx[33m;[39mm
+argin[33m:[39m[35m0[39m [35m8[39mpx[33m;[39mpadding[33m:[39m[35m8[39mpx[33m;[39mfont[33m-[39msize[33m:
+[39m[35m15[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m16[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[3
+9mdropdown [33m.[39mitem[33m.[39mwide{align[33m-[39mitems[33m:[39mcenter[33m;[39mwidth[33m:[39m[35m260[39
+mpx}[33m.[39mdropdown [33m.[39mitem[33m.[39mwide 
+[33m.[39micon[33m-[39mtext[33m-[39mcontainer{display[33m:[39mflex}[33m.[39mdropdown 
+[33m.[39mitem[33m.[39mwide [33m.[39micon[33m-[39mtext[33m-[39mcontainer 
+[33m.[39mtext{min[33m-[39mwidth[33m:[39m[35m120[39mpx}[33m.[39mdropdown [33m.[39mitem [33m.[39mshortcut{c
+olor[33m:[39m[33m#[39m[35m939393[39m[33m;[39malign[33m-[39mself[33m:[39mflex[33m-[39mend}[33m.[39mdropd
+own [33m.[39mitem [33m.[39mactive{background[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33m:[39m[35m20[39
+mpx[33m;[39mheight[33m:[39m[35m20[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mdropdown 
+[33m.[39mitem[33m:[39mfirst[33m-[39mchild{margin[33m-[39mtop[33m:[39m[35m8[39mpx}[33m.[39mdropdown 
+[33m.[39mitem[33m:[39mlast[33m-[39mchild{margin[33m-[39mbottom[33m:[39m[35m8[39mpx}[33m.[39mdropdown 
+[33m.[39mitem[33m:[39mhover{background[33m-[39mcolor[33m:[39m[33m#[39meee}[33m.[39mdropdown 
+[33m.[39mitem [33m.[39mtext{flex[33m-[39mgrow[33m:[39m[35m1[39m[33m;[39mmin[33m-[39mwidth[33m:[39m[35m
+150[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m20[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mdropdow
+n [33m.[39mitem [33m.[39micon{[33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m-
+[39mselect[33m:[39mnone[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m[33m%[39m[33m;[39mbackgrou
+nd[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mwidth
+[33m:[39m[35m20[39mpx[33m;[39mheight[33m:[39m[35m20[39mpx[33m;[39mmargin[33m-[39mright[33m:[39m[35m12
+[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m16[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mdropdown [
+33m.[39mdivider{background[33m-[39mcolor[33m:[39m[33m#[39meee[33m;[39mwidth[33m:[39mauto[33m;[39mheight[3
+3m:[39m[35m1[39mpx[33m;[39mmargin[33m:[39m[35m4[39mpx [35m8[39mpx}[33m@[39mmedia screen and (max[33m-[39
+mwidth[33m:[39m[35m1100[39mpx){[33m.[39mdropdown[33m-[39mbutton[33m-[39mtext{display[33m:[39mnone[33m![39
+mimportant}[33m.[39mdialog[33m-[39mdropdown[33m>[39m[33m.[39mdropdown[33m-[39mbutton[33m-[39mtext[33m,[39
+m[33m.[39mfont[33m-[39msize 
+[33m.[39mdropdown[33m-[39mbutton[33m-[39mtext[33m,[39m[33m.[39mcode[33m-[39mlanguage [33m.[39mdropdown[3
+3m-[39mbutton[33m-[39mtext{display[33m:[39mflex[33m![39mimportant}}[33m.[39micon[33m.[39mparagraph{backgroun
+d[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtext[33m-[39mparagraph[33m.[39msvg)}[33m.[39mico
+n[33m.[39mh1{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[39mh1[33m.[39msv
+g)}[33m.[39micon[33m.[39mh2{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[3
+9mh2[33m.[39msvg)}[33m.[39micon[33m.[39mh3{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/
+[39mtype[33m-[39mh3[33m.[39msvg)}[33m.[39micon[33m.[39mh4{background[33m-[39mimage[33m:[39murl(images[33m/
+[39micons[33m/[39mtype[33m-[39mh4[33m.[39msvg)}[33m.[39micon[33m.[39mh5{background[33m-[39mimage[33m:[39
+murl(images[33m/[39micons[33m/[39mtype[33m-[39mh5[33m.[39msvg)}[33m.[39micon[33m.[39mh6{background[33m-[3
+9mimage[33m:[39murl(images[33m/[39micons[33m/[39mtype[33m-[39mh6[33m.[39msvg)}[33m.[39micon[33m.[39mbulle
+t[33m-[39mlist[33m,[39m[33m.[39micon[33m.[39mbullet{background[33m-[39mimage[33m:[39murl(images[33m/[39mi
+cons[33m/[39mlist[33m-[39mul[33m.[39msvg)}[33m.[39micon[33m.[39mcheck[33m-[39mlist[33m,[39m[33m.[39mico
+n[33m.[39mcheck{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39msquare[33m-[39mcheck[33m
+.[39msvg)}[33m.[39micon[33m.[39mnumbered[33m-[39mlist[33m,[39m[33m.[39micon[33m.[39mnumber{background[33m
+-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mlist[33m-[39mol[33m.[39msvg)}[33m.[39micon[33m.[39mq
+uote{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mchat[33m-[39msquare[33m-[39mquote[3
+3m.[39msvg)}[33m.[39micon[33m.[39mcode{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mc
+ode[33m.[39msvg)}[33m.[39mswitches{z[33m-[39mindex[33m:[39m[35m6[39m[33m;[39manimation[33m:[39m[35m.4[3
+9ms slide[33m-[39m[36min[39m[33m;[39mposition[33m:[39mfixed[33m;[39mbottom[33m:[39m[35m70[39mpx[33m;[39
+mleft[33m:[39m[35m10[39mpx}[33m@[39mkeyframes slide[33m-[39m[36min[39m{[35m0[39m[33m%[39m{opacity[33m:[
+39m[35m0[39m[33m;[39mtransform[33m:[39mtranslate([33m-[39m[35m200[39mpx)}to{opacity[33m:[39m[35m1[39m[33
+m;[39mtransform[33m:[39mtranslate([35m0[39m)}}[33m.[39m[36mswitch[39m{color[33m:[39m[33m#[39m[35m444[39m
+[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39meeeeeeb3[33m;[39mborder[33m-[39mradius[33m:[39m[35m10
+[39mpx[33m;[39mmargin[33m:[39m[35m5[39mpx [35m0[39m[33m;[39mpadding[33m:[39m[35m5[39mpx [35m10[39mpx[
+33m;[39mdisplay[33m:[39mblock}[33m#[39mrich[33m-[39mtext[33m-[39m[36mswitch[39m{right[33m:[39m[35m0[39m}
+[33m#[39mcharacter[33m-[39mcount[33m-[39m[36mswitch[39m{right[33m:[39m[35m130[39mpx}[33m.[39m[36mswitch
+[39m label{vertical[33m-[39malign[33m:[39mmiddle[33m;[39mwidth[33m:[39m[35m100[39mpx[33m;[39mmargin[33m-[
+39mright[33m:[39m[35m5[39mpx[33m;[39mfont[33m-[39msize[33m:[39m[35m12[39mpx[33m;[39mline[33m-[39mheight
+[33m:[39m[35m14[39mpx[33m;[39mdisplay[33m:[39minline[33m-[39mblock}[33m.[39m[36mswitch[39m button{box[33
+m-[39msizing[33m:[39mborder[33m-[39mbox[33m;[39mvertical[33m-[39malign[33m:[39mmiddle[33m;[39mcursor[33m:
+[39mpointer[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39mced0d4[33m;[39mborder[33m:[39m[35m2[39mpx 
+solid [33m#[39m[35m0000[39m[33m;[39mborder[33m-[39mradius[33m:[39m[35m12[39mpx[33m;[39moutline[33m:[39m
+none[33m;[39mwidth[33m:[39m[35m44[39mpx[33m;[39mheight[33m:[39m[35m24[39mpx[33m;[39mtransition[33m:[39m
+background[33m-[39mcolor [35m.1[39ms[33m;[39mdisplay[33m:[39minline[33m-[39mblock[33m;[39mposition[33m:[3
+9mrelative}[33m.[39m[36mswitch[39m button[33m:[39mfocus[33m-[39mvisible{border[33m-[39mcolor[33m:[39m[33m#
+[39m[35m00[39mf}[33m.[39m[36mswitch[39m button span{background[33m-[39mcolor[33m:[39m[33m#[39mfff[33m;[3
+9mborder[33m-[39mradius[33m:[39m[35m12[39mpx[33m;[39mwidth[33m:[39m[35m20[39mpx[33m;[39mheight[33m:[39m
+[35m20[39mpx[33m;[39mtransition[33m:[39mtransform [35m.2[39ms[33m;[39mdisplay[33m:[39mblock[33m;[39mposit
+ion[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m0[39m[33m;[39mleft[33m:[39m[35m0[39m}[33m.[39m[36mswitch
+[39m button[aria[33m-[39mchecked[33m=[39m[36mtrue[39m]{background[33m-[39mcolor[33m:[39m[33m#[39m[35m1877
+[39mf2}[33m.[39m[36mswitch[39m button[aria[33m-[39mchecked[33m=[39m[36mtrue[39m] 
+span{transform[33m:[39mtranslate([35m20[39mpx)}[33m.[39meditor[33m-[39mshell span[33m.[39meditor[33m-[39mim
+age{cursor[33m:[39m[36mdefault[39m[33m;[39m[33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;
+[39muser[33m-[39mselect[33m:[39mnone[33m;[39mdisplay[33m:[39minline[33m-[39mblock[33m;[39mposition[33m:[
+39mrelative[33m;[39moverflow[33m:[39mhidden}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage img
+{cursor[33m:[39m[36mdefault[39m[33m;[39mmax[33m-[39mwidth[33m:[39m[35m100[39m[33m%[39m}[33m.[39meditor
+[33m-[39mshell [33m.[39meditor[33m-[39mimage img[33m.[39mfocused{[33m-[39mwebkit[33m-[39muser[33m-[39msele
+ct[33m:[39mnone[33m;[39muser[33m-[39mselect[33m:[39mnone[33m;[39moutline[33m:[39m[35m2[39mpx solid 
+[33m#[39m[35m3[39mc84f4}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage 
+img[33m.[39mfocused[33m.[39mdraggable{cursor[33m:[39mgrab}[33m.[39meditor[33m-[39mshell 
+[33m.[39meditor[33m-[39mimage 
+img[33m.[39mfocused[33m.[39mdraggable[33m:[39mactive{cursor[33m:[39mgrabbing}[33m.[39meditor[33m-[39mshell 
+[33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mcaption[33m-[39mcontainer [33m.[39mtree[33m-[39mview
+[33m-[39moutput{border[33m-[39mradius[33m:[39m[35m0[39m[33m;[39mmargin[33m:[39m[35m0[39m}[33m.[39medito
+r[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mcaption[33m-[39mcontainer{color[33m:
+[39m[33m#[39m[35m000[39m[33m;[39mbox[33m-[39msizing[33m:[39mborder[33m-[39mbox[33m;[39mword[33m-[39mwra
+p[33m:[39m[36mbreak[39m[33m-[39mword[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39mffffffe6[33m;[39
+mborder[33m-[39mtop[33m:[39m[35m1[39mpx solid [33m#[39mfff[33m;[39mmin[33m-[39mwidth[33m:[39m[35m100[39
+mpx[33m;[39mmax[33m-[39mwidth[33m:[39m[35m100[39m[33m%[39m[33m;[39mmargin[33m:[39m[35m0[39m[33m;[39mp
+adding[33m:[39m[35m0[39m[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mabsolute[33m;[39mbottom[
+33m:[39m[35m4[39mpx[33m;[39mleft[33m:[39m[35m0[39m[33m;[39mright[33m:[39m[35m0[39m[33m;[39moverflow[3
+3m:[39mhidden}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mcaption[
+33m-[39mbutton{color[33m:[39m[33m#[39mfff[33m;[39mcursor[33m:[39mpointer[33m;[39m[33m-[39mwebkit[33m-[39
+muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m-[39mselect[33m:[39mnone[33m;[39mbackground[33m-[39mcol
+or[33m:[39m[33m#[39m[35m00000080[39m[33m;[39mborder[33m:[39m[35m1[39mpx solid [33m#[39mffffff4d[33m;[39
+mborder[33m-[39mradius[33m:[39m[35m5[39mpx[33m;[39mwidth[33m:[39m[35m30[39m[33m%[39m[33m;[39mmin[33m-
+[39mwidth[33m:[39m[35m100[39mpx[33m;[39mmargin[33m:[39m[35m0[39m auto[33m;[39mpadding[33m:[39m[35m10[39
+mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mabsolute[33m;[39mbottom[33m:[39m[35m20[39mpx[
+33m;[39mleft[33m:[39m[35m0[39m[33m;[39mright[33m:[39m[35m0[39m}[33m.[39meditor[33m-[39mshell 
+[33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mcaption[33m-[39mbutton[33m:[39mhover{background[33m-
+[39mcolor[33m:[39m[33m#[39m[35m3[39mc84f480}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage 
+[33m.[39mimage[33m-[39medit[33m-[39mbutton{vertical[33m-[39malign[33m:[39m[33m-[39m[35m.25[39mem[33m;[39
+mcursor[33m:[39mpointer[33m;[39m[33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33
+m-[39mselect[33m:[39mnone[33m;[39mbackground[33m-[39mimage[33m:[39murl([33m/[39msrc[33m/[39mimages[33m/[
+39micons[33m/[39mpencil[33m-[39mfill[33m.[39msvg)[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m
+[33m%[39m[33m;[39mbackground[33m-[39mrepeat[33m:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m
+:[39m[35m16[39mpx[33m;[39mborder[33m:[39m[35m1[39mpx solid [33m#[39m[35m0000004[39md[33m;[39mborder[33m
+-[39mradius[33m:[39m[35m5[39mpx[33m;[39mwidth[33m:[39m[35m35[39mpx[33m;[39mheight[33m:[39m[35m35[39mpx
+[33m;[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m4[39mpx[33m;[39mright[33m:[39m[35m4[39mpx}[
+33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39medit[33m-[39mbutton[33m
+:[39mhover{background[33m-[39mcolor[33m:[39m[33m#[39m[35m3[39mc84f41a}[33m.[39meditor[33m-[39mshell 
+[33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer{background[33m-[39mcolor[33m:[39m[33m#[39m[
+35m3[39mc84f4[33m;[39mborder[33m:[39m[35m1[39mpx solid [33m#[39mfff[33m;[39mwidth[33m:[39m[35m7[39mpx[3
+3m;[39mheight[33m:[39m[35m7[39mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mabsolute}[33m.[
+39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer[33m.[39mimage[33m-[3
+9mresizer[33m-[39mn{cursor[33m:[39mn[33m-[39mresize[33m;[39mtop[33m:[39m[33m-[39m[35m6[39mpx[33m;[39mle
+ft[33m:[39m[35m48[39m[33m%[39m}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mima
+ge[33m-[39mresizer[33m.[39mimage[33m-[39mresizer[33m-[39mne{cursor[33m:[39mne[33m-[39mresize[33m;[39mtop
+[33m:[39m[33m-[39m[35m6[39mpx[33m;[39mright[33m:[39m[33m-[39m[35m6[39mpx}[33m.[39meditor[33m-[39mshell
+ [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer[33m.[39mimage[33m-[39mresizer[33m-[39me{cur
+sor[33m:[39me[33m-[39mresize[33m;[39mbottom[33m:[39m[35m48[39m[33m%[39m[33m;[39mright[33m:[39m[33m-[3
+9m[35m6[39mpx}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer
+[33m.[39mimage[33m-[39mresizer[33m-[39mse{cursor[33m:[39mnwse[33m-[39mresize[33m;[39mbottom[33m:[39m[33m-
+[39m[35m2[39mpx[33m;[39mright[33m:[39m[33m-[39m[35m6[39mpx}[33m.[39meditor[33m-[39mshell 
+[33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer[33m.[39mimage[33m-[39mresizer[33m-[39ms{curs
+or[33m:[39ms[33m-[39mresize[33m;[39mbottom[33m:[39m[33m-[39m[35m2[39mpx[33m;[39mleft[33m:[39m[35m48[3
+9m[33m%[39m}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer[3
+3m.[39mimage[33m-[39mresizer[33m-[39msw{cursor[33m:[39msw[33m-[39mresize[33m;[39mbottom[33m:[39m[33m-[39
+m[35m2[39mpx[33m;[39mleft[33m:[39m[33m-[39m[35m6[39mpx}[33m.[39meditor[33m-[39mshell 
+[33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer[33m.[39mimage[33m-[39mresizer[33m-[39mw{curs
+or[33m:[39mw[33m-[39mresize[33m;[39mbottom[33m:[39m[35m48[39m[33m%[39m[33m;[39mleft[33m:[39m[33m-[39m
+[35m6[39mpx}[33m.[39meditor[33m-[39mshell [33m.[39meditor[33m-[39mimage [33m.[39mimage[33m-[39mresizer[3
+3m.[39mimage[33m-[39mresizer[33m-[39mnw{cursor[33m:[39mnw[33m-[39mresize[33m;[39mtop[33m:[39m[33m-[39m[
+35m6[39mpx[33m;[39mleft[33m:[39m[33m-[39m[35m6[39mpx}[33m.[39memoji{color[33m:[39m[33m#[39m[35m0000[39
+m[33m;[39mcaret[33m-[39mcolor[33m:[39m[33m#[39m[35m050505[39m[33m;[39mvertical[33m-[39malign[33m:[39mmi
+ddle[33m;[39mbackground[33m-[39mposition[33m:[39m[35m50[39m[33m%[39m[33m;[39mbackground[33m-[39mrepeat[3
+3m:[39mno[33m-[39mrepeat[33m;[39mbackground[33m-[39msize[33m:[39m[35m16[39mpx 
+[35m16[39mpx[33m;[39mmargin[33m:[39m[35m0[39m 
+[33m-[39m[35m1[39mpx}[33m.[39memoji[33m-[39minner{padding[33m:[39m[35m0[39m [35m.15[39mem}[33m.[39memoj
+i[33m-[39minner[33m:[39m[33m:[39mselection{color[33m:[39m[33m#[39m[35m0000[39m[33m;[39mbackground[33m-[
+39mcolor[33m:[39m[33m#[39m[35m96969666[39m}[33m.[39memoji[33m-[39minner[33m:[39m[33m:[39mmoz[33m-[39mse
+lection{color[33m:[39m[33m#[39m[35m0000[39m[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39m[35m969696
+66[39m}[33m.[39memoji[33m.[39mhappysmile{background[33m-[39mimage[33m:[39murl(images[33m/[39memoji[33m/[39
+m[35m1[39m[33mF642[39m[33m.[39mpng)}[33m.[39memoji[33m.[39mveryhappysmile{background[33m-[39mimage[33m:[3
+9murl(images[33m/[39memoji[33m/[39m[35m1[39m[33mF600[39m[33m.[39mpng)}[33m.[39memoji[33m.[39munhappysmile
+{background[33m-[39mimage[33m:[39murl(images[33m/[39memoji[33m/[39m[35m1[39m[33mF641[39m[33m.[39mpng)}[3
+3m.[39memoji[33m.[39mheart{background[33m-[39mimage[33m:[39murl(images[33m/[39memoji[33m/[39m[35m2764.[39m
+png)}[33m.[39mkeyword{color[33m:[39m[33m#[39mf1765e[33m;[39mfont[33m-[39mweight[33m:[39m[35m700[39m}[33m
+.[39mactions{text[33m-[39malign[33m:[39mright[33m;[39mmargin[33m:[39m[35m10[39mpx[33m;[39mposition[33m:[
+39mabsolute[33m;[39mbottom[33m:[39m[35m0[39m[33m;[39mright[33m:[39m[35m0[39m}[33m.[39mactions[33m.[39mt
+ree[33m-[39mview{border[33m-[39mbottom[33m-[39mright[33m-[39mradius[33m:[39m[35m0[39m[33m;[39mborder[33m
+-[39mbottom[33m-[39mleft[33m-[39mradius[33m:[39m[35m0[39m}[33m.[39mactions i{vertical[33m-[39malign[33m:
+[39m[33m-[39m[35m.25[39mem[33m;[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33m:[39m[35m15
+[39mpx[33m;[39mheight[33m:[39m[35m15[39mpx[33m;[39mdisplay[33m:[39minline[33m-[39mblock}[33m.[39mactions 
+i[33m.[39mindent{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mindent[33m.[39msvg)}[33
+m.[39mactions i[33m.[39moutdent{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39moutdent[3
+3m.[39msvg)}[33m.[39mactions i[33m.[39mlock{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/
+[39mlock[33m-[39mfill[33m.[39msvg)}[33m.[39mactions i[33m.[39mimage{background[33m-[39mimage[33m:[39murl(im
+ages[33m/[39micons[33m/[39mfile[33m-[39mimage[33m.[39msvg)}[33m.[39mactions i[33m.[39mtable{background[33m
+-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtable[33m.[39msvg)}[33m.[39mactions i[33m.[39munlock{b
+ackground[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mlock[33m.[39msvg)}[33m.[39mactions i[33m.
+[39mleft[33m-[39malign{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtext[33m-[39mleft
+[33m.[39msvg)}[33m.[39mactions i[33m.[39mcenter[33m-[39malign{background[33m-[39mimage[33m:[39murl(images[
+33m/[39micons[33m/[39mtext[33m-[39mcenter[33m.[39msvg)}[33m.[39mactions i[33m.[39mright[33m-[39malign{back
+ground[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mtext[33m-[39mright[33m.[39msvg)}[33m.[39mac
+tions i[33m.[39mjustify[33m-[39malign{background[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mjus
+tify[33m.[39msvg)}[33m.[39mactions i[33m.[39mdisconnect{background[33m-[39mimage[33m:[39murl(images[33m/[39
+micons[33m/[39mplug[33m.[39msvg)}[33m.[39mactions i[33m.[39mconnect{background[33m-[39mimage[33m:[39murl(im
+ages[33m/[39micons[33m/[39mplug[33m-[39mfill[33m.[39msvg)}[33m.[39mactions i[33m.[39mversions{background[3
+3m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mclock[33m-[39mhistory[33m.[39msvg)}[33m.[39mtable[3
+3m-[39mcell[33m-[39maction[33m-[39mbutton[33m-[39mcontainer{z[33m-[39mindex[33m:[39m[35m3[39m[33m;[39mwi
+ll[33m-[39mchange[33m:[39mtransform[33m;[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m0[39m[33m;
+[39mleft[33m:[39m[35m0[39m}[33m.[39mtable[33m-[39mcell[33m-[39maction[33m-[39mbutton[33m-[39mcontainer[
+33m.[39mtable[33m-[39mcell[33m-[39maction[33m-[39mbutton[33m-[39mcontainer[33m--[39mactive{pointer[33m-[39
+mevents[33m:[39mauto[33m;[39mopacity[33m:[39m[35m1[39m}[33m.[39mtable[33m-[39mcell[33m-[39maction[33m-[
+39mbutton[33m-[39mcontainer[33m.[39mtable[33m-[39mcell[33m-[39maction[33m-[39mbutton[33m-[39mcontainer[33m
+--[39minactive{pointer[33m-[39mevents[33m:[39mnone[33m;[39mopacity[33m:[39m[35m0[39m}[33m.[39mtable[33m-
+[39mcell[33m-[39maction[33m-[39mbutton{color[33m:[39m[33m#[39m[35m222[39m[33m;[39mcursor[33m:[39mpointer
+[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mborder[33m-[39mradius[33m:[39m[35m15[39mpx[33m;[39mjustify[33
+m-[39mcontent[33m:[39mcenter[33m;[39malign[33m-[39mitems[33m:[39mcenter[33m;[39mdisplay[33m:[39minline[33
+m-[39mblock[33m;[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m10[39mpx[33m;[39mright[33m:[39m[3
+5m10[39mpx}i[33m.[39mchevron[33m-[39mdown{background[33m-[39mcolor[33m:[39m[33m#[39m[35m0000[39m[33m;[39
+mbackground[33m-[39mimage[33m:[39murl(images[33m/[39micons[33m/[39mchevron[33m-[39mdown[33m.[39msvg)[33m;
+[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33m:[39m[35m8[39mpx[33m;[39mheight[33m:[39m[35
+m8[39mpx[33m;[39mdisplay[33m:[39minline[33m-[39mblock}[33m.[39maction[33m-[39mbutton{color[33m:[39m[33m#
+[39m[35m222[39m[33m;[39mcursor[33m:[39mpointer[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39meee[33m
+;[39mborder[33m:[39m[35m0[39m[33m;[39mborder[33m-[39mradius[33m:[39m[35m15[39mpx[33m;[39mmargin[33m-[3
+9mleft[33m:[39m[35m5[39mpx[33m;[39mpadding[33m:[39m[35m8[39mpx [35m12[39mpx[33m;[39mdisplay[33m:[39minl
+ine[33m-[39mblock[33m;[39mposition[33m:[39mrelative}[33m.[39maction[33m-[39mbutton[33m:[39mhover{color[33m
+:[39m[33m#[39m[35m000[39m[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39mddd}[33m.[39maction[33m-[3
+9mbutton[33m-[39mmic[33m.[39mactive{animation[33m:[39m[35m3[39ms infinite mic[33m-[39mpulsate[33m-[39mcolor
+}button[33m.[39maction[33m-[39mbutton[33m:[39mdisabled{opacity[33m:[39m[35m.6[39m[33m;[39mcursor[33m:[39m
+not[33m-[39mallowed[33m;[39mbackground[33m:[39m[33m#[39meee}[33m@[39mkeyframes mic[33m-[39mpulsate[33m-[3
+9mcolor{[35m0[39m[33m%[39m{background[33m-[39mcolor[33m:[39m[33m#[39mffdcdc}[35m50[39m[33m%[39m{backgroun
+d[33m-[39mcolor[33m:[39m[33m#[39mff8585}to{background[33m-[39mcolor[33m:[39m[33m#[39mffdcdc}}[33m.[39mdeb
+ug[33m-[39mtimetravel[33m-[39mpanel{margin[33m:[39mauto[33m;[39mpadding[33m:[39m[35m0[39m [35m0[39m [35m
+10[39mpx[33m;[39mdisplay[33m:[39mflex[33m;[39moverflow[33m:[39mhidden}[33m.[39mdebug[33m-[39mtimetravel[3
+3m-[39mpanel[33m-[39mslider{flex[33m:[39m[35m8[39m[33m;[39mpadding[33m:[39m[35m0[39m}[33m.[39mdebug[33m
+-[39mtimetravel[33m-[39mpanel[33m-[39mbutton{color[33m:[39m[33m#[39mfff[33m;[39mbackground[33m:[39m[35m0
+[39m [35m0[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mflex[33m:[39m[35m1[39m[33m;[39mpadding[33m:[3
+9m[35m0[39m[33m;[39mfont[33m-[39msize[33m:[39m[35m12[39mpx}[33m.[39mdebug[33m-[39mtimetravel[33m-[39mpa
+nel[33m-[39mbutton[33m:[39mhover{text[33m-[39mdecoration[33m:[39munderline}[33m.[39mdebug[33m-[39mtimetrave
+l[33m-[39mbutton{color[33m:[39m[33m#[39mfff[33m;[39mbackground[33m:[39m[35m0[39m [35m0[39m[33m;[39mbord
+er[33m:[39m[35m0[39m[33m;[39mpadding[33m:[39m[35m0[39m[33m;[39mfont[33m-[39msize[33m:[39m[35m12[39mpx
+[33m;[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m10[39mpx[33m;[39mright[33m:[39m[35m15[39mpx}
+[33m.[39mdebug[33m-[39mtimetravel[33m-[39mbutton[33m:[39mhover{text[33m-[39mdecoration[33m:[39munderline}[
+33m.[39mdebug[33m-[39mtreetype[33m-[39mbutton{color[33m:[39m[33m#[39mfff[33m;[39mbackground[33m:[39m[35m0
+[39m [35m0[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mpadding[33m:[39m[35m0[39m[33m;[39mfont[33m-[
+39msize[33m:[39m[35m12[39mpx[33m;[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m10[39mpx[33m;[39
+mright[33m:[39m[35m85[39mpx}[33m.[39mdebug[33m-[39mtreetype[33m-[39mbutton[33m:[39mhover{text[33m-[39mdec
+oration[33m:[39munderline}[33m.[39mconnecting{color[33m:[39m[33m#[39m[35m999[39m[33m;[39mtext[33m-[39move
+rflow[33m:[39mellipsis[33m;[39m[33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m
+-[39mselect[33m:[39mnone[33m;[39mwhite[33m-[39mspace[33m:[39mnowrap[33m;[39mpointer[33m-[39mevents[33m:[
+39mnone[33m;[39mfont[33m-[39msize[33m:[39m[35m15[39mpx[33m;[39mdisplay[33m:[39minline[33m-[39mblock[33m;
+[39mposition[33m:[39mabsolute[33m;[39mtop[33m:[39m[35m10[39mpx[33m;[39mleft[33m:[39m[35m10[39mpx[33m;[
+39moverflow[33m:[39mhidden}[33m.[39mtoolbar{vertical[33m-[39malign[33m:[39mmiddle[33m;[39mz[33m-[39mindex[
+33m:[39m[35m20[39m[33m;[39mbackground[33m:[39m[33m#[39mfff[33m;[39mborder[33m-[39mtop[33m-[39mleft[33m-
+[39mradius[33m:[39m[35m10[39mpx[33m;[39mborder[33m-[39mtop[33m-[39mright[33m-[39mradius[33m:[39m[35m10
+[39mpx[33m;[39mheight[33m:[39m[35m36[39mpx[33m;[39mmargin[33m-[39mbottom[33m:[39m[35m1[39mpx[33m;[39mpa
+dding[33m:[39m[35m4[39mpx[33m;[39mdisplay[33m:[39mflex[33m;[39mposition[33m:[39msticky[33m;[39mtop[33m:
+[39m[35m0[39m[33m;[39moverflow[33m:[39mauto hidden}[33m.[39mtoolbar 
+[33m.[39mtoolbar[33m-[39mitem[33m:[39mfocus{outline[33m:[39m[35m2[39mpx solid [33m#[39m[35m3[39mc84f4}but
+ton[33m.[39mtoolbar[33m-[39mitem{cursor[33m:[39mpointer[33m;[39mvertical[33m-[39malign[33m:[39mmiddle[33m;
+[39mbackground[33m:[39m[35m0[39m [35m0[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mborder[33m-[39mrad
+ius[33m:[39m[35m10[39mpx[33m;[39mflex[33m-[39mshrink[33m:[39m[35m0[39m[33m;[39mjustify[33m-[39mcontent
+[33m:[39mspace[33m-[39mbetween[33m;[39malign[33m-[39mitems[33m:[39mcenter[33m;[39mpadding[33m:[39m[35m8[
+39mpx[33m;[39mdisplay[33m:[39mflex}button[33m.[39mtoolbar[33m-[39mitem[33m:[39mdisabled{cursor[33m:[39mnot
+[33m-[39mallowed}button[33m.[39mtoolbar[33m-[39mitem[33m.[39mspaced{margin[33m-[39mright[33m:[39m[35m2[39m
+px}button[33m.[39mtoolbar[33m-[39mitem i[33m.[39mformat{vertical[33m-[39malign[33m:[39m[33m-[39m[35m.25[3
+9mem[33m;[39mopacity[33m:[39m[35m.6[39m[33m;[39mbackground[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33
+m:[39m[35m18[39mpx[33m;[39mheight[33m:[39m[35m18[39mpx[33m;[39mdisplay[33m:[39mflex}button[33m.[39mtoolb
+ar[33m-[39mitem[33m:[39mdisabled 
+[33m.[39micon[33m,[39mbutton[33m.[39mtoolbar[33m-[39mitem[33m:[39mdisabled 
+[33m.[39mtext[33m,[39mbutton[33m.[39mtoolbar[33m-[39mitem[33m:[39mdisabled 
+i[33m.[39mformat[33m,[39mbutton[33m.[39mtoolbar[33m-[39mitem[33m:[39mdisabled [33m.[39mchevron[33m-[39mdo
+wn{opacity[33m:[39m[35m.2[39m}button[33m.[39mtoolbar[33m-[39mitem[33m.[39mactive{background[33m-[39mcolor[
+33m:[39m[33m#[39mdfe8fa4d}button[33m.[39mtoolbar[33m-[39mitem[33m.[39mactive i{opacity[33m:[39m[35m1[39m}
+[33m.[39mtoolbar[33m-[39mitem[33m:[39mhover[33m:[39mnot([disabled]){background[33m-[39mcolor[33m:[39m[33m#
+[39meee}[33m.[39mtoolbar[33m-[39mitem[33m.[39mfont[33m-[39mfamily 
+[33m.[39mtext{max[33m-[39mwidth[33m:[39m[35m40[39mpx[33m;[39mdisplay[33m:[39mblock}[33m.[39mtoolbar 
+[33m.[39mcode[33m-[39mlanguage{width[33m:[39m[35m150[39mpx}[33m.[39mtoolbar 
+[33m.[39mtoolbar[33m-[39mitem [33m.[39mtext{vertical[33m-[39malign[33m:[39mmiddle[33m;[39mcolor[33m:[39m
+[33m#[39m[35m777[39m[33m;[39mtext[33m-[39moverflow[33m:[39mellipsis[33m;[39mtext[33m-[39malign[33m:[39ml
+eft[33m;[39mheight[33m:[39m[35m20[39mpx[33m;[39mpadding[33m-[39mright[33m:[39m[35m10[39mpx[33m;[39mfont
+[33m-[39msize[33m:[39m[35m14[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m20[39mpx[33m;[39mdisplay[33
+m:[39mflex[33m;[39moverflow[33m:[39mhidden}[33m.[39mtoolbar [33m.[39mtoolbar[33m-[39mitem [33m.[39micon{[
+33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m-[39mselect[33m:[39mnone[33m;[39
+mbackground[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33m:[39m[35m20[39mpx[33m;[39mheight[33m:[39m[35m2
+0[39mpx[33m;[39mmargin[33m-[39mright[33m:[39m[35m8[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m16[39
+mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mtoolbar 
+i[33m.[39mchevron[33m-[39mdown[33m,[39m[33m.[39mtoolbar[33m-[39mitem i[33m.[39mchevron[33m-[39mdown{[33m
+-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m-[39mselect[33m:[39mnone[33m;[39mwi
+dth[33m:[39m[35m16[39mpx[33m;[39mheight[33m:[39m[35m16[39mpx[33m;[39mmargin[33m-[39mtop[33m:[39m[35m3
+[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mtoolbar i[33m.[39mchevron[33m-[39mdown[33m.[39minside{pointer
+[33m-[39mevents[33m:[39mnone[33m;[39mwidth[33m:[39m[35m16[39mpx[33m;[39mheight[33m:[39m[35m16[39mpx[33m
+;[39mmargin[33m-[39mtop[33m:[39m[35m11[39mpx[33m;[39mmargin[33m-[39mleft[33m:[39m[33m-[39m[35m25[39mpx
+[33m;[39mmargin[33m-[39mright[33m:[39m[35m10[39mpx[33m;[39mdisplay[33m:[39mflex}[33m.[39mtoolbar [33m.[
+39mdivider{background[33m-[39mcolor[33m:[39m[33m#[39meee[33m;[39mwidth[33m:[39m[35m1[39mpx[33m;[39mmargin
+[33m:[39m[35m0[39m [35m4[39mpx}[33m.[39msticky[33m-[39mnote[33m-[39mcontainer{z[33m-[39mindex[33m:[39m
+[35m9[39m[33m;[39mwidth[33m:[39m[35m120[39mpx[33m;[39mdisplay[33m:[39minline[33m-[39mblock[33m;[39mposit
+ion[33m:[39mabsolute}[33m.[39msticky[33m-[39mnote{text[33m-[39malign[33m:[39mleft[33m;[39mcursor[33m:[39m
+move[33m;[39mborder[33m:[39m[35m1[39mpx solid 
+[33m#[39me8e8e8[33m;[39mborder[33m-[39mbottom[33m-[39mright[33m-[39mradius[33m:[39m[35m60[39mpx [35m5[3
+9mpx[33m;[39mwidth[33m:[39m[35m120[39mpx[33m;[39mmargin[33m:[39m[35m25[39mpx[33m;[39mpadding[33m:[39m[
+35m20[39mpx [35m10[39mpx[33m;[39mfont[33m-[39mfamily[33m:[39m[33mReenie[39m [33mBeanie[39m[33m;[39mfont
+[33m-[39msize[33m:[39m[35m24[39mpx[33m;[39mline[33m-[39mheight[33m:[39m[35m1[39m[33m;[39mdisplay[33m:[
+39mblock[33m;[39mposition[33m:[39mrelative}[33m.[39msticky[33m-[39mnote[33m:[39mafter{content[33m:[39m[32m
+""[39m[33m;[39mz[33m-[39mindex[33m:[39m[33m-[39m[35m1[39m[33m;[39mbackground[33m:[39m[33m#[39m[35m000
+3[39m[33m;[39mwidth[33m:[39m[35m120[39mpx[33m;[39mheight[33m:[39m[35m25[39mpx[33m;[39mposition[33m:[39
+mabsolute[33m;[39mbottom[33m:[39m[35m20[39mpx[33m;[39mright[33m:[39m[35m0[39m[33m;[39mtransform[33m:[39
+mmatrix([33m-[39m[35m1[39m[33m,[39m[33m-[39m[35m.1[39m[33m,[39m[35m0[39m[33m,[39m[35m1[39m[33m,[39m
+[35m0[39m[33m,[39m[35m0[39m)[33m;[39mbox[33m-[39mshadow[33m:[39m[35m2[39mpx [35m15[39mpx [35m5[39mpx 
+[33m#[39m[35m0006[39m}[33m.[39msticky[33m-[39mnote[33m.[39myellow{background[33m:[39mlinear[33m-[39mgradi
+ent([35m135[39mdeg[33m,[39m[33m#[39mff8 [35m81[39m[33m%[39m [35m82[39m[33m%[39m[33m,[39m[33m#[39mff8 
+[35m82[39m[33m%[39m[33m,[39m[33m#[39mffffc6 
+[35m100[39m[33m%[39m)[33m;[39mborder[33m-[39mtop[33m:[39m[35m1[39mpx solid [33m#[39mfdfd86}[33m.[39msti
+cky[33m-[39mnote[33m.[39mpink{background[33m:[39mlinear[33m-[39mgradient([35m135[39mdeg[33m,[39m[33m#[39m
+f7cbe8 [35m81[39m[33m%[39m [35m82[39m[33m%[39m[33m,[39m[33m#[39mf7cbe8 
+[35m82[39m[33m%[39m[33m,[39m[33m#[39me7bfe1 
+[35m100[39m[33m%[39m)[33m;[39mborder[33m-[39mtop[33m:[39m[35m1[39mpx solid [33m#[39me7d1e4}[33m.[39msti
+cky[33m-[39mnote[33m-[39mcontainer[33m.[39mdragging{transition[33m:[39mnone[33m![39mimportant}[33m.[39mstic
+ky[33m-[39mnote div{cursor[33m:[39mtext}[33m.[39msticky[33m-[39mnote [33m.[39m[36mdelete[39m{cursor[33m:[
+39mpointer[33m;[39mopacity[33m:[39m[35m.5[39m[33m;[39mbackground[33m:[39m[35m0[39m [35m0[39m[33m;[39mbo
+rder[33m:[39m[35m0[39m[33m;[39mfont[33m-[39msize[33m:[39m[35m10[39mpx[33m;[39mposition[33m:[39mabsolute
+[33m;[39mtop[33m:[39m[35m8[39mpx[33m;[39mright[33m:[39m[35m10[39mpx}[33m.[39msticky[33m-[39mnote [33m.
+[39m[36mdelete[39m[33m:[39mhover{opacity[33m:[39m[35m1[39m[33m;[39mfont[33m-[39mweight[33m:[39m[35m700
+[39m}[33m.[39msticky[33m-[39mnote [33m.[39mcolor{cursor[33m:[39mpointer[33m;[39mopacity[33m:[39m[35m.5[39
+m[33m;[39mbackground[33m:[39m[35m0[39m [35m0[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mposition[33m
+:[39mabsolute[33m;[39mtop[33m:[39m[35m8[39mpx[33m;[39mright[33m:[39m[35m25[39mpx}[33m.[39msticky[33m-[
+39mnote [33m.[39mcolor[33m:[39mhover{opacity[33m:[39m[35m1[39m}[33m.[39msticky[33m-[39mnote 
+[33m.[39mcolor i{background[33m-[39msize[33m:[39mcontain[33m;[39mwidth[33m:[39m[35m12[39mpx[33m;[39mheigh
+t[33m:[39m[35m12[39mpx[33m;[39mdisplay[33m:[39mblock}[33m.[39mexcalidraw[33m-[39mbutton{background[33m-[3
+9mcolor[33m:[39m[33m#[39m[35m0000[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39mmargin[33m:[39m[35m0[3
+9m[33m;[39mpadding[33m:[39m[35m0[39m}[33m.[39mexcalidraw[33m-[39mbutton[33m.[39mselected{[33m-[39mwebkit
+[33m-[39muser[33m-[39mselect[33m:[39mnone[33m;[39muser[33m-[39mselect[33m:[39mnone[33m;[39moutline[33m:[
+39m[35m2[39mpx solid [33m#[39m[35m3[39mc84f4}[33m.[39mgithub[33m-[39mcorner[33m:[39mhover 
+[33m.[39mocto[33m-[39marm{animation[33m:[39m[35m.56[39ms ease[33m-[39m[36min[39m[33m-[39mout 
+octocat[33m-[39mwave}[33m@[39mkeyframes octocat[33m-[39mwave{[35m0[39m[33m%[39m[33m,[39mto{transform[33m:
+[39mrotate([35m0[39m)}[35m20[39m[33m%[39m[33m,[39m[35m60[39m[33m%[39m{transform[33m:[39mrotate([33m-[39
+m[35m25[39mdeg)}[35m40[39m[33m%[39m[33m,[39m[35m80[39m[33m%[39m{transform[33m:[39mrotate([35m10[39mdeg)
+}}[33m@[39mmedia (max[33m-[39mwidth[33m:[39m[35m500[39mpx){[33m.[39mgithub[33m-[39mcorner[33m:[39mhover 
+[33m.[39mocto[33m-[39marm{animation[33m:[39mnone}[33m.[39mgithub[33m-[39mcorner 
+[33m.[39mocto[33m-[39marm{animation[33m:[39m[35m.56[39ms ease[33m-[39m[36min[39m[33m-[39mout octocat[33m
+-[39mwave}}[33m.[39mspacer{letter[33m-[39mspacing[33m:[39m[33m-[39m[35m2[39mpx}[33m.[39meditor[33m-[39me
+quation{cursor[33m:[39m[36mdefault[39m[33m;[39m[33m-[39mwebkit[33m-[39muser[33m-[39mselect[33m:[39mnone[
+33m;[39muser[33m-[39mselect[33m:[39mnone}[33m.[39meditor[33m-[39mequation[33m.[39mfocused{outline[33m:[39m
+[35m2[39mpx solid [33m#[39m[35m3[39mc84f4}button[33m.[39mitem i{opacity[33m:[39m[35m.6[39m}button[33m.[39
+mitem[33m.[39mdropdown[33m-[39mitem[33m-[39mactive{background[33m-[39mcolor[33m:[39m[33m#[39mdfe8fa4d}butto
+n[33m.[39mitem[33m.[39mdropdown[33m-[39mitem[33m-[39mactive i{opacity[33m:[39m[35m1[39m}[33m.[39m[33mTab
+leNode__contentEditable[39m{resize[33m:[39mnone[33m;[39mcursor[33m:[39mtext[33m;[39m[33m-[39mwebkit[33m-[3
+9muser[33m-[39mselect[33m:[39mtext[33m;[39muser[33m-[39mselect[33m:[39mtext[33m;[39mwhite[33m-[39mspace[
+33m:[39mpre[33m-[39mwrap[33m;[39mword[33m-[39m[36mbreak[39m[33m:[39m[36mbreak[39m[33m-[39mword[33m;[39
+mz[33m-[39mindex[33m:[39m[35m3[39m[33m;[39mborder[33m:[39m[35m0[39m[33m;[39moutline[33m:[39m[35m0[39m
+[33m;[39mmin[33m-[39mheight[33m:[39m[35m20[39mpx[33m;[39mpadding[33m:[39m[35m0[39m[33m;[39mfont[33m-[
+39msize[33m:[39m[35m15[39mpx[33m;[39mdisplay[33m:[39mblock[33m;[39mposition[33m:[39mrelative}[33m.[39mdia
+log[33m-[39mdropdown{width[33m:[39m[35m100[39m[33m%[39m[33m;[39mmargin[33m-[39mbottom[33m:[39m[35m10[39
+mpx[33m;[39mbackground[33m-[39mcolor[33m:[39m[33m#[39meee[33m![39mimportant}[33m.[39mtoolbar [33m.[39mblo
+ck[33m-[39mcontrols{align[33m-[39mitems[33m:[39mcenter[33m;[39mdisplay[33m:[39mflex}[33m.[39mtoolbar 
+[33m.[39mblock[33m-[39mcontrols [33m.[39mdropdown[33m-[39mbutton[33m-[39mtext{text[33m-[39malign[33m:[39m
+left[33m;[39mtext[33m-[39moverflow[33m:[39mellipsis[33m;[39mwhite[33m-[39mspace[33m:[39mnowrap[33m;[39mwi
+dth[33m:[39m[35m7[39mem[33m;[39mdisplay[33m:[39minline[33m-[39mblock[33m;[39moverflow[33m:[39mhidden}
+ [90m   |[39m                                                                                                        
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+                                                                                                        
+[31m[1m^[22m[39m
+ [90m 3 |[39m[0m
+
+'moz-selection' is not recognized as a valid pseudo-element. Did you mean ':moz-selection' (pseudo-class) or is this a 
+typo?
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/index.css [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:25:11
+Module not found: Can't resolve 'prettier/parser-babel'
+[0m [90m 23 |[39m   html[33m:[39m [() [33m=>[39m [36mimport[39m([32m'prettier/parser-html'[39m)][33m,[39m
+ [90m 24 |[39m   js[33m:[39m [
+[31m[1m>[22m[39m[90m 25 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/parser-babel'[39m)[33m,[39m
+ [90m    |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 26 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m
+ [90m 27 |[39m   ][33m,[39m
+ [90m 28 |[39m   markdown[33m:[39m [() [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-markdown'[39m)][33m,[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:23:16
+Module not found: Can't resolve 'prettier/parser-html'
+[0m [90m 21 |[39m [36mconst[39m [33mPRETTIER_PARSER_MODULES[39m [33m=[39m {
+ [90m 22 |[39m   css[33m:[39m [() [33m=>[39m [36mimport[39m([32m'prettier/parser-postcss'[39m)][33m,[39m
+[31m[1m>[22m[39m[90m 23 |[39m   html[33m:[39m [() [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-html'[39m)][33m,[39m
+ [90m    |[39m                [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 24 |[39m   js[33m:[39m [
+ [90m 25 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/parser-babel'[39m)[33m,[39m
+ [90m 26 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:28:20
+Module not found: Can't resolve 'prettier/parser-markdown'
+[0m [90m 26 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m
+ [90m 27 |[39m   ][33m,[39m
+[31m[1m>[22m[39m[90m 28 |[39m   markdown[33m:[39m [() [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-markdown'[39m)][33m,[39m
+ [90m    |[39m                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[3
+1m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m
+ [90m 29 |[39m   typescript[33m:[39m [
+ [90m 30 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/parser-typescript'[39m)[33m,[39m
+ [90m 31 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:22:15
+Module not found: Can't resolve 'prettier/parser-postcss'
+[0m [90m 20 |[39m
+ [90m 21 |[39m [36mconst[39m [33mPRETTIER_PARSER_MODULES[39m [33m=[39m {
+[31m[1m>[22m[39m[90m 22 |[39m   css[33m:[39m [() [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-postcss'[39m)][33m,[39m
+ [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 23 |[39m   html[33m:[39m [() [33m=>[39m [36mimport[39m([32m'prettier/parser-html'[39m)][33m,[39m
+ [90m 24 |[39m   js[33m:[39m [
+ [90m 25 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/parser-babel'[39m)[33m,[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:30:11
+Module not found: Can't resolve 'prettier/parser-typescript'
+[0m [90m 28 |[39m   markdown[33m:[39m [() [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-markdown'[39m)][33m,[39m
+ [90m 29 |[39m   typescript[33m:[39m [
+[31m[1m>[22m[39m[90m 30 |[39m     () [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-typescript'[39m)[33m,[39m
+ [90m    |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[
+1m^[22m[39m[31m[1m^[22m[39m
+ [90m 31 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m
+ [90m 32 |[39m   ][33m,[39m
+ [90m 33 |[39m } [36mas[39m [36mconst[39m[33m;[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:26:11
+Module not found: Can't resolve 'prettier/plugins/estree'
+[0m [90m 24 |[39m   js[33m:[39m [
+ [90m 25 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/parser-babel'[39m)[33m,[39m
+[31m[1m>[22m[39m[90m 26 |[39m     () [33m=>[39m 
+[36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m
+ [90m    |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 27 |[39m   ][33m,[39m
+ [90m 28 |[39m   markdown[33m:[39m [() [33m=>[39m 
+[36mimport[39m([32m'prettier/parser-markdown'[39m)][33m,[39m
+ [90m 29 |[39m   typescript[33m:[39m [[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:31:11
+Module not found: Can't resolve 'prettier/plugins/estree'
+[0m [90m 29 |[39m   typescript[33m:[39m [
+ [90m 30 |[39m     () [33m=>[39m [36mimport[39m([32m'prettier/parser-typescript'[39m)[33m,[39m
+[31m[1m>[22m[39m[90m 31 |[39m     () [33m=>[39m 
+[36mimport[39m([32m'prettier/plugins/estree'[39m)[33m,[39m
+ [90m    |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m
+^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 32 |[39m   ][33m,[39m
+ [90m 33 |[39m } [36mas[39m [36mconst[39m[33m;[39m
+ [90m 34 |[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:46:26
+Module not found: Can't resolve 'prettier/standalone'
+[0m [90m 44 |[39m
+ [90m 45 |[39m [36masync[39m [36mfunction[39m loadPrettierFormat() {
+[31m[1m>[22m[39m[90m 46 |[39m   [36mconst[39m {format} [33m=[39m [36mawait[39m 
+[36mimport[39m([32m'prettier/standalone'[39m)[33m;[39m
+ [90m    |[39m                          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[2
+2m[39m[31m[1m^[22m[39m
+ [90m 47 |[39m   [36mreturn[39m format[33m;[39m
+ [90m 48 |[39m }
+ [90m 49 |[39m[0m
+
+
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx [Client 
+Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/TableHoverActionsV2Plugin/index.tsx:27:1
+Export $isSimpleTable doesn't exist in target module
+[0m [90m 25 |[39m [36mimport[39m {useLexicalComposerContext} [36mfrom[39m 
+[32m'@lexical/react/LexicalComposerContext'[39m[33m;[39m
+ [90m 26 |[39m [36mimport[39m {useLexicalEditable} [36mfrom[39m 
+[32m'@lexical/react/useLexicalEditable'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 27 |[39m [36mimport[39m {
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 28 |[39m   $computeTableMapSkipCellCheck[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 29 |[39m   $insertTableColumnAtSelection[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 30 |[39m   $insertTableRowAtSelection[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 31 |[39m   $isSimpleTable[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 32 |[39m   $isTableCellNode[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 33 |[39m   $isTableNode[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 34 |[39m   $isTableRowNode[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 35 |[39m   $moveTableColumn[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 36 |[39m } [36mfrom[39m [32m'@lexical/table'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 37 |[39m [36mimport[39m {
+ [90m 38 |[39m   $getChildCaret[33m,[39m
+ [90m 39 |[39m   $getNearestNodeFromDOMNode[33m,[39m[0m
+
+The export $isSimpleTable was not found in module 
+[project]/OneDrive/Pictures/lmsdoors/admin/node_modules/@lexical/table/LexicalTable.prod.mjs [app-client] (ecmascript).
+Did you mean to import $isTableNode?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the 
+requested export doesn't exist.
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/TableHoverActionsV2Plugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/plugins/TableHoverActionsV2Plugin/index.tsx:27:1
+Export $moveTableColumn doesn't exist in target module
+[0m [90m 25 |[39m [36mimport[39m {useLexicalComposerContext} [36mfrom[39m 
+[32m'@lexical/react/LexicalComposerContext'[39m[33m;[39m
+ [90m 26 |[39m [36mimport[39m {useLexicalEditable} [36mfrom[39m 
+[32m'@lexical/react/useLexicalEditable'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 27 |[39m [36mimport[39m {
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 28 |[39m   $computeTableMapSkipCellCheck[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 29 |[39m   $insertTableColumnAtSelection[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 30 |[39m   $insertTableRowAtSelection[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 31 |[39m   $isSimpleTable[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 32 |[39m   $isTableCellNode[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 33 |[39m   $isTableNode[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 34 |[39m   $isTableRowNode[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 35 |[39m   $moveTableColumn[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 36 |[39m } [36mfrom[39m [32m'@lexical/table'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 37 |[39m [36mimport[39m {
+ [90m 38 |[39m   $getChildCaret[33m,[39m
+ [90m 39 |[39m   $getNearestNodeFromDOMNode[33m,[39m[0m
+
+The export $moveTableColumn was not found in module 
+[project]/OneDrive/Pictures/lmsdoors/admin/node_modules/@lexical/table/LexicalTable.prod.mjs [app-client] (ecmascript).
+Did you mean to import $insertTableColumn?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the 
+requested export doesn't exist.
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/plugins/TableHoverActionsV2Plugin/index.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/Editor.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx:9:1
+Export DecoratorTextExtension doesn't exist in target module
+[0m [90m  7 |[39m [90m */[39m
+ [90m  8 |[39m
+[31m[1m>[22m[39m[90m  9 |[39m [36mimport[39m {[33mDecoratorTextExtension[39m} [36mfrom[39m 
+[32m'@lexical/extension'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[
+39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 10 |[39m [36mimport[39m {$createLinkNode} [36mfrom[39m [32m'@lexical/link'[39m[33m;[39m
+ [90m 11 |[39m [36mimport[39m {$createListItemNode[33m,[39m $createListNode} [36mfrom[39m 
+[32m'@lexical/list'[39m[33m;[39m
+ [90m 12 |[39m [36mimport[39m {[33mLexicalCollaboration[39m} [36mfrom[39m 
+[32m'@lexical/react/LexicalCollaborationContext'[39m[33m;[39m[0m
+
+The export DecoratorTextExtension was not found in module 
+[project]/OneDrive/Pictures/lmsdoors/admin/node_modules/@lexical/extension/LexicalExtension.prod.mjs [app-client] 
+(ecmascript).
+Did you mean to import ClearEditorExtension?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the 
+requested export doesn't exist.
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx:11:1
+Export DecoratorTextNode doesn't exist in target module
+[0m [90m  9 |[39m [36mimport[39m type {[33mJSX[39m} [36mfrom[39m [32m'react'[39m[33m;[39m
+ [90m 10 |[39m
+[31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m {
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 12 |[39m   applyFormatFromStyle[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 13 |[39m   applyFormatToDom[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 14 |[39m   [33mDecoratorTextNode[39m[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 15 |[39m   [33mSerializedDecoratorTextNode[39m[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 16 |[39m } [36mfrom[39m [32m'@lexical/extension'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m
+ [90m 17 |[39m [36mimport[39m {
+ [90m 18 |[39m   $getState[33m,[39m
+ [90m 19 |[39m   $isTextNode[33m,[39m[0m
+
+The export DecoratorTextNode was not found in module 
+[project]/OneDrive/Pictures/lmsdoors/admin/node_modules/@lexical/extension/LexicalExtension.prod.mjs [app-client] 
+(ecmascript).
+Did you mean to import HorizontalRuleNode?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the 
+requested export doesn't exist.
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/nodes/PlaygroundNodes.ts [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx:11:1
+Export applyFormatFromStyle doesn't exist in target module
+[0m [90m  9 |[39m [36mimport[39m type {[33mJSX[39m} [36mfrom[39m [32m'react'[39m[33m;[39m
+ [90m 10 |[39m
+[31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m {
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 12 |[39m   applyFormatFromStyle[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 13 |[39m   applyFormatToDom[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 14 |[39m   [33mDecoratorTextNode[39m[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 15 |[39m   [33mSerializedDecoratorTextNode[39m[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 16 |[39m } [36mfrom[39m [32m'@lexical/extension'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m
+ [90m 17 |[39m [36mimport[39m {
+ [90m 18 |[39m   $getState[33m,[39m
+ [90m 19 |[39m   $isTextNode[33m,[39m[0m
+
+The export applyFormatFromStyle was not found in module 
+[project]/OneDrive/Pictures/lmsdoors/admin/node_modules/@lexical/extension/LexicalExtension.prod.mjs [app-client] 
+(ecmascript).
+Did you mean to import buildEditorFromExtensions?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the 
+requested export doesn't exist.
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/nodes/PlaygroundNodes.ts [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx:11:1
+Export applyFormatToDom doesn't exist in target module
+[0m [90m  9 |[39m [36mimport[39m type {[33mJSX[39m} [36mfrom[39m [32m'react'[39m[33m;[39m
+ [90m 10 |[39m
+[31m[1m>[22m[39m[90m 11 |[39m [36mimport[39m {
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m>[22m[39m[90m 12 |[39m   applyFormatFromStyle[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 13 |[39m   applyFormatToDom[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 14 |[39m   [33mDecoratorTextNode[39m[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 15 |[39m   [33mSerializedDecoratorTextNode[39m[33m,[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m
+[31m[1m>[22m[39m[90m 16 |[39m } [36mfrom[39m [32m'@lexical/extension'[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39
+m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[3
+9m
+ [90m 17 |[39m [36mimport[39m {
+ [90m 18 |[39m   $getState[33m,[39m
+ [90m 19 |[39m   $isTextNode[33m,[39m[0m
+
+The export applyFormatToDom was not found in module 
+[project]/OneDrive/Pictures/lmsdoors/admin/node_modules/@lexical/extension/LexicalExtension.prod.mjs [app-client] 
+(ecmascript).
+Did you mean to import shallowMergeConfig?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the 
+requested export doesn't exist.
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/nodes/PlaygroundNodes.ts [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/editor/PlaygroundEntry.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Client Component Browser]
+    ./OneDrive/Pictures/lmsdoors/admin/app/playground/page.tsx [Server Component]
+
+
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/index.css:2:16987)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:25:11)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:23:16)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:28:20)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:22:15)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:30:11)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:26:11)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:31:11)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> 
+(./OneDrive/Pictures/lmsdoors/admin/editor/plugins/CodeActionMenuPlugin/components/PrettierButton/index.tsx:46:26)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/plugins/TableHoverActionsV2Plugin/index.tsx:27:1)
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/plugins/TableHoverActionsV2Plugin/index.tsx:27:1)
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/App.tsx:9:1)
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx:11:1)
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx:11:1)
+    at <unknown> (./OneDrive/Pictures/lmsdoors/admin/editor/nodes/DateTimeNode/DateTimeNode.tsx:11:1)

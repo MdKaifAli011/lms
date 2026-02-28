@@ -1,0 +1,608 @@
+/* Font for Lexical sticky notes – must be first (only @import/charset/layer allowed before other rules) */
+@import "https://fonts.googleapis.com/css?family=Reenie+Beanie";
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/* Lexical Playground – loaded so app theme overrides body/header */
+@import "../editor/index.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    /* Override Lexical playground global styles so app layout is preserved */
+    background: var(--background) !important;
+    padding: 0 !important;
+  }
+
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    @apply transition-colors duration-150;
+  }
+}
+
+/* Ensure app header is full width – wins over any Lexical or other global header rules */
+header {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+header a {
+  max-width: none !important;
+  margin: 0 !important;
+  display: inline !important;
+}
+
+header h1 {
+  margin: 0 !important;
+  text-align: inherit !important;
+}
+
+header img {
+  margin: 0 !important;
+}
+
+/* Content editor embed: tighter spacing, no extra margin/padding */
+.lexical-playground-embed .editor-shell {
+  margin: 0;
+  max-width: none;
+}
+
+/* Toolbar: wrap to next line instead of horizontal scroll */
+.lexical-playground-embed .toolbar,
+.lexical-playground-embed div.toolbar {
+  flex-wrap: wrap !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  height: auto !important;
+  min-height: 36px;
+  gap: 2px;
+  align-content: flex-start;
+}
+
+.lexical-playground-embed .editor-scroller {
+  min-height: 120px;
+}
+
+.lexical-playground-embed .editor-container {
+  padding: 0;
+}
+
+/* Hide scrollbar but keep scroll (e.g. SEO sidebar) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Content editor embed: dark mode for UI consistency */
+.dark .lexical-playground-embed .editor-shell {
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .editor-shell .editor-container {
+  background: var(--card);
+  border-color: var(--border);
+}
+
+.dark .lexical-playground-embed .editor-scroller {
+  background: var(--card);
+}
+
+.dark .lexical-playground-embed .toolbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.dark .lexical-playground-embed .toolbar .toolbar-item .text {
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .toolbar .font-size-input {
+  color: var(--foreground);
+  background-color: var(--input);
+  border-color: var(--border);
+}
+
+.dark .lexical-playground-embed .toolbar .dropdown-button-text {
+  color: var(--foreground);
+}
+
+/* Toolbar icons – invert so they’re light on dark */
+.dark .lexical-playground-embed .toolbar .icon,
+.dark .lexical-playground-embed .toolbar .toolbar-item .icon,
+.dark .lexical-playground-embed .toolbar i.chevron-down,
+.dark .lexical-playground-embed .toolbar i.format,
+.dark .lexical-playground-embed .toolbar-item i {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+.dark .lexical-playground-embed .toolbar .divider {
+  background-color: var(--border);
+}
+
+.dark .lexical-playground-embed button.toolbar-item:hover:not([disabled]) {
+  background-color: var(--muted);
+}
+
+.dark .lexical-playground-embed button.toolbar-item.active {
+  background-color: var(--accent);
+}
+
+.dark .lexical-playground-embed .toolbar .button.active {
+  background-color: var(--accent);
+}
+
+.dark .lexical-playground-embed .dropdown {
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.4);
+}
+
+.dark .lexical-playground-embed .dropdown .item {
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+}
+
+.dark .lexical-playground-embed .dropdown .item:hover {
+  background-color: var(--muted);
+}
+
+.dark .lexical-playground-embed .dropdown .divider {
+  background-color: var(--border);
+}
+
+.dark .lexical-playground-embed .typeahead-popover {
+  background: var(--popover);
+  border: 1px solid var(--border);
+}
+
+.dark .lexical-playground-embed .typeahead-popover li {
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+}
+
+.dark .lexical-playground-embed .typeahead-popover ul li.selected,
+.dark .lexical-playground-embed .typeahead-popover li:hover {
+  background-color: var(--muted);
+}
+
+.dark .lexical-playground-embed .typeahead-popover li .icon,
+.dark .lexical-playground-embed .typeahead-popover li i,
+.dark .lexical-playground-embed .component-picker-menu li .icon,
+.dark .lexical-playground-embed .component-picker-menu li i,
+.dark .lexical-playground-embed .draggable-block-component-picker li .icon,
+.dark .lexical-playground-embed .draggable-block-component-picker li i {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
+
+.dark .lexical-playground-embed .component-picker-search,
+.dark .draggable-block-component-picker .component-picker-search {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border);
+}
+
+.dark .lexical-playground-embed .draggable-block-menu {
+  background-color: var(--muted);
+  border-radius: 6px;
+  padding: 4px 3px;
+}
+
+.dark .lexical-playground-embed .draggable-block-menu .icon,
+.dark .lexical-playground-embed .draggable-block-menu .icon-plus {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+.dark .lexical-playground-embed .draggable-block-menu .icon:hover {
+  background-color: var(--accent) !important;
+}
+
+.dark .lexical-playground-embed .link-editor {
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+}
+
+.dark .lexical-playground-embed .link-editor .link-input {
+  background-color: var(--input);
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .link-editor .link-view {
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .link-editor .button.hovered {
+  background-color: var(--muted);
+}
+
+.dark .lexical-playground-embed .link-editor .button i,
+.dark .lexical-playground-embed .link-editor i {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+/* Floating format toolbar (selection popup) */
+.dark .lexical-playground-embed .floating-text-format-popup {
+  background: var(--popover);
+  border: 1px solid var(--border);
+}
+
+.dark .lexical-playground-embed .floating-text-format-popup button.popup-item:hover:not([disabled]) {
+  background-color: var(--muted);
+}
+
+.dark .lexical-playground-embed .floating-text-format-popup .icon,
+.dark .lexical-playground-embed .floating-text-format-popup i.format {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+.dark .lexical-playground-embed .dialog-dropdown {
+  background-color: var(--muted) !important;
+}
+
+.dark .lexical-playground-embed [contenteditable="true"] {
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .editor-scroller .editor {
+  color: var(--foreground);
+}
+
+/* Editor content theme (paragraph, headings, quote) in dark mode */
+.dark .lexical-playground-embed .PlaygroundEditorTheme__paragraph,
+.dark .lexical-playground-embed .PlaygroundEditorTheme__h1,
+.dark .lexical-playground-embed .PlaygroundEditorTheme__h2,
+.dark .lexical-playground-embed .PlaygroundEditorTheme__h3 {
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .PlaygroundEditorTheme__quote {
+  color: var(--muted-foreground);
+  border-left-color: var(--border);
+}
+
+.dark .lexical-playground-embed .PlaygroundEditorTheme__h2 {
+  color: var(--muted-foreground);
+}
+
+/* Selects and inputs inside embed */
+.dark .lexical-playground-embed select {
+  background-color: var(--input);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.dark .lexical-playground-embed .link-editor select {
+  background-color: var(--input);
+  color: var(--foreground);
+}
+
+/* Hide the bottom action bar (three circular buttons: clear, lock, markdown, etc.) */
+.lexical-playground-embed .actions,
+.lexical-playground-embed .editor-container .actions,
+.lexical-playground-embed .editor-shell .actions {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  width: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Action buttons column (mic, upload, download, share, clear, lock, markdown) */
+.dark .lexical-playground-embed .action-button {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+.dark .lexical-playground-embed .action-button:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.dark .lexical-playground-embed .action-button i,
+.dark .lexical-playground-embed .actions i {
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+/* Insert dropdown: show ~8 options, scroll for rest, scrollbar hidden */
+.dropdown.dropdown-insert {
+  max-height: 320px !important;
+  overflow-y: auto !important;
+  min-height: 40px !important;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.dropdown.dropdown-insert::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Modal (Insert Columns Layout, Insert Image, etc.) – theme-aware for light and dark mode */
+.Modal__overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dark .Modal__overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.Modal__modal {
+  background-color: var(--card) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25) !important;
+}
+
+.Modal__title {
+  color: var(--foreground) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.Modal__closeButton {
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+
+.Modal__closeButton:hover {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.Modal__content {
+  color: var(--foreground) !important;
+}
+
+.Modal__content .dialog-dropdown,
+.Modal__content .toolbar-item.dialog-dropdown {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.Modal__content .dialog-dropdown .text,
+.Modal__content .toolbar-item.dialog-dropdown .text {
+  color: var(--foreground) !important;
+}
+
+.Modal__content .Button__root {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border: none !important;
+}
+
+.Modal__content .Button__root:hover:not(.Button__disabled) {
+  opacity: 0.9;
+}
+
+.Modal__content .Button__root.Button__disabled {
+  background-color: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+  opacity: 0.7;
+}
+
+.Modal__content .DialogActions .Button__root:last-child:not(:only-child),
+.Modal__content .Button__root:last-child:not(:only-child) {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+}
+
+.Modal__content .DialogActions .Button__root:last-child:not(:only-child):hover,
+.Modal__content .Button__root:last-child:not(:only-child):hover {
+  opacity: 0.9;
+}
+
+.Modal__content .Input__label {
+  color: var(--foreground) !important;
+}
+
+.Modal__content .Input__input {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.Modal__content .Input__input::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* Lexical UI portaled to body (dropdowns, etc.) – dark mode – !important to override Lexical base */
+.dark .dropdown {
+  background-color: var(--popover) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.4) !important;
+  color: var(--popover-foreground) !important;
+}
+
+.dark .dropdown .item {
+  background-color: var(--popover) !important;
+  color: var(--popover-foreground) !important;
+}
+
+.dark .dropdown .item:hover {
+  background-color: var(--muted) !important;
+}
+
+.dark .dropdown .item .text {
+  color: var(--popover-foreground) !important;
+}
+
+.dark .dropdown .item .shortcut {
+  color: var(--muted-foreground) !important;
+}
+
+.dark .dropdown .item .icon,
+.dark .dropdown .item .icon-text-container .icon,
+.dark .dropdown .item i[class*="icon"],
+.dark .dropdown .item i {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
+
+.dark .dropdown .divider {
+  background-color: var(--border) !important;
+}
+
+.dark .typeahead-popover {
+  background: var(--popover) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.dark .typeahead-popover li {
+  background-color: var(--popover) !important;
+  color: var(--popover-foreground) !important;
+}
+
+.dark .typeahead-popover ul li.selected,
+.dark .typeahead-popover li:hover {
+  background-color: var(--muted) !important;
+}
+
+.dark .typeahead-popover li .icon,
+.dark .typeahead-popover li i,
+.dark .component-picker-menu li .icon,
+.dark .component-picker-menu li i,
+.dark .draggable-block-component-picker li .icon,
+.dark .draggable-block-component-picker li i {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
