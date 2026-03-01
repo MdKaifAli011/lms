@@ -3,6 +3,7 @@
  * Only runs when the editor is inside .lexical-playground-embed (exam detail page).
  * - Listens for 'exam-editor-set-initial' to set initial HTML.
  * - Dispatches 'exam-editor-content-change' on each change with serialized HTML.
+ * - Exported HTML is stripped of PlaygroundEditorTheme__* classes so stored content is class-free.
  */
 
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html"
@@ -14,6 +15,30 @@ import { CAN_USE_DOM } from "@lexical/utils"
 const EXAM_SET_INITIAL = "exam-editor-set-initial"
 const EXAM_CONTENT_CHANGE = "exam-editor-content-change"
 const EXAM_EDITOR_READY = "exam-editor-ready"
+
+/** Remove Lexical theme classes so stored HTML has no PlaygroundEditorTheme__* classes. */
+function stripThemeClassesFromHtml(html: string): string {
+  if (typeof html !== "string" || !html.trim()) return html
+  if (!CAN_USE_DOM) return html
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, "text/html")
+    const withClass = doc.querySelectorAll("[class]")
+    withClass.forEach((el) => {
+      const cls = el.getAttribute("class")
+      if (!cls) return
+      const kept = cls
+        .split(/\s+/)
+        .filter((c) => !c.startsWith("PlaygroundEditorTheme__"))
+        .join(" ")
+      if (kept === "") el.removeAttribute("class")
+      else el.setAttribute("class", kept)
+    })
+    return doc.body.innerHTML
+  } catch {
+    return html
+  }
+}
 
 export default function ExamContentSyncPlugin(): null {
   const [editor] = useLexicalComposerContext()
@@ -55,7 +80,8 @@ export default function ExamContentSyncPlugin(): null {
       timeoutId = setTimeout(() => {
         editorState.read(() => {
           try {
-            const html = $generateHtmlFromNodes(editor, null)
+            const rawHtml = $generateHtmlFromNodes(editor, null)
+            const html = stripThemeClassesFromHtml(rawHtml)
             window.dispatchEvent(
               new CustomEvent(EXAM_CONTENT_CHANGE, { detail: { html } })
             )

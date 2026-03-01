@@ -49,6 +49,10 @@ const data = {
           title: "Definitions",
           url: "/self-study/definitions",
         },
+        {
+          title: "Practice",
+          url: "/self-study/practice",
+        },
       ],
     },
   ],
