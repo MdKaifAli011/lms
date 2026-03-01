@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import {
   TrendingUp,
@@ -12,6 +12,7 @@ import {
   Bot,
   FileText,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
@@ -31,8 +32,14 @@ export interface PracticePageViewProps {
   filteredPapers: PracticePaper[];
   recommendedPapers: PracticePaper[];
   fullLengthPapers: PracticePaper[];
-  previousYearsByYear: { year: number; papers: PracticePaper[] }[];
+  previousYearsByYear: { year: number; examId: string; examName: string; papers: PracticePaper[] }[];
   setActiveTab: (id: string) => void;
+  practiceTotal: number;
+  isLoadingMorePractice: boolean;
+  onLoadMorePractice: () => void;
+  mockTotal: number;
+  isLoadingMoreMock: boolean;
+  onLoadMoreMock: () => void;
 }
 
 function StatCard({
@@ -63,9 +70,11 @@ function formatDuration(minutes: number): string {
   return m !== 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-function PracticeTestCard({ paper, examName }: { paper: PracticePaper; examName?: string }) {
+function PracticeTestCard({ paper }: { paper: PracticePaper }) {
   const duration = formatDuration(paper.durationMinutes);
-  const subject = examName ?? "Practice";
+  const subjectName = (paper as { subjectName?: string }).subjectName;
+  const examName = (paper as { examName?: string }).examName;
+  const displayLabel = subjectName ? `${examName} · ${subjectName}` : (examName ?? "Practice");
   return (
     <Link href={`/practice/${paper.slug}`}>
       <Card className="bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer hover:border-blue-500/30">
@@ -75,7 +84,7 @@ function PracticeTestCard({ paper, examName }: { paper: PracticePaper; examName?
               <span className="text-xl sm:text-2xl">📝</span>
             </div>
             <span className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-md bg-muted/60 uppercase tracking-wider text-muted-foreground">
-              {subject}
+              {displayLabel}
             </span>
           </div>
           <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">{paper.title}</h3>
@@ -182,7 +191,81 @@ export function PracticePageView({
   fullLengthPapers,
   previousYearsByYear,
   setActiveTab,
+  practiceTotal,
+  isLoadingMorePractice,
+  onLoadMorePractice,
+  mockTotal,
+  isLoadingMoreMock,
+  onLoadMoreMock,
 }: PracticePageViewProps) {
+  const loadMorePracticeRef = useRef<HTMLDivElement>(null);
+  const loadMoreMockRef = useRef<HTMLDivElement>(null);
+
+  // Get papers based on active tab
+  const practicePapers = activeTab === "practice" ? filteredPapers : recommendedPapers;
+  const hasMorePractice = practicePapers.length < practiceTotal;
+  const hasMoreMock = fullLengthPapers.length < mockTotal;
+
+  // Intersection observer for practice infinite scroll
+  useEffect(() => {
+    // Small delay to ensure DOM is ready after tab switch
+    const timer = setTimeout(() => {
+      if (!loadMorePracticeRef.current || !hasMorePractice || activeTab !== "practice" || isLoadingMorePractice) return;
+
+      const element = loadMorePracticeRef.current;
+      let timeoutId: NodeJS.Timeout | null = null;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMorePractice && !isLoadingMorePractice) {
+            timeoutId = setTimeout(() => {
+              onLoadMorePractice();
+            }, 300);
+          }
+        },
+        { rootMargin: "200px" }
+      );
+
+      observer.observe(element);
+      return () => {
+        observer.disconnect();
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [hasMorePractice, isLoadingMorePractice, activeTab, onLoadMorePractice]);
+
+  // Intersection observer for mock infinite scroll
+  useEffect(() => {
+    // Small delay to ensure DOM is ready after tab switch
+    const timer = setTimeout(() => {
+      if (!loadMoreMockRef.current || !hasMoreMock || activeTab !== "mock" || isLoadingMoreMock) return;
+
+      const element = loadMoreMockRef.current;
+      let timeoutId: NodeJS.Timeout | null = null;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMoreMock && !isLoadingMoreMock) {
+            timeoutId = setTimeout(() => {
+              onLoadMoreMock();
+            }, 300);
+          }
+        },
+        { rootMargin: "200px" }
+      );
+
+      observer.observe(element);
+      return () => {
+        observer.disconnect();
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [hasMoreMock, isLoadingMoreMock, activeTab, onLoadMoreMock]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
@@ -296,21 +379,44 @@ export function PracticePageView({
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h2 className="text-2xl min-[480px]:text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-                      Recommended Practice Tests
+                      {activeTab === "practice" ? "All Practice Tests" : "Recommended Practice Tests"}
                     </h2>
-                    {filteredPapers.filter((p) => p.type === "practice").length > 3 ? (
-                      <Link href="#" className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium inline-flex items-center gap-1 hover:underline">
+                    {activeTab === "all" && practiceTotal > 3 ? (
+                      <button
+                        onClick={() => setActiveTab("practice")}
+                        className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium inline-flex items-center gap-1 hover:underline"
+                      >
                         View all <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </Link>
+                      </button>
                     ) : null}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-                  {(activeTab === "practice" ? filteredPapers : recommendedPapers).slice(0, 6).map((paper) => (
-                    <PracticeTestCard key={paper.id} paper={paper} examName={examNameById[paper.examId]} />
+                  {practicePapers.map((paper) => (
+                    <PracticeTestCard key={paper.id} paper={paper} />
                   ))}
                 </div>
-                {(activeTab === "practice" ? filteredPapers : recommendedPapers).length === 0 ? (
+                {/* Infinite scroll loader for practice */}
+                {activeTab === "practice" && hasMorePractice && (
+                  <div 
+                    ref={loadMorePracticeRef} 
+                    className="flex justify-center py-6 min-h-[80px] cursor-pointer"
+                    onClick={() => !isLoadingMorePractice && onLoadMorePractice()}
+                  >
+                    {isLoadingMorePractice ? (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span className="text-sm">Loading more...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                        <span className="text-xs">Scroll or click to load more</span>
+                        <span className="text-[10px] opacity-60">({practicePapers.length} of {practiceTotal} loaded)</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {practicePapers.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No practice tests available yet.</p>
                 ) : null}
               </section>
@@ -324,9 +430,16 @@ export function PracticePageView({
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <h2 className="text-2xl min-[480px]:text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-                      Full-Length Mock Tests
+                      {activeTab === "mock" ? "All Full-Length Mocks" : "Full-Length Mock Tests"}
                     </h2>
-                    <span className="text-xs sm:text-sm text-muted-foreground">New tests added every Sunday</span>
+                    {activeTab === "all" && mockTotal > 3 ? (
+                      <button
+                        onClick={() => setActiveTab("mock")}
+                        className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium inline-flex items-center gap-1 hover:underline"
+                      >
+                        View all <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </button>
+                    ) : null}
                   </div>
                 </div>
                 <div className="space-y-3 sm:space-y-4">
@@ -334,6 +447,29 @@ export function PracticePageView({
                     <MockTestCard key={paper.id} id={String(idx + 1)} paper={paper} />
                   ))}
                 </div>
+                {/* Infinite scroll loader for mocks */}
+                {activeTab === "mock" && hasMoreMock && (
+                  <div 
+                    ref={loadMoreMockRef} 
+                    className="flex justify-center py-6 min-h-[80px] cursor-pointer"
+                    onClick={() => {
+                      console.log("Mock loader clicked", { isLoadingMoreMock });
+                      if (!isLoadingMoreMock) onLoadMoreMock();
+                    }}
+                  >
+                    {isLoadingMoreMock ? (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span className="text-sm">Loading more...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                        <span className="text-xs">Scroll or click to load more</span>
+                        <span className="text-[10px] opacity-60">({filteredPapers.length} of {mockTotal} loaded)</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {(activeTab === "mock" ? filteredPapers : fullLengthPapers).length === 0 ? (
                   <p className="text-sm text-muted-foreground">No full-length mock tests available yet.</p>
                 ) : null}
@@ -353,12 +489,11 @@ export function PracticePageView({
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                   {previousYearsByYear
                     .filter(({ papers }) => papers[0])
-                    .map(({ year, papers }) => {
+                    .map(({ year, examId, examName, papers }) => {
                       const paper = papers[0]!;
-                      const examName = paper.examId != null ? examNameById[paper.examId] : "Exam";
                       return (
                         <PreviousYearPaperCard
-                          key={`${year}-${paper.examId}`}
+                          key={`${year}-${examId}`}
                           exam={examName}
                           year={year}
                           paper={paper}

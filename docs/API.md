@@ -1269,3 +1269,308 @@ Increment visit count. `param` can be:
 | POST | `/api/definitions/reorder` | Batch update order. |
 | GET | `/api/definitions/[id]/meta` | Get meta/SEO. |
 | POST | `/api/definitions/[id]/visit` | Record visit (param can be id or slug + subtopic query). |
+
+---
+
+# Practice Management APIs
+
+Base URLs:
+- `/api/level-wise-practice` - Level-wise practice papers
+- `/api/full-length-mock` - Full-length mock tests
+- `/api/previous-year-paper` - Previous year papers
+
+All practice APIs support **pagination** for infinite scroll implementations.
+
+---
+
+## Level Wise Practice API
+
+### List practice papers
+
+**GET** `/api/level-wise-practice`
+
+Returns paginated list of level-wise practice papers, sorted by `examId`, `level`, `orderNumber`.
+
+#### Query parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `examId` | string | Filter by exam MongoDB id. |
+| `level` | number | Filter by content level (1-7). |
+| `status` | string | Filter by status (`Active` or `Inactive`). |
+| `page` | number | Page number (default: 1). |
+| `limit` | number | Items per page (default: 0 = no limit). |
+
+#### Response
+
+```json
+{
+  "papers": [
+    {
+      "id": "699f3a54b2e824cf0ff1f0c1",
+      "examId": "699f3a54b2e824cf0ff1f0a1",
+      "examName": "NEET",
+      "examSlug": "neet",
+      "level": 2,
+      "levelName": "Subject",
+      "subjectId": "699f3a54b2e824cf0ff1f0b1",
+      "subjectName": "Physics",
+      "unitId": null,
+      "unitName": null,
+      "chapterId": null,
+      "chapterName": null,
+      "topicId": null,
+      "topicName": null,
+      "subtopicId": null,
+      "subtopicName": null,
+      "definitionId": null,
+      "definitionName": null,
+      "title": "Kinematics Practice",
+      "slug": "kinematics-practice",
+      "description": "Practice test on kinematics",
+      "durationMinutes": 60,
+      "totalMarks": 100,
+      "totalQuestions": 30,
+      "difficulty": "Medium",
+      "orderNumber": 1,
+      "status": "Active",
+      "locked": false,
+      "image": "",
+      "createdAt": "February 28, 2026 at 10:00 AM",
+      "updatedAt": "February 28, 2026 at 10:00 AM"
+    }
+  ],
+  "total": 50
+}
+```
+
+#### Content Levels
+
+| Level | Name | Description |
+|-------|------|-------------|
+| 1 | Exam | Exam-level practice |
+| 2 | Subject | Subject-level practice |
+| 3 | Unit | Unit-level practice |
+| 4 | Chapter | Chapter-level practice |
+| 5 | Topic | Topic-level practice |
+| 6 | Subtopic | Subtopic-level practice |
+| 7 | Definition | Definition-level practice |
+
+---
+
+### Create practice paper
+
+**POST** `/api/level-wise-practice`
+
+Creates a new level-wise practice paper.
+
+#### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `examId` | string | Yes | Exam MongoDB id. |
+| `level` | number | Yes | Content level (1-7). |
+| `subjectId` | string | No | Subject id (required for level >= 2). |
+| `unitId` | string | No | Unit id (required for level >= 3). |
+| `chapterId` | string | No | Chapter id (required for level >= 4). |
+| `topicId` | string | No | Topic id (required for level >= 5). |
+| `subtopicId` | string | No | Subtopic id (required for level >= 6). |
+| `definitionId` | string | No | Definition id (required for level >= 7). |
+| `title` | string | Yes | Practice paper title. |
+| `description` | string | No | Description. |
+| `durationMinutes` | number | No | Duration in minutes (default: 60). |
+| `totalMarks` | number | No | Total marks (default: 100). |
+| `totalQuestions` | number | No | Total questions (default: 30). |
+| `difficulty` | string | No | `Easy`, `Medium`, `Hard`, or `Mixed` (default: `Medium`). |
+| `status` | string | No | `Active` or `Inactive` (default: `Active`). |
+| `locked` | boolean | No | Whether the test is locked (default: `false`). |
+| `image` | string | No | Image URL. |
+
+#### Response (201)
+
+Returns the created practice paper with auto-generated `slug` and `orderNumber`.
+
+---
+
+## Full Length Mock API
+
+### List mock tests
+
+**GET** `/api/full-length-mock`
+
+Returns paginated list of full-length mock tests, sorted by `examId`, `orderNumber`.
+
+#### Query parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `examId` | string | Filter by exam MongoDB id. |
+| `status` | string | Filter by status (`Active` or `Inactive`). |
+| `page` | number | Page number (default: 1). |
+| `limit` | number | Items per page (default: 0 = no limit). |
+
+#### Response
+
+```json
+{
+  "papers": [
+    {
+      "id": "699f3a54b2e824cf0ff1f0c2",
+      "examId": "699f3a54b2e824cf0ff1f0a1",
+      "examName": "NEET",
+      "examSlug": "neet",
+      "title": "Full Mock Test 1",
+      "slug": "full-mock-test-1",
+      "description": "Complete NEET mock test",
+      "durationMinutes": 180,
+      "totalMarks": 720,
+      "totalQuestions": 180,
+      "difficulty": "Mixed",
+      "orderNumber": 1,
+      "status": "Active",
+      "locked": true,
+      "image": "",
+      "createdAt": "February 28, 2026 at 10:00 AM",
+      "updatedAt": "February 28, 2026 at 10:00 AM"
+    }
+  ],
+  "total": 20
+}
+```
+
+---
+
+### Create mock test
+
+**POST** `/api/full-length-mock`
+
+Creates a new full-length mock test.
+
+#### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `examId` | string | Yes | Exam MongoDB id. |
+| `title` | string | Yes | Mock test title. |
+| `description` | string | No | Description. |
+| `durationMinutes` | number | No | Duration in minutes (default: 180). |
+| `totalMarks` | number | No | Total marks (default: 300). |
+| `totalQuestions` | number | No | Total questions (default: 90). |
+| `difficulty` | string | No | `Easy`, `Medium`, `Hard`, or `Mixed` (default: `Mixed`). |
+| `status` | string | No | `Active` or `Inactive` (default: `Active`). |
+| `locked` | boolean | No | Whether the test is locked (default: `false`). |
+| `image` | string | No | Image URL. |
+
+#### Response (201)
+
+Returns the created mock test with auto-generated `slug` and `orderNumber`.
+
+---
+
+## Previous Year Paper API
+
+### List previous year papers
+
+**GET** `/api/previous-year-paper`
+
+Returns paginated list of previous year papers, sorted by `examId`, `year` (desc), `orderNumber`.
+
+#### Query parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `examId` | string | Filter by exam MongoDB id. |
+| `year` | number | Filter by year. |
+| `status` | string | Filter by status (`Active` or `Inactive`). |
+| `page` | number | Page number (default: 1). |
+| `limit` | number | Items per page (default: 0 = no limit). |
+
+#### Response
+
+```json
+{
+  "papers": [
+    {
+      "id": "699f3a54b2e824cf0ff1f0c3",
+      "examId": "699f3a54b2e824cf0ff1f0a1",
+      "examName": "NEET",
+      "examSlug": "neet",
+      "title": "NEET 2025",
+      "slug": "neet-2025",
+      "description": "Previous year NEET paper",
+      "year": 2025,
+      "session": "Morning",
+      "durationMinutes": 180,
+      "totalMarks": 720,
+      "totalQuestions": 180,
+      "difficulty": "Mixed",
+      "orderNumber": 1,
+      "status": "Active",
+      "locked": false,
+      "image": "",
+      "createdAt": "February 28, 2026 at 10:00 AM",
+      "updatedAt": "February 28, 2026 at 10:00 AM"
+    }
+  ],
+  "total": 30
+}
+```
+
+---
+
+### Create previous year paper
+
+**POST** `/api/previous-year-paper`
+
+Creates a new previous year paper.
+
+#### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `examId` | string | Yes | Exam MongoDB id. |
+| `title` | string | Yes | Paper title. |
+| `year` | number | Yes | Year of the paper. |
+| `session` | string | No | Session (e.g., `Morning`, `Evening`). |
+| `description` | string | No | Description. |
+| `durationMinutes` | number | No | Duration in minutes (default: 180). |
+| `totalMarks` | number | No | Total marks (default: 300). |
+| `totalQuestions` | number | No | Total questions (default: 90). |
+| `difficulty` | string | No | `Easy`, `Medium`, `Hard`, or `Mixed` (default: `Mixed`). |
+| `status` | string | No | `Active` or `Inactive` (default: `Active`). |
+| `locked` | boolean | No | Whether the test is locked (default: `false`). |
+| `image` | string | No | Image URL. |
+
+#### Response (201)
+
+Returns the created previous year paper with auto-generated `slug` and `orderNumber`.
+
+---
+
+## Practice APIs Summary
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/level-wise-practice` | List level-wise practice papers (paginated). |
+| POST | `/api/level-wise-practice` | Create level-wise practice paper. |
+| GET | `/api/full-length-mock` | List full-length mock tests (paginated). |
+| POST | `/api/full-length-mock` | Create full-length mock test. |
+| GET | `/api/previous-year-paper` | List previous year papers (paginated). |
+| POST | `/api/previous-year-paper` | Create previous year paper. |
+
+### Pagination Example
+
+For infinite scroll (like YouTube/Instagram):
+
+```
+# Initial load (first 3 items)
+GET /api/level-wise-practice?status=Active&page=1&limit=3
+
+# Load more (next 10 items)
+GET /api/level-wise-practice?status=Active&page=2&limit=10
+
+# Load more (next 10 items)
+GET /api/level-wise-practice?status=Active&page=3&limit=10
+```
+
+The response includes `total` count to determine when all data is loaded.

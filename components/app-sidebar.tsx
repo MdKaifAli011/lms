@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ClipboardList } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -49,9 +49,24 @@ const data = {
           title: "Definitions",
           url: "/self-study/definitions",
         },
+      ],
+    },
+    {
+      title: "Practice Management",
+      url: "/practice-management",
+      icon: ClipboardList,
+      items: [
         {
-          title: "Practice",
-          url: "/self-study/practice",
+          title: "Level Wise",
+          url: "/practice-management/level-wise",
+        },
+        {
+          title: "Full Length",
+          url: "/practice-management/full-length",
+        },
+        {
+          title: "Previous Years Paper",
+          url: "/practice-management/previous-years",
         },
       ],
     },

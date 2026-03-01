@@ -1,17 +1,25 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
-/** Practice paper type: topic practice, full-length mock, or previous year paper */
-export type PracticePaperType = "practice" | "full_length" | "previous_paper";
-
 /**
- * Seven-level content hierarchy (not mastery path):
+ * Seven-level content hierarchy for level-wise practice:
  * 1=Exam, 2=Subject, 3=Unit, 4=Chapter, 5=Topic, 6=Subtopic, 7=Definition
  */
 export type ContentLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-export interface IPracticePaper {
+/** Human-readable level names for API messages and UI */
+export const CONTENT_LEVEL_NAMES: Record<ContentLevel, string> = {
+  1: "Exam",
+  2: "Subject",
+  3: "Unit",
+  4: "Chapter",
+  5: "Topic",
+  6: "Subtopic",
+  7: "Definition",
+};
+
+export interface ILevelWisePractice {
   _id: mongoose.Types.ObjectId;
-  /** Exam this paper belongs to */
+  /** Exam this practice belongs to */
   examId: mongoose.Types.ObjectId;
   /** Content hierarchy level: 1=Exam, 2=Subject, ..., 7=Definition */
   level: ContentLevel;
@@ -22,7 +30,6 @@ export interface IPracticePaper {
   topicId?: mongoose.Types.ObjectId;
   subtopicId?: mongoose.Types.ObjectId;
   definitionId?: mongoose.Types.ObjectId;
-  type: PracticePaperType;
   title: string;
   slug: string;
   description?: string;
@@ -30,9 +37,7 @@ export interface IPracticePaper {
   totalMarks: number;
   totalQuestions: number;
   difficulty?: "Easy" | "Medium" | "Hard" | "Mixed";
-  /** For previous_paper: year e.g. 2023 */
-  year?: number;
-  /** Display order within same exam/type */
+  /** Display order within same exam */
   orderNumber: number;
   status: "Active" | "Inactive";
   /** If true, show as "Unlocks later" / locked */
@@ -43,7 +48,7 @@ export interface IPracticePaper {
   updatedAt?: Date;
 }
 
-const practicePaperSchema = new Schema<IPracticePaper>(
+const levelWisePracticeSchema = new Schema<ILevelWisePractice>(
   {
     examId: { type: Schema.Types.ObjectId, required: true, ref: "Exam" },
     level: {
@@ -60,12 +65,6 @@ const practicePaperSchema = new Schema<IPracticePaper>(
     topicId: { type: Schema.Types.ObjectId, ref: "Topic", default: null },
     subtopicId: { type: Schema.Types.ObjectId, ref: "Subtopic", default: null },
     definitionId: { type: Schema.Types.ObjectId, ref: "Definition", default: null },
-    type: {
-      type: String,
-      required: true,
-      enum: ["practice", "full_length", "previous_paper"],
-      default: "practice",
-    },
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true, lowercase: true },
     description: { type: String, default: "" },
@@ -77,7 +76,6 @@ const practicePaperSchema = new Schema<IPracticePaper>(
       enum: ["Easy", "Medium", "Hard", "Mixed"],
       default: "Medium",
     },
-    year: { type: Number, default: null },
     orderNumber: { type: Number, default: 1 },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
     locked: { type: Boolean, default: false },
@@ -88,12 +86,13 @@ const practicePaperSchema = new Schema<IPracticePaper>(
   { timestamps: true }
 );
 
-practicePaperSchema.index({ examId: 1, slug: 1 }, { unique: true });
-practicePaperSchema.index({ examId: 1, type: 1, orderNumber: 1 });
-practicePaperSchema.index({ examId: 1 });
-practicePaperSchema.index({ type: 1 });
-practicePaperSchema.index({ level: 1 });
+levelWisePracticeSchema.index({ examId: 1, slug: 1 }, { unique: true });
+levelWisePracticeSchema.index({ examId: 1, orderNumber: 1 });
+levelWisePracticeSchema.index({ examId: 1 });
+levelWisePracticeSchema.index({ level: 1 });
+levelWisePracticeSchema.index({ level: 1, orderNumber: 1 });
+levelWisePracticeSchema.index({ examId: 1, level: 1, orderNumber: 1 });
 
-const PracticePaper =
-  models.PracticePaper ?? model<IPracticePaper>("PracticePaper", practicePaperSchema);
-export default PracticePaper;
+const LevelWisePractice =
+  models.LevelWisePractice ?? model<ILevelWisePractice>("LevelWisePractice", levelWisePracticeSchema);
+export default LevelWisePractice;

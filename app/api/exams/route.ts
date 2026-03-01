@@ -3,6 +3,18 @@ import connectDB from "@/lib/db"
 import Exam from "@/models/Exam"
 import { slugify } from "@/lib/slugify"
 
+// CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
 /** GET /api/exams – list exams. Use ?contextapi=1 to get only id, name, slug, status, order (sorted by order). */
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +34,7 @@ export async function GET(request: NextRequest) {
         status: doc.status ?? "Active",
         order: doc.orderNumber ?? 0,
       }))
-      return NextResponse.json(list)
+      return NextResponse.json(list, { headers: corsHeaders })
     }
 
     const list = exams.map((doc: Record<string, unknown>) => ({
@@ -50,12 +62,12 @@ export async function GET(request: NextRequest) {
           })
         : undefined,
     }))
-    return NextResponse.json(list)
+    return NextResponse.json(list, { headers: corsHeaders })
   } catch (err) {
     console.error("GET /api/exams error:", err)
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to fetch exams" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }
@@ -67,12 +79,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const name = (body.name ?? "").trim()
     if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 })
+      return NextResponse.json({ error: "Name is required" }, { status: 400, headers: corsHeaders })
     }
 
     const baseSlug = slugify(name)
     if (!baseSlug) {
-      return NextResponse.json({ error: "Valid exam name is required" }, { status: 400 })
+      return NextResponse.json({ error: "Valid exam name is required" }, { status: 400, headers: corsHeaders })
     }
 
     const existing = await Exam.findOne({ slug: baseSlug }).lean()
@@ -84,7 +96,7 @@ export async function POST(request: NextRequest) {
           existingSlug: (existing as { slug?: string }).slug,
           existingId: (existing as { _id?: unknown })._id?.toString(),
         },
-        { status: 409 }
+        { status: 409, headers: corsHeaders }
       )
     }
 
@@ -138,12 +150,12 @@ export async function POST(request: NextRequest) {
             minute: "2-digit",
           })
         : undefined,
-    })
+    }, { headers: corsHeaders })
   } catch (err) {
     console.error("POST /api/exams error:", err)
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to create exam" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

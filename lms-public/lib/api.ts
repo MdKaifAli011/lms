@@ -40,7 +40,128 @@ async function fetchApi<T>(
   return res.json() as Promise<T>;
 }
 
-// ——— Practice papers (practice tests, full-length mocks, previous year papers) ———
+// ——— Level Wise Practice Papers ———
+export interface LevelWisePractice {
+  id: string;
+  examId: string;
+  examName?: string;
+  examSlug?: string;
+  level: number;
+  levelName?: string;
+  subjectId?: string;
+  subjectName?: string;
+  unitId?: string;
+  unitName?: string;
+  chapterId?: string;
+  chapterName?: string;
+  topicId?: string;
+  topicName?: string;
+  subtopicId?: string;
+  subtopicName?: string;
+  definitionId?: string;
+  definitionName?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  durationMinutes: number;
+  totalMarks: number;
+  totalQuestions: number;
+  difficulty: "Easy" | "Medium" | "Hard" | "Mixed";
+  orderNumber: number;
+  status: "Active" | "Inactive";
+  locked: boolean;
+  image?: string;
+}
+
+export async function getLevelWisePractices(filters?: { examId?: string; level?: number; status?: string; page?: number; limit?: number }): Promise<{ papers: LevelWisePractice[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.examId) params.set("examId", filters.examId);
+    if (filters?.level != null) params.set("level", String(filters.level));
+    if (filters?.status) params.set("status", filters.status);
+    if (filters?.page != null) params.set("page", String(filters.page));
+    if (filters?.limit != null) params.set("limit", String(filters.limit));
+    const q = params.toString() ? `?${params}` : "";
+    const res = await fetchApi<{ papers: LevelWisePractice[]; total: number }>(`/api/level-wise-practice${q}`);
+    return { papers: Array.isArray(res.papers) ? res.papers : [], total: res.total || 0 };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getLevelWisePractices]", e);
+    return { papers: [], total: 0 };
+  }
+}
+
+// ——— Full Length Mock Tests ———
+export interface FullLengthMock {
+  id: string;
+  examId: string;
+  examName?: string;
+  examSlug?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  durationMinutes: number;
+  totalMarks: number;
+  totalQuestions: number;
+  difficulty: "Easy" | "Medium" | "Hard" | "Mixed";
+  orderNumber: number;
+  status: "Active" | "Inactive";
+  locked: boolean;
+  image?: string;
+}
+
+export async function getFullLengthMocks(filters?: { examId?: string; status?: string; page?: number; limit?: number }): Promise<{ papers: FullLengthMock[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.examId) params.set("examId", filters.examId);
+    if (filters?.status) params.set("status", filters.status);
+    if (filters?.page != null) params.set("page", String(filters.page));
+    if (filters?.limit != null) params.set("limit", String(filters.limit));
+    const q = params.toString() ? `?${params}` : "";
+    const res = await fetchApi<{ papers: FullLengthMock[]; total: number }>(`/api/full-length-mock${q}`);
+    return { papers: Array.isArray(res.papers) ? res.papers : [], total: res.total || 0 };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getFullLengthMocks]", e);
+    return { papers: [], total: 0 };
+  }
+}
+
+// ——— Previous Year Papers ———
+export interface PreviousYearPaper {
+  id: string;
+  examId: string;
+  examName?: string;
+  examSlug?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  year: number;
+  session?: string;
+  durationMinutes: number;
+  totalMarks: number;
+  totalQuestions: number;
+  difficulty: "Easy" | "Medium" | "Hard" | "Mixed";
+  orderNumber: number;
+  status: "Active" | "Inactive";
+  locked: boolean;
+  image?: string;
+}
+
+export async function getPreviousYearPapers(filters?: { examId?: string; year?: number; status?: string }): Promise<PreviousYearPaper[]> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.examId) params.set("examId", filters.examId);
+    if (filters?.year) params.set("year", String(filters.year));
+    if (filters?.status) params.set("status", filters.status);
+    const q = params.toString() ? `?${params}` : "";
+    const list = await fetchApi<PreviousYearPaper[]>(`/api/previous-year-paper${q}`);
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getPreviousYearPapers]", e);
+    return [];
+  }
+}
+
+// ——— Legacy Practice Papers (for backward compatibility) ———
 export interface PracticePaperFilters {
   examId?: string;
   type?: "practice" | "full_length" | "previous_paper";
