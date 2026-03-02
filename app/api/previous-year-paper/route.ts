@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import PreviousYearPaper from "@/models/PreviousYearPaper";
+import "@/models/Exam";
 import { slugify } from "@/lib/slugify";
 import mongoose from "mongoose";
 

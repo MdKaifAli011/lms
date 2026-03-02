@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   getLevelWisePractices,
   getFullLengthMocks,
@@ -38,61 +39,118 @@ type PracticePaper = {
 const INITIAL_LIMIT = 3;
 const LOAD_MORE_LIMIT = 10;
 
-export default function PracticePage() {
-  const [activeTab, setActiveTab] = useState("all");
+// Tab configuration with URL mapping
+const TAB_CONFIG = {
+  all: { id: "all", label: "All Tests", urlParam: "all" },
+  practice: { id: "practice", label: "Practice Tests", urlParam: "practice-tests" },
+  mock: { id: "mock", label: "Full-Length Mocks", urlParam: "full-length-mocks" },
+  previous: { id: "previous", label: "Previous Year Papers", urlParam: "previous-year-papers" },
+};
+
+function PracticePageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   
-  // Pagination state for practice tests
+  // Get tab from URL or default to "all"
+  const urlTab = searchParams.get("tab");
+  const activeTab = useMemo(() => {
+    const entry = Object.entries(TAB_CONFIG).find(([_, config]) => config.urlParam === urlTab);
+    return entry ? entry[0] : "all";
+  }, [urlTab]);
+  
+  // Data loading state - track which tabs have been loaded
+  const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(["all"]));
+  
+  // Data states
   const [practicePapers, setPracticePapers] = useState<LevelWisePractice[]>([]);
   const [practiceTotal, setPracticeTotal] = useState(0);
   const [practicePage, setPracticePage] = useState(1);
   const [isLoadingMorePractice, setIsLoadingMorePractice] = useState(false);
   
-  // Pagination state for full-length mocks
-  const [mockPapers, setMockPapers] = useState<FullLengthMock[]>([]);
-  const [mockTotal, setMockTotal] = useState(0);
-  const [mockPage, setMockPage] = useState(1);
-  const [isLoadingMoreMock, setIsLoadingMoreMock] = useState(false);
+  const [fullLengthPapers, setFullLengthPapers] = useState<FullLengthMock[]>([]);
+  const [fullLengthTotal, setFullLengthTotal] = useState(0);
+  const [fullLengthPage, setFullLengthPage] = useState(1);
+  const [isLoadingMoreFullLength, setIsLoadingMoreFullLength] = useState(false);
   
   const [previousYearPapers, setPreviousYearPapers] = useState<PreviousYearPaper[]>([]);
   const [exams, setExams] = useState<{ id: string; name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initial load - only fetch 3 items for each type
+  // Update URL when tab changes
+  const setActiveTab = useCallback((tabId: string) => {
+    const config = TAB_CONFIG[tabId as keyof typeof TAB_CONFIG];
+    if (config) {
+      const url = tabId === "all" ? "/practice" : `/practice?tab=${config.urlParam}`;
+      router.push(url, { scroll: false });
+    }
+  }, [router]);
+
+  // Initial load - only load data for "all" tab (minimal data)
   useEffect(() => {
     let cancelled = false;
-    async function load() {
+    async function loadInitial() {
       setLoading(true);
       setError(null);
       try {
-        const [levelWiseRes, mockRes, previousYearRes, examsRes] = await Promise.all([
+        // Only load minimal data for "all" tab initially
+        const [levelWiseRes, examsRes] = await Promise.all([
           getLevelWisePractices({ status: "Active", page: 1, limit: INITIAL_LIMIT }),
-          getFullLengthMocks({ status: "Active", page: 1, limit: INITIAL_LIMIT }),
-          getPreviousYearPapers({ status: "Active" }),
           getExams(true),
         ]);
         if (cancelled) return;
         setPracticePapers(levelWiseRes.papers);
         setPracticeTotal(levelWiseRes.total);
-        setPracticePage(1);
-        setMockPapers(mockRes.papers);
-        setMockTotal(mockRes.total);
-        setMockPage(1);
-        setPreviousYearPapers(Array.isArray(previousYearRes) ? previousYearRes : []);
         setExams(Array.isArray(examsRes) ? (examsRes as { id: string; name?: string }[]) : []);
+        setPracticePage(1);
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load practice data");
-        setPracticePapers([]);
-        setMockPapers([]);
-        setPreviousYearPapers([]);
-        setExams([]);
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
-    load();
+    loadInitial();
     return () => { cancelled = true; };
   }, []);
+
+  // Lazy load data when tab changes
+  useEffect(() => {
+    if (loadedTabs.has(activeTab)) return; // Already loaded
+
+    let cancelled = false;
+    async function loadTabData() {
+      setLoading(true);
+      try {
+        if (activeTab === "practice" && practicePapers.length === 0) {
+          const res = await getLevelWisePractices({ status: "Active", page: 1, limit: LOAD_MORE_LIMIT });
+          if (!cancelled) {
+            setPracticePapers(res.papers);
+            setPracticeTotal(res.total);
+            setPracticePage(1);
+          }
+        } else if (activeTab === "mock" && fullLengthPapers.length === 0) {
+          const res = await getFullLengthMocks({ status: "Active" });
+          if (!cancelled) {
+            setFullLengthPapers(Array.isArray(res) ? res : []);
+            setFullLengthTotal(Array.isArray(res) ? res.length : 0);
+          }
+        } else if (activeTab === "previous" && previousYearPapers.length === 0) {
+          const res = await getPreviousYearPapers({ status: "Active" });
+          if (!cancelled) setPreviousYearPapers(Array.isArray(res) ? res : []);
+        }
+        if (!cancelled) setLoadedTabs(prev => new Set([...prev, activeTab]));
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load data");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    
+    if (activeTab !== "all") {
+      loadTabData();
+    }
+    return () => { cancelled = true; };
+  }, [activeTab, loadedTabs, practicePapers.length, fullLengthPapers.length, previousYearPapers.length]);
 
   // Load more practice papers (infinite scroll)
   const loadMorePractices = useCallback(async () => {
@@ -122,40 +180,6 @@ export default function PracticePage() {
     }
   }, [practicePage, practicePapers.length, practiceTotal, isLoadingMorePractice]);
 
-  // Load more mock papers (infinite scroll)
-  const loadMoreMocks = useCallback(async () => {
-    console.log("loadMoreMocks called", { isLoadingMoreMock, mockPapersLength: mockPapers.length, mockTotal });
-    if (isLoadingMoreMock || mockPapers.length >= mockTotal) {
-      console.log("loadMoreMocks early return");
-      return;
-    }
-    
-    setIsLoadingMoreMock(true);
-    try {
-      const nextPage = mockPage + 1;
-      console.log("Fetching page", nextPage);
-      const res = await getFullLengthMocks({ 
-        status: "Active", 
-        page: nextPage, 
-        limit: LOAD_MORE_LIMIT 
-      });
-      console.log("Got response", res);
-      
-      // Stop if no more data returned
-      if (res.papers.length === 0) {
-        setMockTotal(mockPapers.length); // Update total to stop further loading
-        return;
-      }
-      
-      setMockPapers(prev => [...prev, ...res.papers]);
-      setMockPage(nextPage);
-    } catch (e) {
-      console.error("Failed to load more mocks:", e);
-    } finally {
-      setIsLoadingMoreMock(false);
-    }
-  }, [mockPage, mockPapers.length, mockTotal, isLoadingMoreMock]);
-
   const examNameById = useMemo(() => {
     const map: Record<string, string> = {};
     exams.forEach((e) => { map[e.id] = e.name ?? "Exam"; });
@@ -175,14 +199,14 @@ export default function PracticePage() {
   }, [practicePapers]);
 
   const fullLengthPapersForView = useMemo<PracticePaper[]>(() => {
-    return mockPapers.map((p) => ({
+    return fullLengthPapers.map((p) => ({
       ...p,
       type: "full_length" as const,
       level: 1,
       examName: p.examName,
       examSlug: p.examSlug,
     }));
-  }, [mockPapers]);
+  }, [fullLengthPapers]);
 
   const previousYearPapersForView = useMemo<PracticePaper[]>(() => {
     return previousYearPapers.map((p) => ({
@@ -246,10 +270,16 @@ export default function PracticePage() {
     previousYearsByYear={previousYearsByYear}
     setActiveTab={setActiveTab}
     practiceTotal={practiceTotal}
-    isLoadingMorePractice={isLoadingMorePractice}
-    onLoadMorePractice={loadMorePractices}
-    mockTotal={mockTotal}
-    isLoadingMoreMock={isLoadingMoreMock}
-    onLoadMoreMock={loadMoreMocks}
+    isLoadingMore={isLoadingMorePractice}
+    onLoadMore={loadMorePractices}
   />;
+}
+
+// Wrap with Suspense for useSearchParams
+export default function PracticePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <PracticePageContent />
+    </Suspense>
+  );
 }

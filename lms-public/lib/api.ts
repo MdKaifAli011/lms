@@ -109,19 +109,17 @@ export interface FullLengthMock {
   image?: string;
 }
 
-export async function getFullLengthMocks(filters?: { examId?: string; status?: string; page?: number; limit?: number }): Promise<{ papers: FullLengthMock[]; total: number }> {
+export async function getFullLengthMocks(filters?: { examId?: string; status?: string }): Promise<FullLengthMock[]> {
   try {
     const params = new URLSearchParams();
     if (filters?.examId) params.set("examId", filters.examId);
     if (filters?.status) params.set("status", filters.status);
-    if (filters?.page != null) params.set("page", String(filters.page));
-    if (filters?.limit != null) params.set("limit", String(filters.limit));
     const q = params.toString() ? `?${params}` : "";
-    const res = await fetchApi<{ papers: FullLengthMock[]; total: number }>(`/api/full-length-mock${q}`);
-    return { papers: Array.isArray(res.papers) ? res.papers : [], total: res.total || 0 };
+    const list = await fetchApi<FullLengthMock[]>(`/api/full-length-mock${q}`);
+    return Array.isArray(list) ? list : [];
   } catch (e) {
     if (typeof window === "undefined") console.error("[getFullLengthMocks]", e);
-    return { papers: [], total: 0 };
+    return [];
   }
 }
 

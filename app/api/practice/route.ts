@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import LevelWisePractice from "@/models/LevelWisePractice";
-import "@/models/Exam";
-import "@/models/Subject";
-import "@/models/Unit";
-import "@/models/Chapter";
-import "@/models/Topic";
-import "@/models/Subtopic";
-import "@/models/Definition";
+import PracticePaper from "@/models/PracticePaper";
+import Exam from "@/models/Exam";
+import Subject from "@/models/Subject";
+import Unit from "@/models/Unit";
+import Chapter from "@/models/Chapter";
+import Topic from "@/models/Topic";
+import Subtopic from "@/models/Subtopic";
+import Definition from "@/models/Definition";
 import { slugify } from "@/lib/slugify";
 import mongoose from "mongoose";
 
@@ -21,55 +21,33 @@ const CONTENT_LEVEL_NAMES: Record<number, string> = {
   7: "Definition",
 };
 
-// CORS headers
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
-
-// Handle OPTIONS request for CORS preflight
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
-}
-
-/** GET /api/level-wise-practice – list level-wise practice papers */
+/** GET /api/practice – list practice papers with optional filters */
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
     
     const examId = searchParams.get("examId");
+    const type = searchParams.get("type") as "practice" | "full_length" | "previous_paper" | null;
     const level = searchParams.get("level");
     const status = searchParams.get("status");
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "0", 10);
 
     const query: Record<string, unknown> = {};
     if (examId) query.examId = examId;
+    if (type) query.type = type;
     if (level) query.level = parseInt(level, 10);
     if (status) query.status = status;
 
-    // Get total count for pagination
-    const total = await LevelWisePractice.countDocuments(query);
-
-    let dbQuery = LevelWisePractice.find(query)
-      .sort({ examId: 1, level: 1, orderNumber: 1 })
+    const papers = await PracticePaper.find(query)
+      .sort({ examId: 1, type: 1, level: 1, orderNumber: 1 })
       .populate("examId", "name slug")
       .populate("subjectId", "name slug")
       .populate("unitId", "name slug")
       .populate("chapterId", "name slug")
       .populate("topicId", "name slug")
       .populate("subtopicId", "name slug")
-      .populate("definitionId", "name slug");
-
-    // Apply pagination if limit is provided
-    if (limit > 0) {
-      const skip = (page - 1) * limit;
-      dbQuery = dbQuery.skip(skip).limit(limit);
-    }
-
-    const papers = await dbQuery.lean();
+      .populate("definitionId", "name slug")
+      .lean();
 
     const list = papers.map((doc: Record<string, unknown>) => ({
       id: (doc._id as { toString: () => string }).toString(),
@@ -90,6 +68,7 @@ export async function GET(request: NextRequest) {
       subtopicName: (doc.subtopicId as { name?: string })?.name || null,
       definitionId: (doc.definitionId as { _id?: { toString: () => string }; name?: string })?._id?.toString() || doc.definitionId,
       definitionName: (doc.definitionId as { name?: string })?.name || null,
+      type: doc.type,
       title: doc.title,
       slug: doc.slug,
       description: doc.description || "",
@@ -97,6 +76,7 @@ export async function GET(request: NextRequest) {
       totalMarks: doc.totalMarks,
       totalQuestions: doc.totalQuestions,
       difficulty: doc.difficulty,
+      year: doc.year,
       orderNumber: doc.orderNumber,
       status: doc.status,
       locked: doc.locked || false,
@@ -121,17 +101,17 @@ export async function GET(request: NextRequest) {
         : undefined,
     }));
 
-    return NextResponse.json({ papers: list, total }, { headers: corsHeaders });
+    return NextResponse.json(list);
   } catch (err) {
-    console.error("GET /api/level-wise-practice error:", err);
+    console.error("GET /api/practice error:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to fetch practice papers" },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 }
 
-/** POST /api/level-wise-practice – create a new level-wise practice paper */
+/** POST /api/practice – create a new practice paper */
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -140,30 +120,35 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     const title = (body.title ?? "").trim();
     if (!title) {
-      return NextResponse.json({ error: "Title is required" }, { status: 400, headers: corsHeaders });
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
     const examId = body.examId;
     if (!examId || !mongoose.Types.ObjectId.isValid(examId)) {
-      return NextResponse.json({ error: "Valid Exam ID is required" }, { status: 400, headers: corsHeaders });
+      return NextResponse.json({ error: "Valid Exam ID is required" }, { status: 400 });
+    }
+
+    const type = body.type || "practice";
+    if (!["practice", "full_length", "previous_paper"].includes(type)) {
+      return NextResponse.json({ error: "Invalid practice paper type" }, { status: 400 });
     }
 
     const level = parseInt(body.level || "1", 10);
     if (level < 1 || level > 7) {
-      return NextResponse.json({ error: "Level must be between 1 and 7" }, { status: 400, headers: corsHeaders });
+      return NextResponse.json({ error: "Level must be between 1 and 7" }, { status: 400 });
     }
 
     // Generate unique slug
     const baseSlug = slugify(title);
     let slug = baseSlug;
     let counter = 1;
-    while (await LevelWisePractice.findOne({ examId, slug }).lean()) {
+    while (await PracticePaper.findOne({ examId, slug }).lean()) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
 
-    // Get max order number for this exam
-    const maxOrder = await LevelWisePractice.findOne({ examId })
+    // Get max order number for this exam and type
+    const maxOrder = await PracticePaper.findOne({ examId, type })
       .sort({ orderNumber: -1 })
       .select("orderNumber")
       .lean();
@@ -172,6 +157,7 @@ export async function POST(request: NextRequest) {
     // Build the document
     const docData: Record<string, unknown> = {
       examId: new mongoose.Types.ObjectId(examId),
+      type,
       level,
       title,
       slug,
@@ -185,6 +171,11 @@ export async function POST(request: NextRequest) {
       locked: body.locked === true,
       image: body.image?.trim() || "",
     };
+
+    // Add year for previous_paper type
+    if (type === "previous_paper" && body.year) {
+      docData.year = parseInt(body.year, 10);
+    }
 
     // Add hierarchy references based on level
     if (level >= 2 && body.subjectId && mongoose.Types.ObjectId.isValid(body.subjectId)) {
@@ -206,13 +197,14 @@ export async function POST(request: NextRequest) {
       docData.definitionId = new mongoose.Types.ObjectId(body.definitionId);
     }
 
-    const doc = await LevelWisePractice.create(docData);
+    const doc = await PracticePaper.create(docData);
 
     return NextResponse.json({
       id: doc._id.toString(),
       examId: doc.examId.toString(),
       level: doc.level,
       levelName: CONTENT_LEVEL_NAMES[doc.level],
+      type: doc.type,
       title: doc.title,
       slug: doc.slug,
       description: doc.description,
@@ -220,6 +212,7 @@ export async function POST(request: NextRequest) {
       totalMarks: doc.totalMarks,
       totalQuestions: doc.totalQuestions,
       difficulty: doc.difficulty,
+      year: doc.year,
       orderNumber: doc.orderNumber,
       status: doc.status,
       locked: doc.locked,
@@ -233,12 +226,12 @@ export async function POST(request: NextRequest) {
             minute: "2-digit",
           })
         : undefined,
-    }, { status: 201, headers: corsHeaders });
+    }, { status: 201 });
   } catch (err) {
-    console.error("POST /api/level-wise-practice error:", err);
+    console.error("POST /api/practice error:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to create practice paper" },
-      { status: 500, headers: corsHeaders }
+      { status: 500 }
     );
   }
 }

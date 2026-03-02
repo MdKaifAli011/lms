@@ -1,14 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-export default function PracticeManagementLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function PracticeManagementLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />

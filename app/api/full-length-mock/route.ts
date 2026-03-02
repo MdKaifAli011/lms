@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import FullLengthMock from "@/models/FullLengthMock";
+import "@/models/Exam";
 import { slugify } from "@/lib/slugify";
 import mongoose from "mongoose";
 
@@ -24,27 +25,15 @@ export async function GET(request: NextRequest) {
     
     const examId = searchParams.get("examId");
     const status = searchParams.get("status");
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "0", 10);
 
     const query: Record<string, unknown> = {};
     if (examId) query.examId = examId;
     if (status) query.status = status;
 
-    // Get total count for pagination
-    const total = await FullLengthMock.countDocuments(query);
-
-    let dbQuery = FullLengthMock.find(query)
+    const papers = await FullLengthMock.find(query)
       .sort({ examId: 1, orderNumber: 1 })
-      .populate("examId", "name slug");
-
-    // Apply pagination if limit is provided
-    if (limit > 0) {
-      const skip = (page - 1) * limit;
-      dbQuery = dbQuery.skip(skip).limit(limit);
-    }
-
-    const papers = await dbQuery.lean();
+      .populate("examId", "name slug")
+      .lean();
 
     const list = papers.map((doc: Record<string, unknown>) => ({
       id: (doc._id as { toString: () => string }).toString(),
@@ -82,7 +71,7 @@ export async function GET(request: NextRequest) {
         : undefined,
     }));
 
-    return NextResponse.json({ papers: list, total }, { headers: corsHeaders });
+    return NextResponse.json(list, { headers: corsHeaders });
   } catch (err) {
     console.error("GET /api/full-length-mock error:", err);
     return NextResponse.json(
