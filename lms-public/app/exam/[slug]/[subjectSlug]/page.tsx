@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-import { getExamBySlugOrId, getSubjects, getSubjectById, getUnits } from "@/lib/api";
+import { getExamBySlugOrId, getSubjects, getSubjectById, getUnits, getSidebarTree } from "@/lib/api";
 import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
-import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
+import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
@@ -31,11 +31,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!subjectBySlug) return { title: "Not Found | LmsDoors" };
   const subject = await getSubjectById(subjectBySlug.id);
   if (!subject || typeof subject !== "object") return { title: "Not Found | LmsDoors" };
-  const subjectName = String((subject as { name?: string }).name ?? subjectSlug);
+  const subjectName = toTitleCase(String((subject as { name?: string }).name ?? subjectSlug));
   const seo = normalizeApiSeo((subject as { seo?: unknown }).seo);
   return generateEntityMetadata({
     title: subjectName,
-    examTitle: examName,
+    examTitle: toTitleCase(examName),
     level: "subject",
     seo: seo ?? undefined,
   });
@@ -47,7 +47,7 @@ export default async function SubjectPage({ params }: PageProps) {
   const exam = await getExamBySlugOrId(examSlug);
   if (!exam || typeof exam !== "object" || !("id" in exam)) notFound();
   const examId = String((exam as { id: string }).id);
-  const examName = String((exam as { name?: string }).name ?? examSlug);
+  const examName = toTitleCase(String((exam as { name?: string }).name ?? examSlug));
 
   const subjectsRaw = await getSubjects({ examId, contextapi: true });
   const subjects = (subjectsRaw as { id: string; name: string; slug: string }[]).filter(
@@ -58,17 +58,18 @@ export default async function SubjectPage({ params }: PageProps) {
 
   const subject = await getSubjectById(subjectBySlug.id);
   if (!subject || typeof subject !== "object") notFound();
-  const subjectName = String((subject as { name?: string }).name ?? subjectSlug);
+  const subjectName = toTitleCase(String((subject as { name?: string }).name ?? subjectSlug));
   const contentBody = (subject as { contentBody?: string }).contentBody ?? "";
 
-  const [hierarchy, nav, unitsRaw] = await Promise.all([
-    buildSubjectHierarchy(examId),
+  const [sidebarData, nav, unitsRaw] = await Promise.all([
+    getSidebarTree(examId),
     getUniversalNav({ examSlug, subjectSlug }),
     getUnits({ subjectId: subjectBySlug.id, contextapi: true }),
   ]);
+  const hierarchy = sidebarData.subjects ?? [];
   const units = (unitsRaw as { id: string; name?: string; slug?: string; status?: string }[]).filter(
     (u) => (u as { status?: string }).status === "Active"
-  ).map((u) => ({ id: u.id, href: `/exam/${examSlug}/${subjectSlug}/${u.slug ?? u.id}`, slug: u.slug, name: u.name }));
+  ).map((u) => ({ id: u.id, href: `/exam/${examSlug}/${subjectSlug}/${u.slug ?? u.id}`, slug: u.slug, name: toTitleCase(u.name ?? "") }));
 
   const breadcrumbs = [
     { label: examName, href: `/exam/${examSlug}` },

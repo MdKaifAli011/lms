@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, Search, X, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { toTitleCase } from "@/lib/titleCase";
 import type { HierarchySubject } from "@/lib/buildHierarchy";
 
 type HierarchyLevel = "subject" | "unit" | "chapter" | "topic";
@@ -57,7 +58,8 @@ interface HierarchySidebarProps {
 }
 
 function getLabel(node: { name?: string; title?: string }): string {
-  return node.name ?? (node as { title?: string }).title ?? "";
+  const raw = node.name ?? (node as { title?: string }).title ?? "";
+  return toTitleCase(raw);
 }
 
 export function HierarchySidebar({
@@ -230,7 +232,7 @@ export function HierarchySidebar({
                                                 <TopicRow
                                                   key={topic.id}
                                                   href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}/${chapterSlug}/${topicSlug}`}
-                                                  label={topic.name}
+                                                  label={toTitleCase(topic.name)}
                                                   active={topicActive}
                                                   isLast={isLast}
                                                 />

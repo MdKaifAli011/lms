@@ -57,6 +57,10 @@ const data = {
       icon: ClipboardList,
       items: [
         {
+          title: "Syllabus Management",
+          url: "/practice-management/syllabus",
+        },
+        {
           title: "Level Wise",
           url: "/practice-management/level-wise",
         },

@@ -14,6 +14,8 @@ export interface IChapter {
   today?: number
   descriptions?: string[]
   orderNumber?: number
+  weightage?: number
+  marks?: number
   lastModified?: string
   contentBody?: string
   seo?: {
@@ -45,6 +47,8 @@ const chapterSchema = new Schema<IChapter>(
     today: { type: Number, default: 0 },
     descriptions: [{ type: String }],
     orderNumber: { type: Number, default: 1 },
+    weightage: { type: Number },
+    marks: { type: Number },
     lastModified: { type: String },
     contentBody: { type: String },
     seo: {

@@ -384,6 +384,34 @@ export async function getDefinitionById(id: string): Promise<unknown | null> {
   }
 }
 
+// ——— Tree APIs (single call for sidebar or syllabus) ———
+
+/** Sidebar tree: exam → subjects → units → chapters → topics (one API call, no weightage/marks). */
+export async function getSidebarTree(examId: string): Promise<{ exam?: { id: string; name?: string; slug?: string }; subjects: unknown[] }> {
+  try {
+    const res = await fetchApi<{ exam?: { id: string; name?: string; slug?: string }; subjects?: unknown[] }>(
+      `/api/sidebar-tree?examId=${encodeURIComponent(examId)}`
+    );
+    return { exam: res.exam, subjects: Array.isArray(res.subjects) ? res.subjects : [] };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getSidebarTree]", e);
+    return { subjects: [] };
+  }
+}
+
+/** Syllabus tree: full 7 levels with weightage and marks (one API call). */
+export async function getSyllabusTree(examId: string): Promise<{ exam?: { id: string; name?: string; slug?: string }; subjects: unknown[] }> {
+  try {
+    const res = await fetchApi<{ exam?: { id: string; name?: string; slug?: string }; subjects?: unknown[] }>(
+      `/api/syllabus-hierarchy?examId=${encodeURIComponent(examId)}`
+    );
+    return { exam: res.exam, subjects: Array.isArray(res.subjects) ? res.subjects : [] };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getSyllabusTree]", e);
+    return { subjects: [] };
+  }
+}
+
 // ——— Visit (optional, for analytics) ———
 export async function recordVisit(
   resource: "exams" | "subjects" | "units" | "chapters" | "topics" | "subtopics" | "definitions",

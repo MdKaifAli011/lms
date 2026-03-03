@@ -23,6 +23,8 @@ function toUnitJson(doc: Record<string, unknown>): Record<string, unknown> {
     today: doc.today ?? 0,
     descriptions: doc.descriptions ?? [],
     orderNumber: doc.orderNumber ?? 0,
+    weightage: doc.weightage,
+    marks: doc.marks,
     lastModified: doc.lastModified ?? (updatedAt
       ? new Date(updatedAt).toLocaleString("en-US", {
           year: "numeric",
@@ -64,10 +66,10 @@ export async function GET(request: NextRequest) {
     }
 
     const query = Unit.find(filter).sort({ subjectId: 1, orderNumber: 1 })
-    const units = await (contextapi ? query.select("name slug status orderNumber subjectId") : query).lean()
+    const units = await (contextapi ? query.select("name slug status orderNumber subjectId weightage marks") : query).lean()
 
     if (contextapi) {
-      type MinimalDoc = { _id: { toString(): string }; subjectId: { toString(): string }; name?: string; slug?: string; status?: string; orderNumber?: number }
+      type MinimalDoc = { _id: { toString(): string }; subjectId: { toString(): string }; name?: string; slug?: string; status?: string; orderNumber?: number; weightage?: number; marks?: number }
       const list = (units as MinimalDoc[]).map((doc) => ({
         id: doc._id.toString(),
         subjectId: doc.subjectId.toString(),
@@ -75,6 +77,8 @@ export async function GET(request: NextRequest) {
         slug: doc.slug ?? "",
         status: doc.status ?? "Active",
         order: doc.orderNumber ?? 0,
+        weightage: doc.weightage,
+        marks: doc.marks,
       }))
       return NextResponse.json(list)
     }

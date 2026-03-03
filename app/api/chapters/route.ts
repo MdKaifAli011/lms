@@ -23,6 +23,8 @@ function toChapterJson(doc: Record<string, unknown>): Record<string, unknown> {
     today: doc.today ?? 0,
     descriptions: doc.descriptions ?? [],
     orderNumber: doc.orderNumber ?? 0,
+    weightage: doc.weightage,
+    marks: doc.marks,
     lastModified: doc.lastModified ?? (updatedAt
       ? new Date(updatedAt).toLocaleString("en-US", {
           year: "numeric",
@@ -64,10 +66,10 @@ export async function GET(request: NextRequest) {
     }
 
     const query = Chapter.find(filter).sort({ unitId: 1, orderNumber: 1 })
-    const chapters = await (contextapi ? query.select("name slug status orderNumber unitId") : query).lean()
+    const chapters = await (contextapi ? query.select("name slug status orderNumber unitId weightage marks") : query).lean()
 
     if (contextapi) {
-      type MinimalDoc = { _id: { toString(): string }; unitId: { toString(): string }; name?: string; slug?: string; status?: string; orderNumber?: number }
+      type MinimalDoc = { _id: { toString(): string }; unitId: { toString(): string }; name?: string; slug?: string; status?: string; orderNumber?: number; weightage?: number; marks?: number }
       const list = (chapters as MinimalDoc[]).map((doc) => ({
         id: doc._id.toString(),
         unitId: doc.unitId.toString(),
@@ -75,6 +77,8 @@ export async function GET(request: NextRequest) {
         slug: doc.slug ?? "",
         status: doc.status ?? "Active",
         order: doc.orderNumber ?? 0,
+        weightage: doc.weightage,
+        marks: doc.marks,
       }))
       return NextResponse.json(list)
     }

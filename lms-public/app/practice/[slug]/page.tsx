@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PracticeShell } from "@/components/practice/PracticeShell";
 import { getPracticePaperBySlug } from "@/lib/api";
+import { toTitleCase } from "@/lib/titleCase";
 import type { LevelWisePractice, FullLengthMock, PreviousYearPaper } from "@/lib/api";
 
 function formatDuration(minutes: number): string {
@@ -81,7 +82,7 @@ export default function PracticeSlugPage() {
         : "Previous Year Paper";
 
   return (
-    <PracticeShell title={paper.title} description={typeLabel}>
+    <PracticeShell title={toTitleCase(paper.title)} description={typeLabel}>
       <Card className="bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border shadow-lg max-w-2xl">
         <CardContent className="p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-4">
@@ -89,13 +90,13 @@ export default function PracticeSlugPage() {
               {typeLabel}
             </span>
             {"examName" in paper && paper.examName && (
-              <span>{paper.examName}</span>
+              <span>{toTitleCase(paper.examName)}</span>
             )}
             {"year" in paper && (
               <span>Year: {paper.year}</span>
             )}
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">{paper.title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">{toTitleCase(paper.title)}</h2>
           {paper.description && (
             <p className="text-muted-foreground text-sm sm:text-base mb-6">{paper.description}</p>
           )}

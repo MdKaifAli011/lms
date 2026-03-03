@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PracticeShell } from "@/components/practice/PracticeShell";
 import { getFullLengthMocks, type FullLengthMock } from "@/lib/api";
+import { toTitleCase } from "@/lib/titleCase";
 import { cn } from "@/lib/utils";
 
 const INITIAL_PAGE_SIZE = 10;
@@ -36,7 +37,7 @@ function MockTestCard({ id, paper }: { id: string; paper: FullLengthMock }) {
               {id}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-base sm:text-lg text-foreground truncate">{paper.title}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-foreground truncate">{toTitleCase(paper.title)}</h3>
               <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                 {paper.description || "Full-length mock test"}
               </p>

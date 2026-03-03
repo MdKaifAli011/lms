@@ -5,6 +5,7 @@ import { ChevronRight, Layers, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { toTitleCase } from "@/lib/titleCase";
 
 export type HierarchyListVariant = "units" | "chapters" | "topics" | "subtopics" | "definitions";
 
@@ -99,7 +100,8 @@ interface HierarchyListSectionProps {
 }
 
 function getLabel(item: HierarchyListItem): string {
-  return (item.name ?? item.title ?? item.slug ?? item.id) || "";
+  const raw = (item.name ?? item.title ?? item.slug ?? item.id) || "";
+  return toTitleCase(raw);
 }
 
 export function HierarchyListSection({

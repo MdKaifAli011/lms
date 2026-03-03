@@ -1,17 +1,19 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-import { getExamBySlugOrId, getExams } from "@/lib/api";
-import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
+import { getExamBySlugOrId, getSidebarTree } from "@/lib/api";
 import { getUniversalNav } from "@/lib/navigationService";
 import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
+import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { SubjectCardGrid } from "@/components/SubjectCardGrid";
 import { RecordVisit } from "@/components/RecordVisit";
+import { BookOpen } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!exam || typeof exam !== "object" || !("id" in exam)) {
     return { title: "Not Found | LmsDoors" };
   }
-  const name = String((exam as { name?: string }).name ?? slug);
+  const name = toTitleCase(String((exam as { name?: string }).name ?? slug));
   const seo = normalizeApiSeo((exam as { seo?: unknown }).seo);
   return generateEntityMetadata({
     title: name,
@@ -38,13 +40,14 @@ export default async function ExamSlugPage({ params }: PageProps) {
   if (!exam || typeof exam !== "object" || !("id" in exam)) notFound();
 
   const examId = String((exam as { id: string }).id);
-  const examName = String((exam as { name?: string }).name ?? slug);
+  const examName = toTitleCase(String((exam as { name?: string }).name ?? slug));
   const contentBody = (exam as { contentBody?: string }).contentBody ?? "";
 
-  const [hierarchy, nav] = await Promise.all([
-    buildSubjectHierarchy(examId),
+  const [sidebarData, nav] = await Promise.all([
+    getSidebarTree(examId),
     getUniversalNav({ examSlug: slug }),
   ]);
+  const hierarchy = sidebarData.subjects ?? [];
 
   const breadcrumbs = [{ label: examName, href: `/exam/${slug}` }];
 
@@ -62,6 +65,15 @@ export default async function ExamSlugPage({ params }: PageProps) {
           <ContentRenderer content={contentBody} />
         </div>
       ) : null}
+      <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3">
+        <Link
+          href={`/exam/${slug}/syllabus`}
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <BookOpen className="h-4 w-4" aria-hidden />
+          View full syllabus
+        </Link>
+      </div>
       <div className="mt-6 sm:mt-8 md:mt-10">
         <SubjectCardGrid examSlug={slug} subjects={hierarchy} />
       </div>

@@ -14,6 +14,8 @@ export interface IUnit {
   today?: number
   descriptions?: string[]
   orderNumber?: number
+  weightage?: number
+  marks?: number
   lastModified?: string
   contentBody?: string
   seo?: {
@@ -45,6 +47,8 @@ const unitSchema = new Schema<IUnit>(
     today: { type: Number, default: 0 },
     descriptions: [{ type: String }],
     orderNumber: { type: Number, default: 1 },
+    weightage: { type: Number },
+    marks: { type: Number },
     lastModified: { type: String },
     contentBody: { type: String },
     seo: {

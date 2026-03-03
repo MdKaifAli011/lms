@@ -23,6 +23,8 @@ function toSubtopicJson(doc: Record<string, unknown>): Record<string, unknown> {
     today: doc.today ?? 0,
     descriptions: doc.descriptions ?? [],
     orderNumber: doc.orderNumber ?? 0,
+    weightage: doc.weightage,
+    marks: doc.marks,
     lastModified: doc.lastModified ?? (updatedAt
       ? new Date(updatedAt).toLocaleString("en-US", {
           year: "numeric",
@@ -64,10 +66,10 @@ export async function GET(request: NextRequest) {
     }
 
     const query = Subtopic.find(filter).sort({ topicId: 1, orderNumber: 1 })
-    const subtopics = await (contextapi ? query.select("name slug status orderNumber topicId") : query).lean()
+    const subtopics = await (contextapi ? query.select("name slug status orderNumber topicId weightage marks") : query).lean()
 
     if (contextapi) {
-      type MinimalDoc = { _id: { toString(): string }; topicId: { toString(): string }; name?: string; slug?: string; status?: string; orderNumber?: number }
+      type MinimalDoc = { _id: { toString(): string }; topicId: { toString(): string }; name?: string; slug?: string; status?: string; orderNumber?: number; weightage?: number; marks?: number }
       const list = (subtopics as MinimalDoc[]).map((doc) => ({
         id: doc._id.toString(),
         topicId: doc.topicId.toString(),
@@ -75,6 +77,8 @@ export async function GET(request: NextRequest) {
         slug: doc.slug ?? "",
         status: doc.status ?? "Active",
         order: doc.orderNumber ?? 0,
+        weightage: doc.weightage,
+        marks: doc.marks,
       }))
       return NextResponse.json(list)
     }

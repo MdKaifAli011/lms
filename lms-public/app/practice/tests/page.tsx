@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PracticeShell } from "@/components/practice/PracticeShell";
 import { getLevelWisePractices, type LevelWisePractice } from "@/lib/api";
+import { toTitleCase } from "@/lib/titleCase";
 
 const LOAD_MORE_LIMIT = 10;
 
@@ -20,8 +21,8 @@ function formatDuration(minutes: number): string {
 function PracticeTestCard({ paper }: { paper: LevelWisePractice }) {
   const duration = formatDuration(paper.durationMinutes);
   const displayLabel = paper.subjectName
-    ? `${paper.examName ?? ""} · ${paper.subjectName}`
-    : (paper.examName ?? "Practice");
+    ? `${toTitleCase(paper.examName ?? "")} · ${toTitleCase(paper.subjectName)}`
+    : toTitleCase(paper.examName ?? "Practice");
   return (
     <Link href={`/practice/${paper.slug}`}>
       <Card className="h-full bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer hover:border-blue-500/30">
@@ -34,7 +35,7 @@ function PracticeTestCard({ paper }: { paper: LevelWisePractice }) {
               {displayLabel}
             </span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">{paper.title}</h3>
+          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">{toTitleCase(paper.title)}</h3>
           <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 line-clamp-2">
             {paper.description || "Practice test"}
           </p>

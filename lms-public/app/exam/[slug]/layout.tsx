@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getExamBySlugOrId, getExams } from "@/lib/api";
-import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
+import { getExamBySlugOrId, getExams, getSidebarTree } from "@/lib/api";
 import { HierarchyShell } from "@/components/HierarchyShell";
 
 interface LayoutProps {
@@ -15,10 +14,11 @@ export default async function ExamSlugLayout({ params, children }: LayoutProps) 
 
   const examId = String((exam as { id: string }).id);
 
-  const [hierarchy, examsRaw] = await Promise.all([
-    buildSubjectHierarchy(examId),
+  const [sidebarData, examsRaw] = await Promise.all([
+    getSidebarTree(examId),
     getExams(),
   ]);
+  const hierarchy = sidebarData.subjects ?? [];
   const exams = (examsRaw as { id: string; name?: string; slug?: string; status?: string }[]).filter(
     (e) => e.status === "Active"
   );

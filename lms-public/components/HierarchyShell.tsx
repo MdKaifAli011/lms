@@ -101,6 +101,7 @@ export function HierarchyShell({
         </div>
 
         <StudyToolsSidebar
+          examSlug={examSlug}
           user={{
             name: "Alex Johnson",
             role: "NEET Aspirant",

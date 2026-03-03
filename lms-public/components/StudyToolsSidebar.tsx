@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   StickyNote,
   Bot,
@@ -9,6 +11,7 @@ import {
   Settings,
   Share2,
   HelpCircle,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -17,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StudyToolsSidebarProps {
+  examSlug?: string;
   user?: {
     name?: string;
     role?: string;
@@ -24,10 +28,15 @@ interface StudyToolsSidebarProps {
   };
 }
 
-export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
+export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
+  const pathname = usePathname();
   const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+
+  const isSyllabusPage = Boolean(
+    examSlug && pathname && pathname === `/exam/${examSlug}/syllabus`
+  );
 
   useEffect(() => {
     if (isMobile) return;
@@ -41,14 +50,17 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
   }, [isHovering, isMobile]);
 
   const studyTools = [
+    ...(examSlug
+      ? [
+          {
+            icon: ClipboardList,
+            label: "Syllabus",
+            href: `/exam/${examSlug}/syllabus`,
+          },
+        ]
+      : []),
     { icon: StickyNote, label: "Take Notes", onClick: () => {} },
-    {
-      icon: Bot,
-      label: "Ask AI Tutor",
-      onClick: () => {},
-      variant: "default" as const,
-      className: "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white",
-    },
+    { icon: Bot, label: "Ask AI Tutor", onClick: () => {} },
     { icon: BookOpen, label: "Flashcards", onClick: () => {} },
     { icon: Bookmark, label: "Bookmark", onClick: () => {} },
   ];
@@ -69,6 +81,7 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
 
   if (isMobile) {
     const mobileTools = [
+      ...(examSlug ? [{ icon: ClipboardList, label: "Syllabus", onClick: () => {}, isPrimary: false, href: `/exam/${examSlug}/syllabus` }] : []),
       { icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false },
       { icon: Bot, label: "AI Tutor", onClick: () => {}, isPrimary: true },
       { icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false },
@@ -93,6 +106,32 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
         <div className="flex items-stretch justify-around gap-0 min-h-[48px] py-1">
           {mobileTools.map((tool, index) => {
             const Icon = tool.icon;
+            const toolHref = (tool as { href?: string }).href;
+            if (toolHref) {
+              const isActive = pathname === toolHref;
+              return (
+                <Link
+                  key={index}
+                  href={toolHref}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1 flex-1 transition-colors",
+                    isActive
+                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+                  )}
+                  aria-label={tool.label}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <div className={cn(
+                    "flex items-center justify-center w-8 h-8 rounded-lg",
+                    isActive && "bg-blue-100 dark:bg-blue-900/40"
+                  )}>
+                    <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  </div>
+                  <span className="text-[10px] font-medium truncate max-w-[52px] text-center">{tool.label}</span>
+                </Link>
+              );
+            }
             if (tool.isPrimary) {
               return (
                 <button
@@ -113,7 +152,7 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
                 key={index}
                 type="button"
                 onClick={tool.onClick}
-                className="flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1 flex-1 text-muted-foreground"
+                className="flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1 flex-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
                 aria-label={tool.label}
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg">
@@ -143,7 +182,7 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
         <div className="p-3 space-y-2">
           {isExpanded && (
             <>
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider px-2 py-1">
+              <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider px-2 py-1">
                 Study Tools
               </h3>
               <Separator className="my-2" />
@@ -153,28 +192,43 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
           <div className="space-y-1">
             {studyTools.map((tool, index) => {
               const Icon = tool.icon;
-              const isAITutor = tool.label === "Ask AI Tutor";
+              const href = (tool as { href?: string }).href;
+              if (href) {
+                const isActive = isSyllabusPage;
+                return (
+                  <Button
+                    key={index}
+                    variant="ghost"
+                    className={cn(
+                      "w-full justify-start gap-3 h-auto py-2.5 px-2 transition-colors",
+                      !isExpanded && "justify-center px-0",
+                      isActive
+                        ? "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                        : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
+                    )}
+                    title={!isExpanded ? tool.label : undefined}
+                    asChild
+                  >
+                    <Link href={href} className="flex w-full items-center gap-3 py-2.5 px-2 min-h-10" aria-current={isActive ? "page" : undefined}>
+                      <Icon className="h-5 w-5 shrink-0" />
+                      {isExpanded && <span className="text-sm font-normal">{tool.label}</span>}
+                    </Link>
+                  </Button>
+                );
+              }
               return (
                 <Button
                   key={index}
-                  variant={tool.variant ?? "ghost"}
+                  variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 h-auto py-2.5 px-2 text-foreground hover:bg-muted/50",
-                    (tool as { className?: string }).className,
-                    !isExpanded && "justify-center px-0",
-                    isAITutor && !isExpanded && "bg-blue-600 hover:bg-blue-700 text-white"
+                    "w-full justify-start gap-3 h-auto py-2.5 px-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100 transition-colors",
+                    !isExpanded && "justify-center px-0"
                   )}
-                  onClick={tool.onClick}
+                  onClick={(tool as { onClick?: () => void }).onClick}
                   title={!isExpanded ? tool.label : undefined}
                 >
-                  <Icon
-                    className={cn("h-5 w-5 shrink-0", isAITutor && "text-white")}
-                  />
-                  {isExpanded && (
-                    <span className={cn("text-sm font-normal", isAITutor && "text-white")}>
-                      {tool.label}
-                    </span>
-                  )}
+                  <Icon className="h-5 w-5 shrink-0" />
+                  {isExpanded && <span className="text-sm font-normal">{tool.label}</span>}
                 </Button>
               );
             })}
@@ -192,7 +246,7 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
                     <Button
                       key={index}
                       variant="ghost"
-                      className="w-full justify-start gap-3 h-auto py-2.5 px-2 text-muted-foreground hover:bg-muted/50"
+                      className="w-full justify-start gap-3 h-auto py-2.5 px-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
                       onClick={action.onClick}
                     >
                       <Icon className="h-5 w-5 shrink-0" />
@@ -216,13 +270,13 @@ export function StudyToolsSidebar({ user }: StudyToolsSidebarProps) {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
-              <p className="text-xs text-muted-foreground truncate">{userRole}</p>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{displayName}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{userRole}</p>
             </div>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0 text-muted-foreground hover:bg-muted/50"
+              className="h-8 w-8 shrink-0 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
               onClick={() => {}}
               title="Settings"
             >

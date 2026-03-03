@@ -24,6 +24,8 @@ function toDefinitionJson(doc: Record<string, unknown>): Record<string, unknown>
     today: doc.today ?? 0,
     descriptions: doc.descriptions ?? [],
     orderNumber: doc.orderNumber ?? 0,
+    weightage: doc.weightage,
+    marks: doc.marks,
     lastModified: doc.lastModified ?? (updatedAt ? new Date(updatedAt).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }) : undefined),
     contentBody: doc.contentBody ?? "",
     seo: doc.seo ?? {},
@@ -73,6 +75,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (body.image !== undefined) update.image = body.image?.trim() || "No Image"
     if (body.contentBody !== undefined) update.contentBody = body.contentBody
     if (body.seo !== undefined && typeof body.seo === "object") update.seo = { ...body.seo }
+    if (body.weightage !== undefined) update.weightage = body.weightage == null || body.weightage === "" ? undefined : Number(body.weightage)
+    if (body.marks !== undefined) update.marks = body.marks == null || body.marks === "" ? undefined : Number(body.marks)
     await Definition.collection.updateOne({ _id: new ObjectId(param) }, { $set: update })
     const updated = await Definition.findById(param).lean()
     if (!updated) return NextResponse.json({ error: "Definition not found" }, { status: 404 })

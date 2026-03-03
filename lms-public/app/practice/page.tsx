@@ -30,6 +30,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toTitleCase } from "@/lib/titleCase";
 
 const RECOMMENDED_LIMIT = 6;
 const MOCKS_PREVIEW = 5;
@@ -82,8 +83,8 @@ function EmptySectionCard({ title, description, href, linkLabel }: { title: stri
 function PracticeTestCard({ paper }: { paper: LevelWisePractice }) {
   const duration = formatDuration(paper.durationMinutes);
   const displayLabel = paper.subjectName
-    ? `${paper.examName ?? ""} · ${paper.subjectName}`
-    : (paper.examName ?? "Practice");
+    ? `${toTitleCase(paper.examName ?? "")} · ${toTitleCase(paper.subjectName)}`
+    : toTitleCase(paper.examName ?? "Practice");
   return (
     <Link href={`/practice/${paper.slug}`} className="block h-full group">
       <Card className="h-full rounded-2xl bg-card/90 dark:bg-card/70 backdrop-blur-xl border border-border shadow-md transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 hover:border-blue-500/40 group-hover:border-blue-500/30">
@@ -96,7 +97,7 @@ function PracticeTestCard({ paper }: { paper: LevelWisePractice }) {
               {displayLabel}
             </span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{paper.title}</h3>
+          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{toTitleCase(paper.title)}</h3>
           <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 line-clamp-2">
             {paper.description || "Practice test"}
           </p>
@@ -134,7 +135,7 @@ function MockTestCardRow({ id, paper }: { id: string; paper: FullLengthMock }) {
               {id}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-base sm:text-lg text-foreground truncate">{paper.title}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-foreground truncate">{toTitleCase(paper.title)}</h3>
               <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 mt-0.5">
                 {paper.description || "Full-length mock test"}
               </p>
@@ -177,7 +178,7 @@ function PreviousYearCard({ examName, year, paper }: { examName: string; year: n
     <Link href={`/practice/${paper.slug}`} className="block group">
       <Card className="rounded-2xl bg-card/90 dark:bg-card/70 backdrop-blur-xl border border-border p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 hover:border-blue-500/40 cursor-pointer">
         <CardContent className="p-0">
-          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5 tracking-wider">{examName}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5 tracking-wider">{toTitleCase(examName)}</p>
           <p className="text-lg sm:text-xl font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{year}</p>
           <div className="mt-2 sm:mt-3 flex justify-center gap-2 text-blue-600 dark:text-blue-400 opacity-80 group-hover:opacity-100 transition-opacity">
             <Download className="h-4 w-4" />
@@ -229,7 +230,7 @@ export default function PracticePage() {
 
   const examNameById = useMemo(() => {
     const map: Record<string, string> = {};
-    exams.forEach((e) => { map[e.id] = e.name ?? "Exam"; });
+    exams.forEach((e) => { map[e.id] = toTitleCase(e.name ?? "Exam"); });
     return map;
   }, [exams]);
 
@@ -242,7 +243,7 @@ export default function PracticePage() {
         map.set(key, {
           year: y,
           examId: p.examId,
-          examName: p.examName ?? examNameById[p.examId] ?? "Exam",
+          examName: toTitleCase(p.examName ?? examNameById[p.examId] ?? "Exam"),
           papers: [],
         });
       }

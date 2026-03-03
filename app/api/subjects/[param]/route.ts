@@ -24,6 +24,8 @@ function toSubjectJson(doc: Record<string, unknown>): Record<string, unknown> {
     today: doc.today ?? 0,
     descriptions: doc.descriptions ?? [],
     orderNumber: doc.orderNumber ?? 0,
+    weightage: doc.weightage,
+    marks: doc.marks,
     lastModified: doc.lastModified ?? (updatedAt
       ? new Date(updatedAt).toLocaleString("en-US", {
           year: "numeric",
@@ -138,6 +140,8 @@ export async function PUT(
     if (body.image !== undefined) update.image = body.image?.trim() || "No Image"
     if (body.contentBody !== undefined) update.contentBody = body.contentBody
     if (body.seo !== undefined && typeof body.seo === "object") update.seo = { ...body.seo }
+    if (body.weightage !== undefined) update.weightage = body.weightage == null || body.weightage === "" ? undefined : Number(body.weightage)
+    if (body.marks !== undefined) update.marks = body.marks == null || body.marks === "" ? undefined : Number(body.marks)
 
     await Subject.collection.updateOne(
       { _id: new ObjectId(param) },

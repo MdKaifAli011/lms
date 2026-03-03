@@ -6,6 +6,7 @@ import { Download, PlayCircle, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PracticeShell } from "@/components/practice/PracticeShell";
 import { getPreviousYearPapers, getExams, type PreviousYearPaper } from "@/lib/api";
+import { toTitleCase } from "@/lib/titleCase";
 
 const INITIAL_GROUPS = 4;
 const LOAD_MORE_GROUPS = 4;
@@ -23,7 +24,7 @@ function PreviousYearCard({
     <Link href={`/practice/${paper.slug}`}>
       <Card className="bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border p-4 text-center hover:shadow-lg hover:border-blue-500/30 transition-all cursor-pointer">
         <CardContent className="p-0">
-          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5">{examName}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5">{toTitleCase(examName)}</p>
           <p className="text-lg sm:text-xl font-bold text-foreground">{year}</p>
           <div className="mt-2 sm:mt-3 flex justify-center gap-2 text-blue-600 dark:text-blue-400">
             <Download className="h-4 w-4" />
@@ -69,7 +70,7 @@ export default function PracticePreviousYearPaperPage() {
 
   const examNameById = useMemo(() => {
     const map: Record<string, string> = {};
-    exams.forEach((e) => { map[e.id] = e.name ?? "Exam"; });
+    exams.forEach((e) => { map[e.id] = toTitleCase(e.name ?? "Exam"); });
     return map;
   }, [exams]);
 
@@ -82,7 +83,7 @@ export default function PracticePreviousYearPaperPage() {
         map.set(key, {
           year: y,
           examId: p.examId,
-          examName: p.examName ?? examNameById[p.examId] ?? "Exam",
+          examName: toTitleCase(p.examName ?? examNameById[p.examId] ?? "Exam"),
           papers: [],
         });
       }

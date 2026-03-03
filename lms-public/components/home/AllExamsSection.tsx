@@ -1,6 +1,7 @@
 import React from "react";
 import { BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { toTitleCase } from "@/lib/titleCase";
 import { ExamCard } from "../ExamCard";
 
 interface ExamItem {
@@ -51,7 +52,7 @@ export function AllExamsSection({ exams }: AllExamsSectionProps) {
               <ExamCard
                 exam={{
                   id: exam.id,
-                  name: exam.name ?? "Exam",
+                  name: toTitleCase(exam.name ?? "Exam"),
                   slug: exam.slug,
                   image: exam.image,
                   orderNumber: exam.orderNumber,
