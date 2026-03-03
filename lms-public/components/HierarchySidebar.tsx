@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Search, X, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -142,13 +142,13 @@ export function HierarchySidebar({
       )}
       <aside
         className={cn(
-          "overflow-y-auto border-r shadow-lg bg-background/95 backdrop-blur-sm border-border scrollbar-thin",
+          "overflow-y-auto border-r bg-background/95 backdrop-blur-sm border-border scrollbar-hide",
           isMobile
-            ? "fixed left-0 top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] z-50 w-80 flex-shrink-0"
-            : "sticky self-start top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] w-80 flex-shrink-0"
+            ? "fixed left-0 top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] z-50 w-80 shrink-0"
+            : "sticky self-start top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] w-80 shrink-0"
         )}
       >
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-5 space-y-5">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary" />
             <Input
@@ -167,16 +167,16 @@ export function HierarchySidebar({
               </button>
             )}
           </div>
-          <div className="space-y-1">
+          <nav className="space-y-2" aria-label="Syllabus navigation">
             {visibleSubjects.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">No results found</div>
+              <div className="py-10 text-center text-sm text-muted-foreground">No results found</div>
             ) : (
               visibleSubjects.map((subject) => {
                 const subjectSlug = subject.slug || subject.id;
                 const subjectActive = subjectSlug === active.subject;
                 const subjectId = `subject-${subject.id}`;
                 return (
-                  <div key={subject.id} className="space-y-1">
+                  <div key={subject.id} className="space-y-2">
                     <BranchRow
                       level="subject"
                       href={`/exam/${examSlug}/${subjectSlug}`}
@@ -187,13 +187,13 @@ export function HierarchySidebar({
                       hasLeadingCircle={false}
                     />
                     {expanded(subjectId, subjectActive) && subject.units?.length ? (
-                      <div className="relative ml-3 pl-4 border-l-2 border-dashed border-border/60 space-y-1 mt-1">
+                      <div className="relative ml-3 pl-4 border-l-2 border-dashed border-border/60 space-y-2 mt-2">
                         {subject.units.map((unit) => {
                           const unitSlug = unit.slug || unit.id;
                           const unitActive = unitSlug === active.unit;
                           const unitId = `unit-${unit.id}`;
                           return (
-                            <div key={unit.id} className="space-y-1">
+                            <div key={unit.id} className="space-y-2">
                               <BranchRow
                                 level="unit"
                                 href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}`}
@@ -204,13 +204,13 @@ export function HierarchySidebar({
                                 hasLeadingCircle
                               />
                               {expanded(unitId, unitActive) && unit.chapters?.length ? (
-                                <div className="relative ml-3 pl-4 border-l-2 border-dashed border-border/60 space-y-1 mt-1">
+                                <div className="relative ml-3 pl-4 border-l-2 border-dashed border-border/60 space-y-2 mt-2">
                                   {unit.chapters.map((chapter) => {
                                     const chapterSlug = chapter.slug || chapter.id;
                                     const chapterActive = chapterSlug === active.chapter;
                                     const chapterId = `chapter-${chapter.id}`;
                                     return (
-                                      <div key={chapter.id} className="space-y-1">
+                                      <div key={chapter.id} className="space-y-2">
                                         <BranchRow
                                           level="chapter"
                                           href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}/${chapterSlug}`}
@@ -221,7 +221,7 @@ export function HierarchySidebar({
                                           hasLeadingCircle
                                         />
                                         {expanded(chapterId, chapterActive) && chapter.topics?.length ? (
-                                          <div className="relative ml-3 pl-4 border-l-2 border-dashed border-border/60 space-y-0.5 mt-1">
+                                          <div className="relative ml-3 pl-4 border-l-2 border-dashed border-border/60 space-y-1 mt-2">
                                             {chapter.topics.map((topic, topicIdx) => {
                                               const topicSlug = topic.slug || topic.id;
                                               const topicActive = topicSlug === active.topic;
@@ -252,7 +252,7 @@ export function HierarchySidebar({
                 );
               })
             )}
-          </div>
+          </nav>
         </div>
       </aside>
     </>
@@ -286,14 +286,20 @@ function BranchRow({
         hasLeadingCircle && "-ml-4",
         active && colors.bg,
         !active && colors.bgHover,
-        active && "shadow-sm ring-1 ring-border/50"
+        active && "ring-1 ring-border/50"
       )}
     >
       {hasLeadingCircle && (
-        <div
-          className={cn("shrink-0 w-3 h-3 rounded-full border-2 bg-background transition-all duration-200", colors.border, active && "scale-110 shadow-sm")}
+        <span
+          className={cn(
+            "shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200 select-none pointer-events-none",
+            colors.border,
+            active ? cn(colors.dot, "border-transparent") : "bg-background"
+          )}
           aria-hidden
-        />
+        >
+          {active && <Check className="h-2.5 w-2.5 text-white dark:text-gray-900 stroke-3" />}
+        </span>
       )}
       <Link href={href} title={label} className={cn("flex-1 min-w-0 truncate transition-all duration-200", active ? colors.textActive : colors.text, !active && "group-hover:translate-x-0.5")}>
         {label}
@@ -319,16 +325,25 @@ function BranchRow({
 function TopicRow({ href, label, active, isLast }: { href: string; label: string; active: boolean; isLast: boolean }) {
   const colors = LEVEL_COLORS.topic;
   return (
-    <div className={cn("relative flex items-center py-1.5 min-h-[40px] -ml-4 pl-3", isLast && "pb-2")}>
+    <div className={cn("relative flex items-center py-2 min-h-[40px] -ml-4 pl-3", isLast && "pb-3")}>
       <div className="absolute left-0 top-1/2 w-3.5 h-0 -translate-y-1/2 shrink-0 border-t border-dashed border-border/60" aria-hidden />
-      <div className={cn("relative z-[1] shrink-0 w-2.5 h-2.5 rounded-full transition-all duration-200", colors.dot, active && "scale-125 shadow-sm ring-2 ring-background")} aria-hidden />
+      <span
+        className={cn(
+          "relative z-1 shrink-0 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center transition-all duration-200 select-none pointer-events-none",
+          colors.border,
+          active ? cn(colors.dot, "border-transparent") : "bg-background"
+        )}
+        aria-hidden
+      >
+        {active && <Check className="h-2 w-2 text-white dark:text-gray-900 stroke-3" />}
+      </span>
       <Link
         href={href}
         title={label}
         className={cn(
-          "flex-1 min-w-0 py-2 pl-3 pr-2 rounded-md transition-all duration-200 truncate text-sm font-normal",
+          "flex-1 min-w-0 py-2 pl-3 pr-2.5 rounded-md transition-all duration-200 truncate text-sm font-normal",
           active ? colors.textActive : colors.text,
-          active ? cn(colors.bg, "shadow-sm") : colors.bgHover,
+          active ? colors.bg : colors.bgHover,
           !active && "hover:translate-x-0.5"
         )}
       >

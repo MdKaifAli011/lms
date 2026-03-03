@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 import { getExamBySlugOrId, getExams } from "@/lib/api";
 import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
+import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
@@ -13,6 +15,21 @@ import { RecordVisit } from "@/components/RecordVisit";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const exam = await getExamBySlugOrId(slug);
+  if (!exam || typeof exam !== "object" || !("id" in exam)) {
+    return { title: "Not Found | LmsDoors" };
+  }
+  const name = String((exam as { name?: string }).name ?? slug);
+  const seo = normalizeApiSeo((exam as { seo?: unknown }).seo);
+  return generateEntityMetadata({
+    title: name,
+    level: "exam",
+    seo: seo ?? undefined,
+  });
 }
 
 export default async function ExamSlugPage({ params }: PageProps) {

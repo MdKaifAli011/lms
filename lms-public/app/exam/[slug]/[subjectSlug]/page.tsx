@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 import { getExamBySlugOrId, getSubjects, getSubjectById, getUnits } from "@/lib/api";
+import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
 import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -13,6 +15,30 @@ import { RecordVisit } from "@/components/RecordVisit";
 
 interface PageProps {
   params: Promise<{ slug: string; subjectSlug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug: examSlug, subjectSlug } = await params;
+  const exam = await getExamBySlugOrId(examSlug);
+  if (!exam || typeof exam !== "object" || !("id" in exam)) return { title: "Not Found | LmsDoors" };
+  const examId = String((exam as { id: string }).id);
+  const examName = String((exam as { name?: string }).name ?? examSlug);
+  const subjectsRaw = await getSubjects({ examId, contextapi: true });
+  const subjects = (subjectsRaw as { id: string; name: string; slug: string }[]).filter(
+    (s) => (s as { status?: string }).status === "Active"
+  );
+  const subjectBySlug = subjects.find((s) => s.slug === subjectSlug);
+  if (!subjectBySlug) return { title: "Not Found | LmsDoors" };
+  const subject = await getSubjectById(subjectBySlug.id);
+  if (!subject || typeof subject !== "object") return { title: "Not Found | LmsDoors" };
+  const subjectName = String((subject as { name?: string }).name ?? subjectSlug);
+  const seo = normalizeApiSeo((subject as { seo?: unknown }).seo);
+  return generateEntityMetadata({
+    title: subjectName,
+    examTitle: examName,
+    level: "subject",
+    seo: seo ?? undefined,
+  });
 }
 
 export default async function SubjectPage({ params }: PageProps) {

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ import {
 } from "@/lib/api";
 import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
+import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
@@ -19,6 +21,38 @@ import { RecordVisit } from "@/components/RecordVisit";
 
 interface PageProps {
   params: Promise<{ slug: string; subjectSlug: string; unitSlug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug: examSlug, subjectSlug, unitSlug } = await params;
+  const exam = await getExamBySlugOrId(examSlug);
+  if (!exam || typeof exam !== "object" || !("id" in exam)) return { title: "Not Found | LmsDoors" };
+  const examId = String((exam as { id: string }).id);
+  const examName = String((exam as { name?: string }).name ?? examSlug);
+  const subjectsRaw = await getSubjects({ examId, contextapi: true });
+  const subjects = (subjectsRaw as { id: string; name: string; slug: string }[]).filter(
+    (s) => (s as { status?: string }).status === "Active"
+  );
+  const subjectBySlug = subjects.find((s) => s.slug === subjectSlug);
+  if (!subjectBySlug) return { title: "Not Found | LmsDoors" };
+  const subjectName = subjectBySlug.name;
+  const unitsRaw = await getUnits({ subjectId: subjectBySlug.id, contextapi: true });
+  const units = (unitsRaw as { id: string; name: string; slug: string }[]).filter(
+    (u) => (u as { status?: string }).status === "Active"
+  );
+  const unitBySlug = units.find((u) => u.slug === unitSlug);
+  if (!unitBySlug) return { title: "Not Found | LmsDoors" };
+  const unit = await getUnitById(unitBySlug.id);
+  if (!unit || typeof unit !== "object") return { title: "Not Found | LmsDoors" };
+  const unitName = String((unit as { name?: string }).name ?? unitSlug);
+  const seo = normalizeApiSeo((unit as { seo?: unknown }).seo);
+  return generateEntityMetadata({
+    title: unitName,
+    examTitle: examName,
+    subjectTitle: subjectName,
+    level: "unit",
+    seo: seo ?? undefined,
+  });
 }
 
 export default async function UnitPage({ params }: PageProps) {

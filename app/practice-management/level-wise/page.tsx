@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -303,94 +304,52 @@ export default function LevelWisePracticePage() {
     })
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-96 text-destructive">
-        Error: {error}
-      </div>
-    )
-  }
-
   return (
-    <div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">Practice Management</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Level Wise</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+    <div className="flex min-h-0 flex-1 min-w-0 flex-col">
+      {error && (
+        <div className="mx-4 mt-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive flex items-center justify-between">
+          <span>{error}</span>
+          <button type="button" onClick={() => setError(null)} aria-label="Dismiss">×</button>
         </div>
-      </header>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Papers</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inactive</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.inactive}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Locked</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.locked}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Card */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Level Wise Practice Papers</CardTitle>
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={resetForm}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Practice
-              </Button>
-            </DialogTrigger>
+      )}
+      {loading && (
+        <div className="flex flex-1 items-center justify-center p-8 text-muted-foreground">
+          Loading level-wise practice…
+        </div>
+      )}
+      {!loading && (
+        <>
+          <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border/60 bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/self-study">Self Study</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Level Wise</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={resetForm}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Practice
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Level Wise Practice</DialogTitle>
@@ -511,34 +470,93 @@ export default function LevelWisePracticePage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </CardHeader>
-        <CardContent>
-          {/* Filters */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search papers..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-            <Select value={levelFilter} onValueChange={setLevelFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Levels</SelectItem>
-                {CONTENT_LEVELS.map((level) => (
-                  <SelectItem key={level.value} value={String(level.value)}>{level.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          </header>
 
-          {/* Table */}
-          <div className="rounded-md border">
+          <div className="min-h-0 min-w-0 flex-1 space-y-4 overflow-auto p-4 pt-4">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">Total Papers</CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-blue-100 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-blue-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none">{stats.total}</div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">All level-wise papers</p>
+                </CardContent>
+              </Card>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">Active</CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-green-100 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-green-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none text-green-600">{stats.active}</div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Currently visible</p>
+                </CardContent>
+              </Card>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">Inactive</CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none text-yellow-600">{stats.inactive}</div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Hidden from students</p>
+                </CardContent>
+              </Card>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">Locked</CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-red-100 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-red-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none text-red-600">{stats.locked}</div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Require unlock</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="min-w-0 shrink-0 shadow-sm">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <CardTitle>Level Wise Practice Papers</CardTitle>
+                    <CardDescription>Manage level-wise practice papers by exam and level.</CardDescription>
+                  </div>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="relative flex-1 max-w-sm">
+                      <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder="Search papers..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 h-10"
+                      />
+                    </div>
+                    <Select value={levelFilter} onValueChange={setLevelFilter}>
+                      <SelectTrigger className="w-[160px] h-10">
+                        <SelectValue placeholder="Filter by level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Levels</SelectItem>
+                        {CONTENT_LEVELS.map((level) => (
+                          <SelectItem key={level.value} value={String(level.value)}>{level.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="min-w-0 overflow-hidden">
+                <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -590,9 +608,12 @@ export default function LevelWisePracticePage() {
                 )}
               </TableBody>
             </Table>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </>
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>

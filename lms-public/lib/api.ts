@@ -159,6 +159,37 @@ export async function getPreviousYearPapers(filters?: { examId?: string; year?: 
   }
 }
 
+/** Fetch a single practice paper by slug (tries level-wise, then full-length, then previous-year) */
+export async function getPracticePaperBySlug(slug: string): Promise<{
+  type: "practice" | "full_length" | "previous_paper";
+  paper: LevelWisePractice | FullLengthMock | PreviousYearPaper;
+} | null> {
+  const base = getBase();
+  const url = (path: string) => path.startsWith("http") ? path : `${base}${path}`;
+  try {
+    const [levelRes, mockRes, prevRes] = await Promise.all([
+      fetch(url(`/api/level-wise-practice/${encodeURIComponent(slug)}`)),
+      fetch(url(`/api/full-length-mock/${encodeURIComponent(slug)}`)),
+      fetch(url(`/api/previous-year-paper/${encodeURIComponent(slug)}`)),
+    ]);
+    if (levelRes.ok) {
+      const paper = await levelRes.json();
+      return { type: "practice", paper };
+    }
+    if (mockRes.ok) {
+      const paper = await mockRes.json();
+      return { type: "full_length", paper };
+    }
+    if (prevRes.ok) {
+      const paper = await prevRes.json();
+      return { type: "previous_paper", paper };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // ——— Legacy Practice Papers (for backward compatibility) ———
 export interface PracticePaperFilters {
   examId?: string;

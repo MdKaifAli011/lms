@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ import {
 } from "@/lib/api";
 import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
+import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
@@ -29,6 +31,70 @@ interface PageProps {
     subtopicSlug: string;
     definitionSlug: string;
   }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug: examSlug, subjectSlug, unitSlug, chapterSlug, topicSlug, subtopicSlug, definitionSlug } = await params;
+  const exam = await getExamBySlugOrId(examSlug);
+  if (!exam || typeof exam !== "object" || !("id" in exam)) return { title: "Not Found | LmsDoors" };
+  const examId = String((exam as { id: string }).id);
+  const examName = String((exam as { name?: string }).name ?? examSlug);
+  const subjectsRaw = await getSubjects({ examId, contextapi: true });
+  const subjects = (subjectsRaw as { id: string; name: string; slug: string }[]).filter(
+    (s) => (s as { status?: string }).status === "Active"
+  );
+  const subjectBySlug = subjects.find((s) => s.slug === subjectSlug);
+  if (!subjectBySlug) return { title: "Not Found | LmsDoors" };
+  const subjectName = subjectBySlug.name;
+  const unitsRaw = await getUnits({ subjectId: subjectBySlug.id, contextapi: true });
+  const units = (unitsRaw as { id: string; name: string; slug: string }[]).filter(
+    (u) => (u as { status?: string }).status === "Active"
+  );
+  const unitBySlug = units.find((u) => u.slug === unitSlug);
+  if (!unitBySlug) return { title: "Not Found | LmsDoors" };
+  const unitName = unitBySlug.name;
+  const chaptersRaw = await getChapters({ unitId: unitBySlug.id, contextapi: true });
+  const chapters = (chaptersRaw as { id: string; name: string; slug: string }[]).filter(
+    (c) => (c as { status?: string }).status === "Active"
+  );
+  const chapterBySlug = chapters.find((c) => c.slug === chapterSlug);
+  if (!chapterBySlug) return { title: "Not Found | LmsDoors" };
+  const chapterName = chapterBySlug.name;
+  const topicsRaw = await getTopics({ chapterId: chapterBySlug.id, contextapi: true });
+  const topics = (topicsRaw as { id: string; name: string; slug: string }[]).filter(
+    (t) => (t as { status?: string }).status === "Active"
+  );
+  const topicBySlug = topics.find((t) => t.slug === topicSlug);
+  if (!topicBySlug) return { title: "Not Found | LmsDoors" };
+  const topicName = topicBySlug.name;
+  const subtopicsRaw = await getSubtopics({ topicId: topicBySlug.id, contextapi: true });
+  const subtopics = (subtopicsRaw as { id: string; name: string; slug: string }[]).filter(
+    (s) => (s as { status?: string }).status === "Active"
+  );
+  const subtopicBySlug = subtopics.find((s) => s.slug === subtopicSlug);
+  if (!subtopicBySlug) return { title: "Not Found | LmsDoors" };
+  const subtopicName = subtopicBySlug.name;
+  const definitionsRaw = await getDefinitions({ subtopicId: subtopicBySlug.id, contextapi: true });
+  const definitions = (definitionsRaw as { id: string; name: string; slug: string }[]).filter(
+    (d) => (d as { status?: string }).status === "Active"
+  );
+  const definitionBySlug = definitions.find((d) => d.slug === definitionSlug);
+  if (!definitionBySlug) return { title: "Not Found | LmsDoors" };
+  const definition = await getDefinitionById(definitionBySlug.id);
+  if (!definition || typeof definition !== "object") return { title: "Not Found | LmsDoors" };
+  const definitionName = String((definition as { name?: string }).name ?? definitionSlug);
+  const seo = normalizeApiSeo((definition as { seo?: unknown }).seo);
+  return generateEntityMetadata({
+    title: definitionName,
+    examTitle: examName,
+    subjectTitle: subjectName,
+    unitTitle: unitName,
+    chapterTitle: chapterName,
+    topicTitle: topicName,
+    subtopicTitle: subtopicName,
+    level: "definition",
+    seo: seo ?? undefined,
+  });
 }
 
 export default async function DefinitionPage({ params }: PageProps) {

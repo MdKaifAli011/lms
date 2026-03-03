@@ -1,13 +1,13 @@
 import React from "react";
 import Link from "next/link";
-import { BarChart3, BookOpen, Users, Gamepad2, ArrowRight, BadgeCheck } from "lucide-react";
+import { BarChart3, BookOpen, Wrench, ArrowRight, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const FEATURES = [
   { icon: BarChart3, title: "Pro Mock Tests", desc: "Adaptive difficulty that mimics real exam pattern.", href: "/mock-tests", label: "Enter Simulator", badge: "TOP RANKERS", primary: true },
-  { icon: BookOpen, title: "Material Archive", desc: "Year-wise solved archives with step-by-step solutions.", href: "/materials", label: "Browse Archive" },
-  { icon: Users, title: "Prime Community", desc: "Mentors from Top IITs, AIIMS, and Ivy League.", href: "#", label: "Join Discussion" },
-  { icon: Gamepad2, title: "Gamified XP", desc: "Earn XP for streaks, unlock milestones.", href: "#", label: "Leaderboard" },
+  { icon: BookOpen, title: "Material Archive", desc: "Year-wise solved archives with step-by-step solutions.", href: "/materials", label: "Browse Archive", primary: true},
+  { icon:  BookOpen, title: "Flashcards", desc: "Flashcards to help you memorize key concepts.", href: "#", label: "Create Flashcards", primary: true },
+  { icon: Wrench, title: "Study Tools", desc: "Tools to help you prepare for your exams.", href: "#", label: "Access Tools", primary: true },
 ];
 
 export function FeaturesSection() {

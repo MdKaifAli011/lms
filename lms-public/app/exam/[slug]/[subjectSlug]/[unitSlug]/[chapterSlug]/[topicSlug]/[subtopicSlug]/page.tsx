@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ import {
 } from "@/lib/api";
 import { buildSubjectHierarchy } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
+import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
@@ -29,6 +31,62 @@ interface PageProps {
     topicSlug: string;
     subtopicSlug: string;
   }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug: examSlug, subjectSlug, unitSlug, chapterSlug, topicSlug, subtopicSlug } = await params;
+  const exam = await getExamBySlugOrId(examSlug);
+  if (!exam || typeof exam !== "object" || !("id" in exam)) return { title: "Not Found | LmsDoors" };
+  const examId = String((exam as { id: string }).id);
+  const examName = String((exam as { name?: string }).name ?? examSlug);
+  const subjectsRaw = await getSubjects({ examId, contextapi: true });
+  const subjects = (subjectsRaw as { id: string; name: string; slug: string }[]).filter(
+    (s) => (s as { status?: string }).status === "Active"
+  );
+  const subjectBySlug = subjects.find((s) => s.slug === subjectSlug);
+  if (!subjectBySlug) return { title: "Not Found | LmsDoors" };
+  const subjectName = subjectBySlug.name;
+  const unitsRaw = await getUnits({ subjectId: subjectBySlug.id, contextapi: true });
+  const units = (unitsRaw as { id: string; name: string; slug: string }[]).filter(
+    (u) => (u as { status?: string }).status === "Active"
+  );
+  const unitBySlug = units.find((u) => u.slug === unitSlug);
+  if (!unitBySlug) return { title: "Not Found | LmsDoors" };
+  const unitName = unitBySlug.name;
+  const chaptersRaw = await getChapters({ unitId: unitBySlug.id, contextapi: true });
+  const chapters = (chaptersRaw as { id: string; name: string; slug: string }[]).filter(
+    (c) => (c as { status?: string }).status === "Active"
+  );
+  const chapterBySlug = chapters.find((c) => c.slug === chapterSlug);
+  if (!chapterBySlug) return { title: "Not Found | LmsDoors" };
+  const chapterName = chapterBySlug.name;
+  const topicsRaw = await getTopics({ chapterId: chapterBySlug.id, contextapi: true });
+  const topics = (topicsRaw as { id: string; name: string; slug: string }[]).filter(
+    (t) => (t as { status?: string }).status === "Active"
+  );
+  const topicBySlug = topics.find((t) => t.slug === topicSlug);
+  if (!topicBySlug) return { title: "Not Found | LmsDoors" };
+  const topicName = topicBySlug.name;
+  const subtopicsRaw = await getSubtopics({ topicId: topicBySlug.id, contextapi: true });
+  const subtopics = (subtopicsRaw as { id: string; name: string; slug: string }[]).filter(
+    (s) => (s as { status?: string }).status === "Active"
+  );
+  const subtopicBySlug = subtopics.find((s) => s.slug === subtopicSlug);
+  if (!subtopicBySlug) return { title: "Not Found | LmsDoors" };
+  const subtopic = await getSubtopicById(subtopicBySlug.id);
+  if (!subtopic || typeof subtopic !== "object") return { title: "Not Found | LmsDoors" };
+  const subtopicName = String((subtopic as { name?: string }).name ?? subtopicSlug);
+  const seo = normalizeApiSeo((subtopic as { seo?: unknown }).seo);
+  return generateEntityMetadata({
+    title: subtopicName,
+    examTitle: examName,
+    subjectTitle: subjectName,
+    unitTitle: unitName,
+    chapterTitle: chapterName,
+    topicTitle: topicName,
+    level: "subtopic",
+    seo: seo ?? undefined,
+  });
 }
 
 export default async function SubtopicPage({ params }: PageProps) {
