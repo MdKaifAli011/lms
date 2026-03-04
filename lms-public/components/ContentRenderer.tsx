@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect, useMemo } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
 
 interface ContentRendererProps {
@@ -43,20 +42,20 @@ function addHeadingIds(html: string): string {
 export function ContentRenderer({ content, className }: ContentRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [processedHtml, setProcessedHtml] = useState("");
 
-  const processedHtml = useMemo(() => {
-    if (!content?.trim()) return "";
-
-    // 🔐 Proper Sanitization (Production Safe)
-    let clean = DOMPurify.sanitize(content, {
-      USE_PROFILES: { html: true },
+  useEffect(() => {
+    if (!content?.trim()) {
+      setProcessedHtml("");
+      return;
+    }
+    void import("dompurify").then(({ default: DOMPurify }) => {
+      let clean = DOMPurify.sanitize(content, { USE_PROFILES: { html: true } });
+      clean = wrapTables(clean);
+      clean = enhanceImages(clean);
+      clean = addHeadingIds(clean);
+      setProcessedHtml(clean);
     });
-
-    clean = wrapTables(clean);
-    clean = enhanceImages(clean);
-    clean = addHeadingIds(clean);
-
-    return clean;
   }, [content]);
 
   /* 🔥 Improved Link Handling (Event Delegation) */
