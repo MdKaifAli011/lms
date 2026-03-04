@@ -282,12 +282,12 @@ export default function FullLengthMockPage() {
                     <BreadcrumbLink href="/self-study">Self Study</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
+                    <BreadcrumbItem>
+                    <BreadcrumbLink href="/practice-management">Mock Management</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Full Length</BreadcrumbPage>
+                    <BreadcrumbPage>Full-Length Mocks</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>

@@ -12,33 +12,21 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Layers, FileQuestion, Calendar } from "lucide-react";
+import { BookMarked } from "lucide-react";
 
 const LINKS = [
   {
-    title: "Level-Wise (Chapter/Unit/Subject)",
-    description: "Create chapter-wise, unit-wise, or subject-wise mock tests by choosing exam and syllabus level.",
-    href: "/practice-management/level-wise",
-    icon: Layers,
-  },
-  {
-    title: "Full-Length Mocks",
-    description: "Create full-length mock tests that simulate the complete exam (e.g. NEET 180Q, JEE 75Q).",
-    href: "/practice-management/full-length",
-    icon: FileQuestion,
-  },
-  {
-    title: "Previous Year Papers",
-    description: "Manage previous year exam papers for students to attempt.",
-    href: "/practice-management/previous-years",
-    icon: Calendar,
+    title: "Syllabus",
+    description: "Set weightage and marks for subject, unit, chapter, topic, subtopic, and definition levels.",
+    href: "/syllabus-management/syllabus",
+    icon: BookMarked,
   },
 ];
 
-export default function PracticeManagementLandingPage() {
+export default function SyllabusManagementLandingPage() {
   return (
     <div className="flex min-h-0 flex-1 min-w-0 flex-col">
-      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border/60 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border/60 bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-5 data-[orientation=vertical]:h-4" />
         <Breadcrumb>
@@ -48,11 +36,7 @@ export default function PracticeManagementLandingPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/self-study">Self Study</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Mock Management</BreadcrumbPage>
+              <BreadcrumbPage>Syllabus Management</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -60,9 +44,9 @@ export default function PracticeManagementLandingPage() {
 
       <div className="min-h-0 min-w-0 flex-1 space-y-6 overflow-auto p-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Mock Management</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Syllabus Management</h1>
           <p className="text-muted-foreground mt-1">
-            Manage mock tests: full-length papers, chapter/unit/subject-wise practice, and previous year papers.
+            Manage syllabus structure, weightage, and marks per exam.
           </p>
         </div>
 

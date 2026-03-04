@@ -175,6 +175,57 @@ export function MainContentSkeleton({ className }: { className?: string }) {
 }
 
 /**
+ * Syllabus page: breadcrumbs, header, tree-like skeleton, Expand/Collapse buttons.
+ * Main content only (used inside HierarchyShell).
+ */
+export function SyllabusPageSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("max-w-7xl mx-auto", className)}>
+      <div className="route-loading-bar-inline" aria-hidden />
+      <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6">
+        <div className="mb-3 sm:mb-4 flex items-center gap-1">
+          <Skeleton className="h-5 w-20 rounded" />
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-5 w-24 rounded" />
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-5 w-32 rounded" />
+        </div>
+        <header className="mb-6 sm:mb-8">
+          <Skeleton className="h-8 sm:h-9 md:h-10 w-64 sm:w-80 mb-2 rounded-lg" />
+          <Skeleton className="h-4 w-full max-w-2xl rounded" />
+        </header>
+        <div className="mt-6 sm:mt-8 space-y-1">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded shrink-0" />
+                <Skeleton className={cn("h-5 rounded", i === 0 && "w-28", i === 1 && "w-24", i === 2 && "w-32")} />
+                <Skeleton className="h-3 w-20 rounded shrink-0 ml-auto" />
+              </div>
+              {i < 2 && (
+                <div className="pl-6 space-y-1">
+                  {[1, 2].map((j) => (
+                    <div key={j} className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-4 rounded shrink-0" />
+                      <Skeleton className={cn("h-4 rounded", "w-36")} />
+                      <Skeleton className="h-3 w-16 rounded shrink-0 ml-auto" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 sm:mt-10 flex items-center gap-2">
+          <Skeleton className="h-9 w-28 rounded-md" />
+          <Skeleton className="h-9 w-24 rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Mock Tests hub: main content area only (no shell).
  * Section header, search bar, featured card block, filter pills, grid of mock test cards.
  */

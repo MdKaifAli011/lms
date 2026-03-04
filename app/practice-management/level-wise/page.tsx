@@ -329,16 +329,16 @@ export default function LevelWisePracticePage() {
                     <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
-                  <BreadcrumbItem>
+                    <BreadcrumbItem>
                     <BreadcrumbLink href="/self-study">Self Study</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
+                    <BreadcrumbLink href="/practice-management">Mock Management</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Level Wise</BreadcrumbPage>
+                    <BreadcrumbPage>Level-Wise (Chapter/Unit/Subject)</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>

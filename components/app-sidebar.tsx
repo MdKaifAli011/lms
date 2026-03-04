@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, ClipboardList } from "lucide-react";
+import { BookMarked, BookOpen, ClipboardList, FileText } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -52,24 +52,42 @@ const data = {
       ],
     },
     {
-      title: "Practice Management",
+      title: "Syllabus Management",
+      url: "/syllabus-management",
+      icon: BookMarked,
+      items: [
+        {
+          title: "Syllabus",
+          url: "/syllabus-management/syllabus",
+        },
+      ],
+    },
+    {
+      title: "Material Management",
+      url: "/study-materials",
+      icon: FileText,
+      items: [
+        {
+          title: "Formula Toolkits",
+          url: "/study-materials/formula-toolkits",
+        },
+      ],
+    },
+    {
+      title: "Mock Management",
       url: "/practice-management",
       icon: ClipboardList,
       items: [
         {
-          title: "Syllabus Management",
-          url: "/practice-management/syllabus",
-        },
-        {
-          title: "Level Wise",
-          url: "/practice-management/level-wise",
-        },
-        {
-          title: "Full Length",
+          title: "Full-Length Mocks",
           url: "/practice-management/full-length",
         },
         {
-          title: "Previous Years Paper",
+          title: "Level-Wise (Chapter/Unit/Subject)",
+          url: "/practice-management/level-wise",
+        },
+        {
+          title: "Previous Year Papers",
           url: "/practice-management/previous-years",
         },
       ],

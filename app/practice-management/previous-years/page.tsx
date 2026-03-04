@@ -302,7 +302,7 @@ export default function PreviousYearPapersPage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
+                    <BreadcrumbLink href="/practice-management">Mock Management</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   FileText,
   Download,
@@ -18,6 +19,7 @@ import { Header } from "@/components/Header";
 import { ExamCategoriesBar } from "@/components/ExamCategoriesBar";
 import { FooterComponent } from "@/components/home/FooterComponent";
 import { cn } from "@/lib/utils";
+import { getFormulaToolkits, getPreviousYearPapers, type FormulaToolkit as ApiFormulaToolkit, type PreviousYearPaper as ApiPreviousYearPaper } from "@/lib/api";
 
 interface FormulaToolkitProps {
   subject: string;
@@ -25,17 +27,57 @@ interface FormulaToolkitProps {
   description: string;
   pages: number;
   size: string;
+  fileUrl?: string;
   icon: React.ReactNode;
   color: "blue" | "red" | "yellow";
 }
 
+function pickIcon(subject: string | null | undefined): React.ReactNode {
+  const s = (subject ?? "").toLowerCase();
+  if (s.includes("physics")) return <Atom size={24} />;
+  if (s.includes("biology")) return <Dna size={24} />;
+  if (s.includes("chem")) return <Beaker size={24} />;
+  return <FileText size={24} />;
+}
+
+function pickColor(subject: string | null | undefined): "blue" | "red" | "yellow" {
+  const s = (subject ?? "").toLowerCase();
+  if (s.includes("physics")) return "blue";
+  if (s.includes("biology")) return "red";
+  if (s.includes("chem")) return "yellow";
+  return "blue";
+}
+
 interface PreviousYearPaperProps {
-  exam: string;
-  year: number;
+  paper: ApiPreviousYearPaper;
 }
 
 export default function MaterialsPage() {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [toolkits, setToolkits] = useState<ApiFormulaToolkit[]>([]);
+  const [toolkitsLoading, setToolkitsLoading] = useState(true);
+  const [previousPapers, setPreviousPapers] = useState<ApiPreviousYearPaper[]>([]);
+  const [previousPapersLoading, setPreviousPapersLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    getFormulaToolkits({ status: "Active" }).then((list) => {
+      if (!cancelled) setToolkits(list);
+    }).finally(() => {
+      if (!cancelled) setToolkitsLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getPreviousYearPapers({ status: "Active" }).then((list) => {
+      if (!cancelled) setPreviousPapers(list);
+    }).finally(() => {
+      if (!cancelled) setPreviousPapersLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const filters = [
     { id: "all", label: "All Resources" },
@@ -58,8 +100,8 @@ export default function MaterialsPage() {
             Study Materials &amp; Archives
           </h1>
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl">
-            Premium repository of year-wise papers, curated formula toolkits, and AI-assisted
-            revision guides.
+            Premium repository of year-wise papers, curated formula toolkits,
+            and AI-assisted revision guides.
           </p>
         </header>
 
@@ -73,7 +115,7 @@ export default function MaterialsPage() {
                   "px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
                   activeFilter === filter.id
                     ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg"
-                    : "bg-card dark:bg-gray-800 border border-border text-muted-foreground hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
+                    : "bg-card dark:bg-gray-800 border border-border text-muted-foreground hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400",
                 )}
               >
                 {filter.label}
@@ -86,7 +128,9 @@ export default function MaterialsPage() {
           <section className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Formula Toolkits</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Formula Toolkits
+                </h2>
                 <p className="text-sm text-muted-foreground mt-1">
                   High-yield revision sheets for quick last-minute preparation.
                 </p>
@@ -96,62 +140,74 @@ export default function MaterialsPage() {
                 className="text-blue-600 dark:text-blue-400 font-semibold text-sm flex items-center group"
               >
                 View all toolkits
-                <ArrowRight className="ml-1 group-hover:translate-x-1 transition-transform" size={16} />
+                <ArrowRight
+                  className="ml-1 group-hover:translate-x-1 transition-transform"
+                  size={16}
+                />
               </a>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              <FormulaToolkitCard
-                subject="Physics"
-                title="Electromagnetism Handbook"
-                description="Complete collection of Gauss's Law, Faraday's Law, and Maxwell equations with 50+ solved examples."
-                pages={24}
-                size="4.2 MB"
-                icon={<Atom size={24} />}
-                color="blue"
-              />
-              <FormulaToolkitCard
-                subject="Biology"
-                title="Genetic Mechanisms Summary"
-                description="Visual mind-maps for DNA replication, transcription, and translation processes. Updated for 2024 syllabus."
-                pages={18}
-                size="3.8 MB"
-                icon={<Dna size={24} />}
-                color="red"
-              />
-              <FormulaToolkitCard
-                subject="Chemistry"
-                title="Organic Reagents Mastery"
-                description="Comprehensive table of reducing agents, oxidizing agents, and named reaction catalysts."
-                pages={12}
-                size="2.5 MB"
-                icon={<Beaker size={24} />}
-                color="yellow"
-              />
+              {toolkitsLoading ? (
+                <div className="col-span-full text-center py-12 text-muted-foreground">
+                  Loading formula toolkits…
+                </div>
+              ) : toolkits.length === 0 ? (
+                <div className="col-span-full text-center py-12 text-muted-foreground rounded-2xl border border-dashed border-border bg-muted/30">
+                  No formula toolkits available yet. Check back later.
+                </div>
+              ) : (
+                toolkits.map((item) => (
+                  <FormulaToolkitCard
+                    key={item.id}
+                    subject={item.subjectLabel || item.subjectName || "Resource"}
+                    title={item.title}
+                    description={item.description || ""}
+                    pages={item.pages ?? 0}
+                    size={item.size || ""}
+                    fileUrl={item.fileUrl}
+                    icon={pickIcon(item.subjectLabel || item.subjectName)}
+                    color={pickColor(item.subjectLabel || item.subjectName)}
+                  />
+                ))
+              )}
             </div>
           </section>
 
           <section className="pb-20">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Year-wise Previous Papers</h2>
+                <h2 className="text-2xl font-bold text-foreground">
+                  Year-wise Previous Papers
+                </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Official question papers with verified solutions and video explanations.
+                  Official question papers with verified solutions and video
+                  explanations.
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
-              {[2023, 2022, 2021, 2020, 2019].map((year) => (
-                <PreviousYearPaperCard key={year} exam="NEET" year={year} />
-              ))}
-
-              <div className="bg-muted/50 dark:bg-slate-800/50 rounded-2xl p-6 text-center border border-dashed border-border flex flex-col items-center justify-center hover:bg-card dark:hover:bg-slate-800 transition-all cursor-pointer">
-                <History className="text-muted-foreground mb-2" size={32} />
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                  More Archives
-                </p>
-              </div>
+              {previousPapersLoading ? (
+                <div className="col-span-full text-center py-12 text-muted-foreground">
+                  Loading previous papers…
+                </div>
+              ) : (
+                <>
+                  {previousPapers.map((paper) => (
+                    <PreviousYearPaperCard key={paper.id} paper={paper} />
+                  ))}
+                  <Link
+                    href="/practice/previous-year-paper"
+                    className="bg-muted/50 dark:bg-slate-800/50 rounded-2xl p-6 text-center border border-dashed border-border flex flex-col items-center justify-center hover:bg-card dark:hover:bg-slate-800 transition-all cursor-pointer"
+                  >
+                    <History className="text-muted-foreground mb-2" size={32} />
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                      More Archives
+                    </p>
+                  </Link>
+                </>
+              )}
             </div>
           </section>
         </div>
@@ -188,6 +244,7 @@ function FormulaToolkitCard({
   description,
   pages,
   size,
+  fileUrl,
   icon,
   color,
 }: FormulaToolkitProps) {
@@ -205,7 +262,8 @@ function FormulaToolkitCard({
     yellow: {
       bg: "bg-yellow-50 dark:bg-yellow-950/30",
       text: "text-yellow-600 dark:text-yellow-500",
-      badge: "bg-yellow-50 dark:bg-yellow-950/50 text-yellow-600 dark:text-yellow-500",
+      badge:
+        "bg-yellow-50 dark:bg-yellow-950/50 text-yellow-600 dark:text-yellow-500",
     },
   }[color];
 
@@ -216,7 +274,7 @@ function FormulaToolkitCard({
           className={cn(
             "w-12 h-12 rounded-xl flex items-center justify-center",
             colorClasses.bg,
-            colorClasses.text
+            colorClasses.text,
           )}
         >
           {icon}
@@ -224,7 +282,7 @@ function FormulaToolkitCard({
         <span
           className={cn(
             "text-xs font-bold px-2 py-1 rounded uppercase tracking-widest",
-            colorClasses.badge
+            colorClasses.badge,
           )}
         >
           {subject}
@@ -234,16 +292,22 @@ function FormulaToolkitCard({
       <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
         {title}
       </h3>
-      <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{description}</p>
+      <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
+        {description}
+      </p>
 
       <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground mb-6">
         <div className="flex items-center gap-4">
-          <span className="flex items-center">
-            <FileText size={14} className="mr-1" /> {pages} Pages
-          </span>
-          <span className="flex items-center">
-            <Download size={14} className="mr-1" /> {size}
-          </span>
+          {pages > 0 && (
+            <span className="flex items-center">
+              <FileText size={14} className="mr-1" /> {pages} Pages
+            </span>
+          )}
+          {size && (
+            <span className="flex items-center">
+              <Download size={14} className="mr-1" /> {size}
+            </span>
+          )}
         </div>
       </div>
 
@@ -254,38 +318,47 @@ function FormulaToolkitCard({
         >
           <Printer size={16} className="mr-2" /> Print
         </Button>
-        <Button className="py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-lg shadow-blue-600/20">
-          Start Review
-        </Button>
+        {fileUrl ? (
+          <Button className="py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-lg shadow-blue-600/20" asChild>
+            <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+              Start Review
+            </a>
+          </Button>
+        ) : (
+          <Button className="py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-lg shadow-blue-600/20">
+            Start Review
+          </Button>
+        )}
       </div>
     </div>
   );
 }
 
-function PreviousYearPaperCard({ exam, year }: PreviousYearPaperProps) {
+function PreviousYearPaperCard({ paper }: PreviousYearPaperProps) {
+  const examLabel = paper.examName || "Exam";
+  const href = `/practice/${paper.slug}`;
   return (
-    <div className="bg-card/80 dark:bg-gray-800/60 rounded-2xl p-6 text-center border border-border shadow-sm hover:shadow-lg hover:border-blue-500/30 transition-all group cursor-pointer">
-      <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-        {exam} Paper
-      </p>
-      <p className="text-3xl font-bold text-foreground mb-4 group-hover:scale-110 transition-transform">
-        {year}
-      </p>
+    <Link href={href} className="block">
+      <div className="bg-card/80 dark:bg-gray-800/60 rounded-2xl p-6 text-center border border-border shadow-sm hover:shadow-lg hover:border-blue-500/30 transition-all group cursor-pointer h-full flex flex-col">
+        <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          {examLabel} Paper
+        </p>
+        <p className="text-3xl font-bold text-foreground mb-4 group-hover:scale-110 transition-transform">
+          {paper.year}
+        </p>
+        {paper.session && (
+          <p className="text-xs text-muted-foreground mb-2">{paper.session}</p>
+        )}
 
-      <div className="flex flex-col gap-2">
-        <button
-          type="button"
-          className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase hover:underline flex items-center justify-center"
-        >
-          <Download size={14} className="mr-1" /> PDF
-        </button>
-        <button
-          type="button"
-          className="py-1.5 rounded-lg bg-muted text-muted-foreground hover:bg-blue-600 hover:text-white text-xs font-bold uppercase transition-all"
-        >
-          Mock Test
-        </button>
+        <div className="flex flex-col gap-2 mt-auto">
+          <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase flex items-center justify-center">
+            <Download size={14} className="mr-1" /> PDF
+          </span>
+          <span className="py-1.5 rounded-lg bg-muted text-muted-foreground hover:bg-blue-600 hover:text-white text-xs font-bold uppercase transition-all">
+            Mock Test
+          </span>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

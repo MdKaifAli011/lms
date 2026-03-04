@@ -133,51 +133,44 @@ export default function SyllabusManagementPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
+              <BreadcrumbLink href="/syllabus-management">Syllabus Management</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Syllabus Management</BreadcrumbPage>
+              <BreadcrumbPage>Syllabus</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </header>
 
       <div className="min-h-0 min-w-0 flex-1 space-y-6 overflow-auto p-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Syllabus Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Set weightage and marks for each level of the syllabus (subject, unit, chapter, topic, subtopic, definition).
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-semibold tracking-tight">Syllabus Management</h1>
+            <p className="text-muted-foreground mt-1">
+              Set weightage and marks for each level of the syllabus (subject, unit, chapter, topic, subtopic, definition).
+            </p>
+          </div>
+          <div className="shrink-0 space-y-1.5">
+            <Label className="text-sm">Exam</Label>
+            <Select
+              value={examId}
+              onValueChange={setExamId}
+              disabled={loadingExams}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={loadingExams ? "Loading…" : "Select exam"} />
+              </SelectTrigger>
+              <SelectContent>
+                {exams.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Exam</CardTitle>
-            <CardDescription>Choose an exam to manage its syllabus weightage and marks.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="max-w-sm space-y-2">
-              <Label>Exam</Label>
-              <Select
-                value={examId}
-                onValueChange={setExamId}
-                disabled={loadingExams}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={loadingExams ? "Loading…" : "Select exam"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {exams.map((e) => (
-                    <SelectItem key={e.id} value={e.id}>
-                      {e.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
 
         {examId && (
           <Card>

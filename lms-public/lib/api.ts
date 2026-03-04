@@ -386,6 +386,43 @@ export async function getDefinitionById(id: string): Promise<unknown | null> {
 
 // ——— Tree APIs (single call for sidebar or syllabus) ———
 
+// ——— Formula Toolkits (Study Materials) ———
+export interface FormulaToolkit {
+  id: string;
+  examId: string;
+  examName?: string;
+  examSlug?: string;
+  level: number;
+  levelName?: string;
+  subjectName?: string | null;
+  subjectLabel?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  fileUrl?: string;
+  pages?: number;
+  size?: string;
+  orderNumber: number;
+  status: string;
+}
+
+export async function getFormulaToolkits(filters?: {
+  examId?: string;
+  status?: string;
+}): Promise<FormulaToolkit[]> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.examId) params.set("examId", filters.examId);
+    if (filters?.status) params.set("status", filters.status);
+    const q = params.toString() ? `?${params}` : "";
+    const list = await fetchApi<FormulaToolkit[]>(`/api/formula-toolkit${q}`);
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getFormulaToolkits]", e);
+    return [];
+  }
+}
+
 /** Sidebar tree: exam → subjects → units → chapters → topics (one API call, no weightage/marks). */
 export async function getSidebarTree(examId: string): Promise<{ exam?: { id: string; name?: string; slug?: string }; subjects: unknown[] }> {
   try {
