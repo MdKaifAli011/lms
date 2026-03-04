@@ -38,6 +38,7 @@ export async function GET(
       difficulty: doc.difficulty,
       orderNumber: doc.orderNumber,
       status: doc.status,
+      mockId: (doc as { mockId?: string }).mockId ?? "",
       locked: doc.locked || false,
       image: doc.image || "",
       createdAt: doc.createdAt
@@ -119,6 +120,7 @@ export async function PUT(
     if (body.status !== undefined) updateData.status = body.status;
     if (body.locked !== undefined) updateData.locked = body.locked === true;
     if (body.image !== undefined) updateData.image = body.image.trim();
+    if (body.mockId !== undefined) updateData.mockId = String(body.mockId).trim() || "";
 
     updateData.updatedAt = new Date();
 
@@ -147,6 +149,7 @@ export async function PUT(
       difficulty: doc.difficulty,
       orderNumber: doc.orderNumber,
       status: doc.status,
+      mockId: (doc as { mockId?: string }).mockId ?? "",
       locked: doc.locked || false,
       image: doc.image || "",
       updatedAt: doc.updatedAt

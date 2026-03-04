@@ -105,6 +105,7 @@ export interface FullLengthMock {
   difficulty: "Easy" | "Medium" | "Hard" | "Mixed";
   orderNumber: number;
   status: "Active" | "Inactive";
+  mockId?: string;
   locked: boolean;
   image?: string;
 }

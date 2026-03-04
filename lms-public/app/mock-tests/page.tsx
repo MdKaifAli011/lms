@@ -10,9 +10,11 @@ import {
   Lock,
   Smartphone,
   Loader2,
+  ChevronDown,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MockTestCard } from "@/components/mock-tests/MockTestCard";
+import { PreviousYearPapersSection } from "@/components/practice/PreviousYearPapersSection";
 import {
   getFullLengthMocksPaginated,
   getExams,
@@ -20,11 +22,17 @@ import {
 } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-const PAGE_SIZE = 10;
+/** Initial count and first "Load more": 6. Every subsequent "Load more": 10. */
+function getLimitForPage(pageNum: number): number {
+  if (pageNum === 1) return 6;
+  if (pageNum === 2) return 6;
+  return 10;
+}
 
 type MockItem = {
   type: "full_length";
   id: string;
+  mockId?: string;
   slug: string;
   title: string;
   examName?: string;
@@ -71,11 +79,12 @@ export default function MockTestHub() {
     async (pageNum: number, append: boolean) => {
       const setter = append ? setLoadingMore : setLoading;
       setter(true);
+      const limit = getLimitForPage(pageNum);
       try {
         const { papers: nextPapers, total: nextTotal } = await getFullLengthMocksPaginated({
           status: "Active",
           page: pageNum,
-          limit: PAGE_SIZE,
+          limit,
           search: searchTerm || undefined,
           examId: examIdFilter,
         });
@@ -136,6 +145,7 @@ export default function MockTestHub() {
       papers.map((m) => ({
         type: "full_length" as const,
         id: m.id,
+        mockId: m.mockId,
         slug: m.slug,
         title: m.title,
         examName: m.examName,
@@ -326,12 +336,15 @@ export default function MockTestHub() {
                         </div>
                       </div>
                       <CardContent className="p-5 sm:p-6 relative">
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                        <div className="flex justify-between items-start gap-3 mb-4">
+                          <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest shrink-0">
                             {item.difficulty}
                           </span>
-                          <span className="text-xs text-muted-foreground">
-                            {item.levelName}
+                          <span
+                            className="min-w-0 text-right font-mono text-xs tabular-nums text-foreground/90 truncate max-w-[130px] sm:max-w-[150px]"
+                            title={(typeof item.mockId === "string" && item.mockId.trim()) ? item.mockId.trim() : "Mock ID"}
+                          >
+                            {(typeof item.mockId === "string" && item.mockId.trim()) ? item.mockId.trim() : "—"}
                           </span>
                         </div>
                         <h3 className="text-lg font-bold mb-4 text-foreground">
@@ -360,6 +373,7 @@ export default function MockTestHub() {
                   <MockTestCard
                     key={item.id}
                     id={item.levelName}
+                    mockId={item.mockId}
                     title={item.title}
                     difficulty={item.difficulty}
                     difficultyColor={difficultyColor(item.difficulty)}
@@ -383,20 +397,28 @@ export default function MockTestHub() {
                 onClick={handleLoadMore}
                 disabled={loadingMore}
                 className={cn(
-                  "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm sm:text-base border-2 border-primary bg-primary/5 text-primary hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-60 disabled:pointer-events-none",
+                  "text-muted-foreground hover:text-primary font-semibold flex items-center gap-2 transition-colors px-5 py-2.5 rounded-full hover:bg-primary/10",
+                  "disabled:opacity-60 disabled:pointer-events-none",
                 )}
               >
                 {loadingMore ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin shrink-0" />
                     Loading...
                   </>
                 ) : (
-                  <>Load more ({papers.length} of {total})</>
+                  <>
+                    Load More
+                    <ChevronDown className="h-4 w-4 shrink-0" />
+                  </>
                 )}
               </button>
             </div>
           )}
+
+          <div className="mt-12 sm:mt-14 md:mt-16">
+            <PreviousYearPapersSection />
+          </div>
         </>
       )}
     </main>

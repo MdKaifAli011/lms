@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -62,6 +61,7 @@ interface FullLengthMock {
   title: string
   slug: string
   description?: string
+  mockId?: string
   durationMinutes: number
   totalMarks: number
   totalQuestions: number
@@ -93,10 +93,12 @@ export default function FullLengthMockPage() {
   const [editSaving, setEditSaving] = useState(false)
   
   // Form state
+  const currentYear = new Date().getFullYear()
   const [formData, setFormData] = useState({
     examId: "",
     title: "",
     description: "",
+    mockYear: String(currentYear),
     durationMinutes: "180",
     totalMarks: "300",
     totalQuestions: "90",
@@ -158,6 +160,7 @@ export default function FullLengthMockPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          mockYear: formData.mockYear ? parseInt(formData.mockYear, 10) : new Date().getFullYear(),
           durationMinutes: parseInt(formData.durationMinutes),
           totalMarks: parseInt(formData.totalMarks),
           totalQuestions: parseInt(formData.totalQuestions),
@@ -224,10 +227,12 @@ export default function FullLengthMockPage() {
   // Open edit dialog
   const openEdit = (paper: FullLengthMock) => {
     setEditingPaper(paper)
+    const mockYearFromId = paper.mockId?.match(/^MOCK-(\d{4})-/)?.[1] ?? ""
     setFormData({
       examId: paper.examId,
       title: paper.title,
       description: paper.description || "",
+      mockYear: mockYearFromId,
       durationMinutes: String(paper.durationMinutes),
       totalMarks: String(paper.totalMarks),
       totalQuestions: String(paper.totalQuestions),
@@ -244,6 +249,7 @@ export default function FullLengthMockPage() {
       examId: "",
       title: "",
       description: "",
+      mockYear: String(new Date().getFullYear()),
       durationMinutes: "180",
       totalMarks: "300",
       totalQuestions: "90",
@@ -283,7 +289,7 @@ export default function FullLengthMockPage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                    <BreadcrumbLink href="/practice-management">Mock Management</BreadcrumbLink>
+                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
@@ -337,6 +343,33 @@ export default function FullLengthMockPage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Enter description"
                   />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mockYear">Year for Mock ID</Label>
+                    <Input
+                      id="mockYear"
+                      type="number"
+                      min={2000}
+                      max={2100}
+                      value={formData.mockYear}
+                      onChange={(e) => setFormData({ ...formData, mockYear: e.target.value })}
+                      placeholder="e.g. 2024"
+                    />
+                    <p className="text-[11px] text-muted-foreground">Generates MOCK-2024-001, MOCK-2024-002, …</p>
+                  </div>
+                  <div className="space-y-2 flex flex-col justify-end">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.locked}
+                        onChange={(e) => setFormData({ ...formData, locked: e.target.checked })}
+                        className="rounded border-border"
+                      />
+                      <span className="text-sm font-medium">Locked</span>
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">Show as &quot;Coming Soon&quot; on public page</p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
@@ -482,18 +515,20 @@ export default function FullLengthMockPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px]">Order</TableHead>
+                  <TableHead>Mock ID</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Exam</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead>Questions</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="w-[70px]">Locked</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredPapers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                       No mock tests found
                     </TableCell>
                   </TableRow>
@@ -501,6 +536,7 @@ export default function FullLengthMockPage() {
                   filteredPapers.map((paper) => (
                     <TableRow key={paper.id}>
                       <TableCell>{paper.orderNumber}</TableCell>
+                      <TableCell className="font-mono text-xs text-muted-foreground">{paper.mockId || "—"}</TableCell>
                       <TableCell className="font-medium">{paper.title}</TableCell>
                       <TableCell>{paper.examName}</TableCell>
                       <TableCell>{paper.durationMinutes} min</TableCell>
@@ -511,6 +547,13 @@ export default function FullLengthMockPage() {
                         }`}>
                           {paper.status}
                         </span>
+                      </TableCell>
+                      <TableCell>
+                        {paper.locked ? (
+                          <span className="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Locked</span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -541,7 +584,11 @@ export default function FullLengthMockPage() {
             <DialogTitle>Edit Full Length Mock Test</DialogTitle>
             <DialogDescription>Update the mock test details</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+            <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label>Mock ID</Label>
+              <Input value={editingPaper?.mockId ?? "—"} readOnly className="bg-muted/50" />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="edit-exam">Exam *</Label>
               <Select value={formData.examId} onValueChange={(v) => setFormData({ ...formData, examId: v })}>
@@ -626,6 +673,18 @@ export default function FullLengthMockPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.locked}
+                  onChange={(e) => setFormData({ ...formData, locked: e.target.checked })}
+                  className="rounded border-border"
+                />
+                <span className="text-sm font-medium">Locked</span>
+              </label>
+              <p className="text-[11px] text-muted-foreground">Show as &quot;Coming Soon&quot; on public page</p>
             </div>
           </div>
           <DialogFooter>

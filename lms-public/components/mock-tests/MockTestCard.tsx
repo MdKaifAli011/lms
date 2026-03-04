@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 
 export function MockTestCard({
   id,
+  mockId,
   title,
   difficulty,
   difficultyColor,
@@ -16,6 +17,7 @@ export function MockTestCard({
   href,
 }: {
   id: string;
+  mockId?: string;
   title: string;
   difficulty: string;
   difficultyColor: "green" | "orange" | "blue";
@@ -33,19 +35,26 @@ export function MockTestCard({
     blue: "bg-primary/10 text-primary",
   }[difficultyColor];
 
+  const displayMockId = (typeof mockId === "string" && mockId.trim()) ? mockId.trim() : "—";
+
   return (
     <Card className="group h-full flex flex-col bg-card border border-border shadow-lg transition-all hover:shadow-xl hover:border-primary/20 hover:-translate-y-0.5">
       <CardContent className="p-5 sm:p-6 flex flex-col flex-1">
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start gap-3 mb-4">
           <span
             className={cn(
-              "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest",
+              "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest shrink-0",
               diffBg
             )}
           >
             {difficulty}
           </span>
-          <span className="text-xs text-muted-foreground">{id}</span>
+          <span
+            className="min-w-0 text-right font-mono text-xs tabular-nums text-foreground/90 truncate max-w-[130px] sm:max-w-[150px]"
+            title={displayMockId || "Mock ID"}
+          >
+            {displayMockId}
+          </span>
         </div>
 
         <h3 className="text-lg font-bold mb-4 text-foreground group-hover:text-primary transition-colors flex-1 min-h-0">

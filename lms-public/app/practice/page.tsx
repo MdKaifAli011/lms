@@ -5,11 +5,9 @@ import Link from "next/link";
 import {
   getLevelWisePractices,
   getFullLengthMocksPaginated,
-  getPreviousYearPapersPaginated,
   getExams,
   type LevelWisePractice,
   type FullLengthMock,
-  type PreviousYearPaper,
 } from "@/lib/api";
 import { Header } from "@/components/Header";
 import { ExamCategoriesBar } from "@/components/ExamCategoriesBar";
@@ -18,14 +16,12 @@ import { GradientBg } from "@/components/ui/gradient-bg";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PracticeTabs } from "@/components/practice/PracticeTabs";
+import { PreviousYearPapersSection } from "@/components/practice/PreviousYearPapersSection";
 import {
   Clock,
   HelpCircle,
-  History,
   TrendingUp,
   ArrowRight,
-  Download,
-  PlayCircle,
   Bot,
   FileText,
   Sparkles,
@@ -35,7 +31,6 @@ import { toTitleCase } from "@/lib/titleCase";
 
 const RECOMMENDED_LIMIT = 6;
 const MOCKS_PREVIEW = 3;
-const PREVIOUS_YEARS_PREVIEW = 5;
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes}m`;
@@ -174,50 +169,11 @@ function MockTestCardRow({ id, paper }: { id: string; paper: FullLengthMock }) {
   );
 }
 
-function PreviousYearCard({ examName, year, paper }: { examName: string; year: number; paper: PreviousYearPaper }) {
-  return (
-    <Link href={`/practice/${paper.slug}`} className="block group">
-      <Card className="rounded-2xl bg-card/90 dark:bg-card/70 backdrop-blur-xl border border-border p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 hover:border-blue-500/40 cursor-pointer">
-        <CardContent className="p-0">
-          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5 tracking-wider">{toTitleCase(examName)}</p>
-          <p className="text-lg sm:text-xl font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{year}</p>
-          <div className="mt-2 sm:mt-3 flex justify-center gap-2 text-blue-600 dark:text-blue-400 opacity-80 group-hover:opacity-100 transition-opacity">
-            <Download className="h-4 w-4" />
-            <PlayCircle className="h-4 w-4" />
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
-function ArchivedCard() {
-  return (
-    <Link href="/practice/previous-year-paper" className="block group">
-      <Card className="rounded-2xl bg-muted/20 dark:bg-muted/10 backdrop-blur-xl border border-dashed border-border p-4 text-center shadow-md transition-all duration-300 hover:shadow-lg hover:border-muted-foreground/40 cursor-pointer">
-        <CardContent className="p-0">
-          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5 tracking-wider invisible select-none" aria-hidden>
-            &nbsp;
-          </p>
-          <div className="flex justify-center items-center min-h-6 sm:min-h-7">
-            <History className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground group-hover:text-muted-foreground/90 transition-colors shrink-0" />
-          </div>
-          <p className="mt-2 sm:mt-3 text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-            Archived
-          </p>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
 export default function PracticePage() {
   const [practicePapers, setPracticePapers] = useState<LevelWisePractice[]>([]);
   const [practiceTotal, setPracticeTotal] = useState(0);
   const [fullLengthPapers, setFullLengthPapers] = useState<FullLengthMock[]>([]);
   const [fullLengthTotal, setFullLengthTotal] = useState(0);
-  const [previousYearPapers, setPreviousYearPapers] = useState<PreviousYearPaper[]>([]);
-  const [previousYearTotal, setPreviousYearTotal] = useState(0);
   const [exams, setExams] = useState<{ id: string; name?: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -228,10 +184,9 @@ export default function PracticePage() {
       setLoading(true);
       setError(null);
       try {
-        const [levelRes, mockRes, prevRes, examsRes] = await Promise.all([
+        const [levelRes, mockRes, examsRes] = await Promise.all([
           getLevelWisePractices({ status: "Active", page: 1, limit: RECOMMENDED_LIMIT }),
           getFullLengthMocksPaginated({ status: "Active", page: 1, limit: MOCKS_PREVIEW }),
-          getPreviousYearPapersPaginated({ status: "Active", page: 1, limit: PREVIOUS_YEARS_PREVIEW }),
           getExams(true),
         ]);
         if (!cancelled) {
@@ -239,8 +194,6 @@ export default function PracticePage() {
           setPracticeTotal(levelRes.total);
           setFullLengthPapers(Array.isArray(mockRes.papers) ? mockRes.papers : []);
           setFullLengthTotal(mockRes.total ?? 0);
-          setPreviousYearPapers(Array.isArray(prevRes.papers) ? prevRes.papers : []);
-          setPreviousYearTotal(prevRes.total ?? 0);
           setExams(Array.isArray(examsRes) ? (examsRes as { id: string; name?: string }[]) : []);
         }
       } catch (e) {
@@ -259,27 +212,6 @@ export default function PracticePage() {
     return map;
   }, [exams]);
 
-  const previousYearsByYear = useMemo(() => {
-    const map = new Map<string, { year: number; examId: string; examName: string; papers: PreviousYearPaper[] }>();
-    previousYearPapers.forEach((p) => {
-      const y = p.year ?? new Date().getFullYear();
-      const key = `${y}-${p.examId}`;
-      if (!map.has(key)) {
-        map.set(key, {
-          year: y,
-          examId: p.examId,
-          examName: toTitleCase(p.examName ?? examNameById[p.examId] ?? "Exam"),
-          papers: [],
-        });
-      }
-      map.get(key)!.papers.push(p);
-    });
-    return Array.from(map.values()).sort(
-      (a, b) => b.year - a.year || a.examName.localeCompare(b.examName)
-    );
-  }, [previousYearPapers, examNameById]);
-
-  const previousYearsPreview = previousYearsByYear;
   const fullLengthPreview = fullLengthPapers;
 
   return (
@@ -485,34 +417,7 @@ export default function PracticePage() {
               )}
             </section>
 
-            {/* Previous Year Papers */}
-            <section className="pb-4">
-              <div className="flex items-center gap-3 mb-6">
-                <span className="h-8 w-1 rounded-full bg-primary shrink-0" aria-hidden />
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-                  Previous Year Papers
-                </h2>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                {previousYearPapers.map((paper) => (
-                  <PreviousYearCard
-                    key={paper.id}
-                    examName={toTitleCase(paper.examName ?? examNameById[paper.examId] ?? "Exam")}
-                    year={paper.year ?? new Date().getFullYear()}
-                    paper={paper}
-                  />
-                ))}
-                {previousYearTotal > PREVIOUS_YEARS_PREVIEW && <ArchivedCard />}
-              </div>
-              {previousYearPapers.length === 0 && (
-                <EmptySectionCard
-                  title="No previous year papers yet"
-                  description="Past exam papers will appear here when added."
-                  href="/practice"
-                  linkLabel="Back to Practice"
-                />
-              )}
-            </section>
+            <PreviousYearPapersSection />
           </>
         )}
 

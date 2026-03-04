@@ -52,7 +52,7 @@ export default function PracticeManagementLandingPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Mock Management</BreadcrumbPage>
+              <BreadcrumbPage>Practice Management</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

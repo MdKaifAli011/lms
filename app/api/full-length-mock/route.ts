@@ -77,6 +77,7 @@ export async function GET(request: NextRequest) {
               difficulty: 1,
               orderNumber: 1,
               status: 1,
+              mockId: 1,
               locked: 1,
               image: 1,
               createdAt: 1,
@@ -104,6 +105,7 @@ export async function GET(request: NextRequest) {
         difficulty: doc.difficulty,
         orderNumber: doc.orderNumber,
         status: doc.status,
+        mockId: typeof doc.mockId === "string" ? doc.mockId.trim() : "",
         locked: doc.locked ?? false,
         image: doc.image ?? "",
         createdAt: doc.createdAt
@@ -151,6 +153,7 @@ export async function GET(request: NextRequest) {
       difficulty: doc.difficulty,
       orderNumber: doc.orderNumber,
       status: doc.status,
+      mockId: (doc as { mockId?: string }).mockId ?? "",
       locked: doc.locked ?? false,
       image: doc.image ?? "",
       createdAt: doc.createdAt
@@ -188,6 +191,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Valid Exam ID is required" }, { status: 400, headers: corsHeaders });
     }
 
+    const rawYear =
+      body.mockYear != null && body.mockYear !== ""
+        ? parseInt(String(body.mockYear), 10)
+        : new Date().getFullYear();
+    const mockYear =
+      !Number.isNaN(rawYear) && rawYear >= 2000 && rawYear <= 2100
+        ? rawYear
+        : new Date().getFullYear();
+    const prefix = `MOCK-${mockYear}-`;
+    const existing = await FullLengthMock.find({ mockId: new RegExp(`^${prefix}\\d+$`) })
+      .select("mockId")
+      .lean();
+    let nextNum = 1;
+    for (const d of existing) {
+      const m = (d as { mockId?: string }).mockId?.match(new RegExp(`^${prefix}(\\d+)$`));
+      if (m) nextNum = Math.max(nextNum, parseInt(m[1], 10) + 1);
+    }
+    const mockId = `${prefix}${String(nextNum).padStart(3, "0")}`;
+
     // Generate unique slug
     const baseSlug = slugify(title);
     let slug = baseSlug;
@@ -215,9 +237,19 @@ export async function POST(request: NextRequest) {
       difficulty: body.difficulty || "Mixed",
       orderNumber,
       status: body.status === "Inactive" ? "Inactive" : "Active",
+      mockId,
       locked: body.locked === true,
       image: body.image?.trim() || "",
     });
+
+    // If create() didn't persist mockId (cached Mongoose schema), write directly to MongoDB so it always persists
+    if (!doc.mockId) {
+      await FullLengthMock.collection.updateOne(
+        { _id: doc._id },
+        { $set: { mockId } }
+      );
+    }
+    const finalMockId = doc.mockId ?? mockId;
 
     return NextResponse.json({
       id: doc._id.toString(),
@@ -231,6 +263,7 @@ export async function POST(request: NextRequest) {
       difficulty: doc.difficulty,
       orderNumber: doc.orderNumber,
       status: doc.status,
+      mockId: finalMockId,
       locked: doc.locked,
       image: doc.image,
       createdAt: doc.createdAt

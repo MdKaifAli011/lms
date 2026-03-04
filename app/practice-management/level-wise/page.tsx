@@ -334,7 +334,7 @@ export default function LevelWisePracticePage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/practice-management">Mock Management</BreadcrumbLink>
+                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>

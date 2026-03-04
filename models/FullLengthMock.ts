@@ -14,6 +14,8 @@ export interface IFullLengthMock {
   /** Display order within same exam */
   orderNumber: number;
   status: "Active" | "Inactive";
+  /** Display ID e.g. MOCK-2024-001 */
+  mockId?: string;
   /** If true, show as "Unlocks later" / locked */
   locked?: boolean;
   /** Optional image URL for card */
@@ -38,6 +40,7 @@ const fullLengthMockSchema = new Schema<IFullLengthMock>(
     },
     orderNumber: { type: Number, default: 1 },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+    mockId: { type: String, default: "", trim: true },
     locked: { type: Boolean, default: false },
     image: { type: String, default: "" },
     createdAt: { type: Date, default: Date.now },
