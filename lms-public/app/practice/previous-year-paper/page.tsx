@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { Download, PlayCircle, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PracticeShell } from "@/components/practice/PracticeShell";
-import { getPreviousYearPapers, getExams, type PreviousYearPaper } from "@/lib/api";
+import { getPreviousYearPapersPaginated, getExams, type PreviousYearPaper } from "@/lib/api";
 import { toTitleCase } from "@/lib/titleCase";
 
-const INITIAL_GROUPS = 4;
-const LOAD_MORE_GROUPS = 4;
+const PAGE_SIZE = 10;
 
 function PreviousYearCard({
   examName,
@@ -38,35 +37,62 @@ function PreviousYearCard({
 
 export default function PracticePreviousYearPaperPage() {
   const [papers, setPapers] = useState<PreviousYearPaper[]>([]);
-  const [exams, setExams] = useState<{ id: string; name?: string }[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(INITIAL_GROUPS);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [exams, setExams] = useState<{ id: string; name?: string }[]>([]);
+
+  const hasMore = papers.length < total;
+
+  const loadPage = useCallback(async (pageNum: number, append: boolean) => {
+    const setter = append ? setLoadingMore : setLoading;
+    setter(true);
+    try {
+      const { papers: nextPapers, total: nextTotal } = await getPreviousYearPapersPaginated({
+        status: "Active",
+        page: pageNum,
+        limit: PAGE_SIZE,
+      });
+      if (append) {
+        setPapers((prev) => [...prev, ...nextPapers]);
+      } else {
+        setPapers(nextPapers);
+      }
+      setTotal(nextTotal);
+      setPage(pageNum);
+    } catch (e) {
+      if (!append) {
+        setPapers([]);
+        setTotal(0);
+        setError(e instanceof Error ? e.message : "Failed to load");
+      }
+    } finally {
+      setter(false);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const [list, examsRes] = await Promise.all([
-          getPreviousYearPapers({ status: "Active" }),
-          getExams(true),
-        ]);
-        if (!cancelled) {
-          setPapers(list);
-          setExams(Array.isArray(examsRes) ? (examsRes as { id: string; name?: string }[]) : []);
-        }
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
-      } finally {
-        if (!cancelled) setLoading(false);
+    (async () => {
+      const examsRes = await getExams(true);
+      if (!cancelled && Array.isArray(examsRes)) {
+        setExams(examsRes as { id: string; name?: string }[]);
       }
-    }
-    load();
+    })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    setError(null);
+    loadPage(1, false);
+  }, [loadPage]);
+
+  const handleLoadMore = () => {
+    if (loadingMore || !hasMore) return;
+    loadPage(page + 1, true);
+  };
 
   const examNameById = useMemo(() => {
     const map: Record<string, string> = {};
@@ -94,33 +120,10 @@ export default function PracticePreviousYearPaperPage() {
     );
   }, [papers, examNameById]);
 
-  const visibleGroups = useMemo(
-    () => byYearAndExam.slice(0, visibleCount),
-    [byYearAndExam, visibleCount]
-  );
-  const hasMore = visibleCount < byYearAndExam.length;
-
-  const loadMore = useCallback(() => {
-    setVisibleCount((c) => c + LOAD_MORE_GROUPS);
-  }, []);
-
-  useEffect(() => {
-    if (!loadMoreRef.current || !hasMore) return;
-    const el = loadMoreRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore) loadMore();
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasMore, loadMore]);
-
   return (
     <PracticeShell
       title="Previous Year Papers"
-      description="Previous year exam papers. Click a card to open. Scroll for more."
+      description="Previous year exam papers. Click a card to open. Load more to see all."
     >
       {loading ? (
         <div className="flex justify-center py-12">
@@ -133,8 +136,8 @@ export default function PracticePreviousYearPaperPage() {
       ) : (
         <>
           <div className="space-y-8">
-            {visibleGroups.map(({ year, examName, papers: groupPapers }) => (
-              <div key={`${year}-${examName}`}>
+            {byYearAndExam.map(({ year, examId, examName, papers: groupPapers }) => (
+              <div key={`${year}-${examId}`}>
                 <h2 className="text-lg font-semibold text-foreground mb-3">
                   {examName} — {year}
                 </h2>
@@ -151,12 +154,26 @@ export default function PracticePreviousYearPaperPage() {
               </div>
             ))}
           </div>
-          {hasMore && (
-            <div ref={loadMoreRef} className="flex justify-center py-6 min-h-[60px]">
-              <span className="text-xs text-muted-foreground">Scroll for more</span>
+          {hasMore && papers.length > 0 && (
+            <div className="flex justify-center py-8">
+              <button
+                type="button"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm border-2 border-primary bg-primary/5 text-primary hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-60 disabled:pointer-events-none"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>Load more ({papers.length} of {total})</>
+                )}
+              </button>
             </div>
           )}
-          {byYearAndExam.length === 0 && (
+          {papers.length === 0 && !loading && (
             <p className="text-sm text-muted-foreground">No previous year papers available yet.</p>
           )}
         </>

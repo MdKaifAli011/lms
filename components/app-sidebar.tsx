@@ -74,7 +74,7 @@ const data = {
       ],
     },
     {
-      title: "Mock Management",
+      title: "Practice Management",
       url: "/practice-management",
       icon: ClipboardList,
       items: [

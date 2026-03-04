@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { id: "all", label: "All Tests", href: "/practice" },
   { id: "level-wise", label: "Practice Tests", href: "/practice/level-wise" },
-  { id: "full-length", label: "Full-Length Mocks", href: "/practice/full-length" },
+  { id: "full-length", label: "Full-Length Mocks", href: "/mock-tests" },
   { id: "previous-year-paper", label: "Previous Year Papers", href: "/practice/previous-year-paper" },
 ] as const;
 
@@ -17,7 +17,7 @@ export function PracticeTabs() {
   const activeId = (() => {
     if (pathname === "/practice" || pathname === "/practice/") return "all";
     if (pathname.startsWith("/practice/level-wise")) return "level-wise";
-    if (pathname.startsWith("/practice/full-length")) return "full-length";
+    if (pathname.startsWith("/mock-tests")) return "full-length";
     if (pathname.startsWith("/practice/previous-year-paper")) return "previous-year-paper";
     return "all";
   })();

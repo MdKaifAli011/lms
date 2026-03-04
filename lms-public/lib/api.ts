@@ -123,6 +123,32 @@ export async function getFullLengthMocks(filters?: { examId?: string; status?: s
   }
 }
 
+export async function getFullLengthMocksPaginated(filters: {
+  status?: string;
+  page: number;
+  limit: number;
+  search?: string;
+  examId?: string;
+}): Promise<{ papers: FullLengthMock[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    params.set("page", String(filters.page));
+    params.set("limit", String(filters.limit));
+    if (filters.status) params.set("status", filters.status);
+    if (filters.search?.trim()) params.set("search", filters.search.trim());
+    if (filters.examId) params.set("examId", filters.examId);
+    const q = params.toString();
+    const res = await fetchApi<{ papers: FullLengthMock[]; total: number }>(`/api/full-length-mock?${q}`);
+    return {
+      papers: Array.isArray(res.papers) ? res.papers : [],
+      total: typeof res.total === "number" ? res.total : 0,
+    };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getFullLengthMocksPaginated]", e);
+    return { papers: [], total: 0 };
+  }
+}
+
 // ——— Previous Year Papers ———
 export interface PreviousYearPaper {
   id: string;
@@ -156,6 +182,32 @@ export async function getPreviousYearPapers(filters?: { examId?: string; year?: 
   } catch (e) {
     if (typeof window === "undefined") console.error("[getPreviousYearPapers]", e);
     return [];
+  }
+}
+
+export async function getPreviousYearPapersPaginated(filters: {
+  status?: string;
+  page: number;
+  limit: number;
+  examId?: string;
+  year?: number;
+}): Promise<{ papers: PreviousYearPaper[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    params.set("page", String(filters.page));
+    params.set("limit", String(filters.limit));
+    if (filters.status) params.set("status", filters.status);
+    if (filters.examId) params.set("examId", filters.examId);
+    if (filters.year != null) params.set("year", String(filters.year));
+    const q = params.toString();
+    const res = await fetchApi<{ papers: PreviousYearPaper[]; total: number }>(`/api/previous-year-paper?${q}`);
+    return {
+      papers: Array.isArray(res.papers) ? res.papers : [],
+      total: typeof res.total === "number" ? res.total : 0,
+    };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getPreviousYearPapersPaginated]", e);
+    return { papers: [], total: 0 };
   }
 }
 

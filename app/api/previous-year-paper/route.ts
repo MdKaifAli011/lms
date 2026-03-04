@@ -17,64 +17,70 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
-/** GET /api/previous-year-paper – list previous year papers */
+const mapDoc = (doc: Record<string, unknown>) => ({
+  id: (doc._id as { toString: () => string }).toString(),
+  examId: (doc.examId as { _id?: { toString: () => string }; name?: string; slug?: string })?._id?.toString() ?? doc.examId,
+  examName: (doc.examId as { name?: string })?.name ?? "",
+  examSlug: (doc.examId as { slug?: string })?.slug ?? "",
+  title: doc.title,
+  slug: doc.slug,
+  description: doc.description ?? "",
+  year: doc.year,
+  session: doc.session ?? "",
+  durationMinutes: doc.durationMinutes,
+  totalMarks: doc.totalMarks,
+  totalQuestions: doc.totalQuestions,
+  difficulty: doc.difficulty,
+  orderNumber: doc.orderNumber,
+  status: doc.status,
+  locked: doc.locked ?? false,
+  image: doc.image ?? "",
+  createdAt: doc.createdAt
+    ? new Date(doc.createdAt as Date).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })
+    : undefined,
+  updatedAt: doc.updatedAt
+    ? new Date(doc.updatedAt as Date).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })
+    : undefined,
+});
+
+/** GET /api/previous-year-paper – list previous year papers (supports pagination) */
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    
+
     const examId = searchParams.get("examId");
-    const year = searchParams.get("year");
+    const yearParam = searchParams.get("year");
     const status = searchParams.get("status");
+    const pageParam = searchParams.get("page");
+    const limitParam = searchParams.get("limit");
+
+    const usePagination = pageParam != null && limitParam != null;
+    const page = Math.max(1, parseInt(pageParam ?? "1", 10));
+    const limit = Math.min(100, Math.max(1, parseInt(limitParam ?? "10", 10)));
 
     const query: Record<string, unknown> = {};
-    if (examId) query.examId = examId;
-    if (year) query.year = parseInt(year, 10);
+    if (examId && mongoose.Types.ObjectId.isValid(examId)) query.examId = new mongoose.Types.ObjectId(examId);
+    if (yearParam && !Number.isNaN(parseInt(yearParam, 10))) query.year = parseInt(yearParam, 10);
     if (status) query.status = status;
+
+    if (usePagination) {
+      const total = await PreviousYearPaper.countDocuments(query);
+      const papers = await PreviousYearPaper.find(query)
+        .sort({ examId: 1, year: -1, orderNumber: 1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .populate("examId", "name slug")
+        .lean();
+      const list = (papers as Record<string, unknown>[]).map(mapDoc);
+      return NextResponse.json({ papers: list, total }, { headers: corsHeaders });
+    }
 
     const papers = await PreviousYearPaper.find(query)
       .sort({ examId: 1, year: -1, orderNumber: 1 })
       .populate("examId", "name slug")
       .lean();
-
-    const list = papers.map((doc: Record<string, unknown>) => ({
-      id: (doc._id as { toString: () => string }).toString(),
-      examId: (doc.examId as { _id?: { toString: () => string }; name?: string; slug?: string })?._id?.toString() || doc.examId,
-      examName: (doc.examId as { name?: string })?.name || "",
-      examSlug: (doc.examId as { slug?: string })?.slug || "",
-      title: doc.title,
-      slug: doc.slug,
-      description: doc.description || "",
-      year: doc.year,
-      session: doc.session || "",
-      durationMinutes: doc.durationMinutes,
-      totalMarks: doc.totalMarks,
-      totalQuestions: doc.totalQuestions,
-      difficulty: doc.difficulty,
-      orderNumber: doc.orderNumber,
-      status: doc.status,
-      locked: doc.locked || false,
-      image: doc.image || "",
-      createdAt: doc.createdAt
-        ? new Date(doc.createdAt as Date).toLocaleString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : undefined,
-      updatedAt: doc.updatedAt
-        ? new Date(doc.updatedAt as Date).toLocaleString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : undefined,
-    }));
-
+    const list = (papers as Record<string, unknown>[]).map(mapDoc);
     return NextResponse.json(list, { headers: corsHeaders });
   } catch (err) {
     console.error("GET /api/previous-year-paper error:", err);

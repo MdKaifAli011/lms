@@ -1,15 +1,29 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { ArrowRight, Search, Clock, BarChart, Lock, Smartphone, Loader2 } from "lucide-react";
+import {
+  ArrowRight,
+  Search,
+  Clock,
+  BarChart,
+  Lock,
+  Smartphone,
+  Loader2,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MockTestCard } from "@/components/mock-tests/MockTestCard";
-import { getFullLengthMocks, getLevelWisePractices, type FullLengthMock, type LevelWisePractice } from "@/lib/api";
+import {
+  getFullLengthMocksPaginated,
+  getExams,
+  type FullLengthMock,
+} from "@/lib/api";
 import { cn } from "@/lib/utils";
 
+const PAGE_SIZE = 10;
+
 type MockItem = {
-  type: "full_length" | "level_wise";
+  type: "full_length";
   id: string;
   slug: string;
   title: string;
@@ -19,7 +33,7 @@ type MockItem = {
   totalMarks: number;
   totalQuestions: number;
   locked?: boolean;
-  levelName?: string;
+  levelName: string;
 };
 
 function formatTime(mins: number): string {
@@ -35,82 +49,155 @@ function difficultyColor(d: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
+function toTitleCase(s: string): string {
+  return s.replace(/\w\S*/g, (t) => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase());
+}
+
 export default function MockTestHub() {
-  const [fullLength, setFullLength] = useState<FullLengthMock[]>([]);
-  const [levelWise, setLevelWise] = useState<LevelWisePractice[]>([]);
+  const [papers, setPapers] = useState<FullLengthMock[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [examFilter, setExamFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [exams, setExams] = useState<{ id: string; name?: string }[]>([]);
+
+  const hasMore = papers.length < total;
+  const examIdFilter = examFilter === "all" ? undefined : examFilter;
+
+  const loadPage = useCallback(
+    async (pageNum: number, append: boolean) => {
+      const setter = append ? setLoadingMore : setLoading;
+      setter(true);
+      try {
+        const { papers: nextPapers, total: nextTotal } = await getFullLengthMocksPaginated({
+          status: "Active",
+          page: pageNum,
+          limit: PAGE_SIZE,
+          search: searchTerm || undefined,
+          examId: examIdFilter,
+        });
+        if (append) {
+          setPapers((prev) => [...prev, ...nextPapers]);
+        } else {
+          setPapers(nextPapers);
+        }
+        setTotal(nextTotal);
+        setPage(pageNum);
+      } catch {
+        if (!append) setPapers([]);
+        setTotal(0);
+      } finally {
+        setter(false);
+      }
+    },
+    [searchTerm, examIdFilter],
+  );
 
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      setLoading(true);
-      try {
-        const [mocksRes, levelRes] = await Promise.all([
-          getFullLengthMocks({ status: "Active" }),
-          getLevelWisePractices({ status: "Active", limit: 0 }),
-        ]);
-        if (!cancelled) {
-          setFullLength(mocksRes);
-          setLevelWise(levelRes.papers ?? []);
-        }
-      } catch {
-        if (!cancelled) setFullLength([]), setLevelWise([]);
-      } finally {
-        if (!cancelled) setLoading(false);
+    (async () => {
+      const list = await getExams(true);
+      if (!cancelled && Array.isArray(list)) {
+        setExams(
+          list.map((e: unknown) => {
+            const o = e as { id?: string; _id?: { toString?: () => string }; name?: string };
+            return {
+              id: String(o?.id ?? (o?._id && typeof o._id === "object" && "toString" in o._id ? (o._id as { toString: () => string }).toString() : o?._id) ?? ""),
+              name: o?.name ?? "Exam",
+            };
+          }),
+        );
       }
-    }
-    load();
-    return () => { cancelled = true; };
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const combined: MockItem[] = useMemo(() => {
-    const full: MockItem[] = fullLength.map((m) => ({
-      type: "full_length" as const,
-      id: m.id, slug: m.slug, title: m.title, examName: m.examName,
-      difficulty: m.difficulty ?? "Mixed", durationMinutes: m.durationMinutes,
-      totalMarks: m.totalMarks, totalQuestions: m.totalQuestions, locked: m.locked, levelName: "Full Length",
-    }));
-    const level: MockItem[] = levelWise.map((p) => ({
-      type: "level_wise" as const,
-      id: p.id, slug: p.slug, title: p.title, examName: p.examName,
-      difficulty: p.difficulty ?? "Mixed", durationMinutes: p.durationMinutes,
-      totalMarks: p.totalMarks, totalQuestions: p.totalQuestions, locked: p.locked, levelName: p.levelName ?? "Practice",
-    }));
-    return [...full, ...level];
-  }, [fullLength, levelWise]);
+  useEffect(() => {
+    loadPage(1, false);
+  }, [searchTerm, examIdFilter, loadPage]);
 
-  const filtered = useMemo(() => combined.filter((item) => {
-    const matchSearch = !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase()) || (item.examName ?? "").toLowerCase().includes(searchTerm.toLowerCase());
-    const matchExam = examFilter === "all" || (item.examName ?? "").toLowerCase() === examFilter.toLowerCase();
-    const matchType = typeFilter === "all" || (typeFilter === "full_length" && item.type === "full_length") || (typeFilter === "level_wise" && item.type === "level_wise");
-    return matchSearch && matchExam && matchType;
-  }), [combined, searchTerm, examFilter, typeFilter]);
+  const handleLoadMore = () => {
+    if (loadingMore || !hasMore) return;
+    loadPage(page + 1, true);
+  };
 
-  const featured = useMemo(() => fullLength.find((m) => !m.locked) ?? fullLength[0] ?? filtered[0], [fullLength, filtered]);
-  const examNamesForFilter = useMemo(() => Array.from(new Set(combined.map((i) => i.examName).filter(Boolean))) as string[], [combined]);
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchTerm(searchInput.trim());
+  };
+
+  const combined: MockItem[] = useMemo(
+    () =>
+      papers.map((m) => ({
+        type: "full_length" as const,
+        id: m.id,
+        slug: m.slug,
+        title: m.title,
+        examName: m.examName,
+        difficulty: m.difficulty ?? "Mixed",
+        durationMinutes: m.durationMinutes,
+        totalMarks: m.totalMarks,
+        totalQuestions: m.totalQuestions,
+        locked: m.locked,
+        levelName: "Full Length",
+      })),
+    [papers],
+  );
+
+  const featured = useMemo(
+    () => papers.find((m) => !m.locked) ?? papers[0],
+    [papers],
+  );
+
+  const examNamesForFilter = useMemo(
+    () => exams.map((e) => ({ id: e.id, name: toTitleCase(e.name ?? "Exam") })),
+    [exams],
+  );
 
   return (
     <main className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-10 sm:py-12 md:py-14 selection:bg-primary/30">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-10">
         <div>
-          <div className="inline-flex items-center justify-center mb-3 sm:mb-4"><span className="h-1 w-10 rounded-full bg-primary" /></div>
-          <span className="inline-block px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-bold tracking-wider uppercase mb-3">Exam Hub</span>
-          <h1 className="text-2xl min-[480px]:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">Mock Test <span className="text-primary">Selection</span></h1>
-          <p className="mt-2 sm:mt-3 text-sm sm:text-base text-muted-foreground max-w-xl">Full-length papers, chapter-wise, unit-wise and subject-wise tests—aligned with NEET, JEE, and other entrance exams.</p>
+          <div className="inline-flex items-center justify-center mb-3 sm:mb-4">
+            <span className="h-1 w-10 rounded-full bg-primary" />
+          </div>
+          <span className="inline-block px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-bold tracking-wider uppercase mb-3">
+            Exam Hub
+          </span>
+          <h1 className="text-2xl min-[480px]:text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+            Mock Test <span className="text-primary">Selection</span>
+          </h1>
+          <p className="mt-2 sm:mt-3 text-sm sm:text-base text-muted-foreground max-w-xl">
+            Full-length papers aligned with NEET, JEE, and other entrance exams.
+          </p>
         </div>
         <div className="w-full md:w-80 lg:w-96 shrink-0">
-          <div className="relative">
+          <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <input className="w-full h-10 sm:h-11 pl-9 pr-4 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" placeholder="Search by title or exam..." type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-          </div>
+            <input
+              className="w-full h-10 sm:h-11 pl-9 pr-4 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              placeholder="Search by title or exam..."
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              aria-label="Search mock tests"
+            />
+            <button type="submit" className="sr-only">
+              Search
+            </button>
+          </form>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-16 text-muted-foreground"><Loader2 className="h-8 w-8 animate-spin" /></div>
+        <div className="flex items-center justify-center py-16 text-muted-foreground">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       ) : (
         <>
           {featured && !("locked" in featured && featured.locked) && (
@@ -120,23 +207,64 @@ export default function MockTestHub() {
                   <div className="relative bg-muted/50 dark:bg-muted/20">
                     <div className="relative z-10 grid md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 md:p-10">
                       <div>
-                        <div className="flex items-center gap-2 mb-3 sm:mb-4"><span className="flex h-2 w-2 rounded-full bg-primary animate-pulse shrink-0" /><span className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-widest">Recommended</span></div>
-                        <h2 className="text-xl min-[480px]:text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-3 leading-tight">{featured.title}</h2>
-                        <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 leading-relaxed">{"description" in featured && featured.description ? featured.description : "Full-length mock test matching actual exam pattern and marking scheme."}</p>
+                        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                          <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse shrink-0" />
+                          <span className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-widest">
+                            Recommended
+                          </span>
+                        </div>
+                        <h2 className="text-xl min-[480px]:text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-3 leading-tight">
+                          {featured.title}
+                        </h2>
+                        <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
+                          {"description" in featured && featured.description
+                            ? featured.description
+                            : "Full-length mock test matching actual exam pattern and marking scheme."}
+                        </p>
                         <div className="flex flex-wrap gap-3 sm:gap-4 items-center">
-                          <div className="flex items-center gap-2 text-muted-foreground bg-muted/60 px-3 py-2 rounded-lg border border-border text-xs sm:text-sm font-medium"><Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />{formatTime(featured.durationMinutes)}</div>
-                          <div className="flex items-center gap-2 text-muted-foreground bg-muted/60 px-3 py-2 rounded-lg border border-border text-xs sm:text-sm font-medium"><BarChart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />{featured.totalMarks} Marks</div>
-                          <Link href={`/mock-tests/${featured.slug}`} className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-primary/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all">Start Now <ArrowRight className="w-4 h-4" /></Link>
+                          <div className="flex items-center gap-2 text-muted-foreground bg-muted/60 px-3 py-2 rounded-lg border border-border text-xs sm:text-sm font-medium">
+                            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                            {formatTime(featured.durationMinutes)}
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground bg-muted/60 px-3 py-2 rounded-lg border border-border text-xs sm:text-sm font-medium">
+                            <BarChart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                            {featured.totalMarks} Marks
+                          </div>
+                          <Link
+                            href={`/mock-tests/${featured.slug}`}
+                            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-primary/25 hover:opacity-95 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                          >
+                            Start Now <ArrowRight className="w-4 h-4" />
+                          </Link>
                         </div>
                       </div>
                       <div className="hidden md:block relative">
                         <div className="absolute -right-8 -top-8 w-48 h-48 bg-primary/15 blur-3xl rounded-full pointer-events-none" />
                         <Card className="bg-card/80 backdrop-blur-xl border border-border p-5 rounded-xl shadow-xl relative">
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0"><Smartphone className="w-5 h-5" /></div>
-                            <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Exam</p><p className="text-lg font-bold text-foreground">{featured.examName ?? "Mock Test"}</p></div>
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                              <Smartphone className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                                Exam
+                              </p>
+                              <p className="text-lg font-bold text-foreground">
+                                {featured.examName ?? "Mock Test"}
+                              </p>
+                            </div>
                           </div>
-                          <div className="space-y-2"><div className="h-1.5 w-full bg-muted rounded-full overflow-hidden"><div className="h-full bg-primary w-[85%] rounded-full" /></div><p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold flex justify-between"><span>Questions</span><span className="text-foreground">{featured.totalQuestions}</span></p></div>
+                          <div className="space-y-2">
+                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-primary w-[85%] rounded-full" />
+                            </div>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold flex justify-between">
+                              <span>Questions</span>
+                              <span className="text-foreground">
+                                {featured.totalQuestions}
+                              </span>
+                            </p>
+                          </div>
                         </Card>
                       </div>
                     </div>
@@ -147,37 +275,128 @@ export default function MockTestHub() {
           )}
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
-            <button type="button" onClick={() => setExamFilter("all")} className={cn("px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all", examFilter === "all" ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5")}>All Exams</button>
-            {examNamesForFilter.slice(0, 8).map((name) => (
-              <button key={name} type="button" onClick={() => setExamFilter(examFilter === name ? "all" : name)} className={cn("px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors", examFilter === name ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5")}>{name}</button>
+            <button
+              type="button"
+              onClick={() => setExamFilter("all")}
+              className={cn(
+                "px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all",
+                examFilter === "all"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5",
+              )}
+            >
+              All Exams
+            </button>
+            {examNamesForFilter.slice(0, 8).map(({ id, name }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setExamFilter(examFilter === id ? "all" : id)}
+                className={cn(
+                  "px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors",
+                  examFilter === id
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5",
+                )}
+              >
+                {name}
+              </button>
             ))}
-            <div className="ml-auto flex flex-wrap items-center gap-2">
-              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="bg-card border border-border rounded-full px-3 py-2 text-xs sm:text-sm font-medium text-foreground cursor-pointer focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                <option value="all">All Types</option>
-                <option value="full_length">Full Length</option>
-                <option value="level_wise">Chapter/Unit/Subject</option>
-              </select>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-            {filtered.length === 0 ? (
-              <div className="col-span-full text-center py-16 rounded-2xl border border-dashed border-border bg-muted/30 text-muted-foreground">No mock tests match your filters. Try a different exam or type.</div>
-            ) : filtered.map((item) => {
-                if (item.locked) return (
-                  <Card key={item.id} className="relative overflow-hidden bg-card/60 border border-border border-dashed opacity-80">
-                    <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/60 backdrop-blur-sm"><div className="bg-card px-4 py-2 rounded-full border border-border flex items-center gap-2 shadow-lg"><Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" /><span className="text-xs font-bold text-foreground uppercase tracking-wider">Locked</span></div></div>
-                    <CardContent className="p-5 sm:p-6 relative">
-                      <div className="flex justify-between items-start mb-4"><span className="px-2 py-0.5 rounded bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">{item.difficulty}</span><span className="text-xs text-muted-foreground">{item.levelName ?? item.type}</span></div>
-                      <h3 className="text-lg font-bold mb-4 text-foreground">{item.title}</h3>
-                      <div className="flex items-center gap-4 mb-6 text-muted-foreground text-sm"><span className="font-bold text-foreground">{formatTime(item.durationMinutes)}</span><span className="font-bold text-foreground">{item.totalMarks} Marks</span></div>
-                      <div className="flex justify-between items-center"><span className="text-xs text-muted-foreground">{item.examName}</span><span className="bg-muted px-5 py-2 rounded-xl text-xs font-bold cursor-not-allowed text-muted-foreground">Coming Soon</span></div>
-                    </CardContent>
-                  </Card>
+            {combined.length === 0 ? (
+              <div className="col-span-full text-center py-16 rounded-2xl border border-dashed border-border bg-muted/30 text-muted-foreground">
+                No mock tests match your filters. Try a different exam or search.
+              </div>
+            ) : (
+              combined.map((item) => {
+                if (item.locked)
+                  return (
+                    <Card
+                      key={item.id}
+                      className="relative overflow-hidden bg-card/60 border border-border border-dashed opacity-80"
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/60 backdrop-blur-sm">
+                        <div className="bg-card px-4 py-2 rounded-full border border-border flex items-center gap-2 shadow-lg">
+                          <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                          <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                            Locked
+                          </span>
+                        </div>
+                      </div>
+                      <CardContent className="p-5 sm:p-6 relative">
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="px-2 py-0.5 rounded bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                            {item.difficulty}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {item.levelName}
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-bold mb-4 text-foreground">
+                          {item.title}
+                        </h3>
+                        <div className="flex items-center gap-4 mb-6 text-muted-foreground text-sm">
+                          <span className="font-bold text-foreground">
+                            {formatTime(item.durationMinutes)}
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {item.totalMarks} Marks
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">
+                            {item.examName}
+                          </span>
+                          <span className="bg-muted px-5 py-2 rounded-xl text-xs font-bold cursor-not-allowed text-muted-foreground">
+                            Coming Soon
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                return (
+                  <MockTestCard
+                    key={item.id}
+                    id={item.levelName}
+                    title={item.title}
+                    difficulty={item.difficulty}
+                    difficultyColor={difficultyColor(item.difficulty)}
+                    time={formatTime(item.durationMinutes)}
+                    marks={String(item.totalMarks)}
+                    questions={String(item.totalQuestions)}
+                    users={[item.examName ?? "Exam"].filter(Boolean)}
+                    userColors={["bg-primary"]}
+                    actionLabel="Start Now"
+                    href={`/mock-tests/${item.slug}`}
+                  />
                 );
-                return <MockTestCard key={item.id} id={item.levelName ?? (item.type === "full_length" ? "Full Length" : "Practice")} title={item.title} difficulty={item.difficulty} difficultyColor={difficultyColor(item.difficulty)} time={formatTime(item.durationMinutes)} marks={String(item.totalMarks)} questions={String(item.totalQuestions)} users={[item.examName ?? "Exam"].filter(Boolean)} userColors={["bg-primary"]} actionLabel="Start Now" href={`/mock-tests/${item.slug}`} />;
-              })}
+              })
+            )}
           </div>
+
+          {hasMore && combined.length > 0 && (
+            <div className="mt-8 sm:mt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className={cn(
+                  "inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm sm:text-base border-2 border-primary bg-primary/5 text-primary hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-60 disabled:pointer-events-none",
+                )}
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>Load more ({papers.length} of {total})</>
+                )}
+              </button>
+            </div>
+          )}
         </>
       )}
     </main>
