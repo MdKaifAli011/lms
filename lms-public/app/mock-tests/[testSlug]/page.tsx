@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useEffect } from "react";
 import Link from "next/link";
 import {
   HelpCircle,
@@ -16,8 +16,11 @@ import {
   Lock,
   ArrowRight,
   Activity,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getFullLengthMockBySlug, type FullLengthMock } from "@/lib/api";
+import { toTitleCase } from "@/lib/titleCase";
 
 export default function MockTestSetup({
   params,
@@ -26,6 +29,70 @@ export default function MockTestSetup({
 }) {
   const resolvedParams = use(params);
   const [agreed, setAgreed] = useState(false);
+  const [mock, setMock] = useState<FullLengthMock | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const slug = resolvedParams.testSlug;
+    const tick = queueMicrotask || ((fn: () => void) => setTimeout(fn, 0));
+    tick(() => {
+      if (!cancelled) {
+        setLoading(true);
+        setError(null);
+      }
+    });
+    getFullLengthMockBySlug(slug)
+      .then((data) => {
+        if (!cancelled) {
+          setMock(data);
+          if (!data) setError("Mock test not found");
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setMock(null);
+          setError(e instanceof Error ? e.message : "Failed to load mock test");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [resolvedParams.testSlug]);
+
+  if (loading) {
+    return (
+      <main className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-6 sm:py-8 antialiased selection:bg-primary/30 font-sans">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading mock test...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || !mock) {
+    return (
+      <main className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-6 sm:py-8 antialiased selection:bg-primary/30 font-sans">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
+          <h1 className="text-xl font-bold text-foreground">Mock test not found</h1>
+          <p className="text-sm text-muted-foreground max-w-md">{error ?? "This mock test may have been removed or the link is invalid."}</p>
+          <Link
+            href="/mock-tests"
+            className="px-5 py-2.5 rounded-xl font-medium text-sm bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+          >
+            Back to Mock Tests
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const examLabel = toTitleCase(mock.examName ?? "Entrance");
+  const mockIdDisplay = (typeof mock.mockId === "string" && mock.mockId.trim()) ? mock.mockId.trim() : "—";
+  const marksPerQuestion = mock.totalQuestions > 0 ? Math.round(mock.totalMarks / mock.totalQuestions) : 4;
 
   return (
     <main className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-6 sm:py-8 antialiased selection:bg-primary/30 font-sans">
@@ -34,19 +101,18 @@ export default function MockTestSetup({
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-[9px] font-bold uppercase tracking-wider">
-                Entrance 2024
+                {examLabel}
               </span>
               <span className="w-1 h-1 rounded-full bg-muted-foreground" />
               <span className="text-muted-foreground text-[10px] font-mono">
-                ID: MOCK-2024-001
+                ID: {mockIdDisplay}
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-serif italic text-foreground leading-tight">
-              NEET AI-Predicted <span className="text-primary">Mock Test</span>
+              {mock.title}
             </h1>
             <p className="text-muted-foreground max-w-2xl text-sm font-light leading-relaxed">
-              Verify your identity and system requirements. This test uses real-time AI invigilation
-              for NEET/JEE standards compliance.
+              {mock.description?.trim() || "Verify your identity and system requirements. This test uses real-time AI invigilation for exam standards compliance."}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -55,7 +121,7 @@ export default function MockTestSetup({
                 Time Limit
               </span>
               <span className="text-xl font-bold text-foreground tracking-tight">
-                180<span className="text-sm text-muted-foreground ml-1 font-medium">m</span>
+                {mock.durationMinutes}<span className="text-sm text-muted-foreground ml-1 font-medium">m</span>
               </span>
             </div>
           </div>
@@ -65,12 +131,12 @@ export default function MockTestSetup({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-8 space-y-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <StatsCard icon={<HelpCircle className="w-3.5 h-3.5" />} title="Questions" value="180" sub="Total" />
-            <StatsCard icon={<Award className="w-3.5 h-3.5" />} title="Max Marks" value="720" />
+            <StatsCard icon={<HelpCircle className="w-3.5 h-3.5" />} title="Questions" value={String(mock.totalQuestions)} sub="Total" />
+            <StatsCard icon={<Award className="w-3.5 h-3.5" />} title="Max Marks" value={String(mock.totalMarks)} />
             <StatsCard
               icon={<PlusCircle className="w-3.5 h-3.5" />}
               title="Correct"
-              value="+4"
+              value={`+${marksPerQuestion}`}
               colorClass="text-green-400"
               borderClass="border-l-green-500/30"
               titleColorClass="text-green-500/70"
@@ -118,12 +184,10 @@ export default function MockTestSetup({
             <div className="mt-6 pt-6 border-t border-border">
               <div className="flex items-center gap-2 mb-4">
                 <h3 className="text-sm font-bold text-foreground">Syllabus Coverage</h3>
-                <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
+                <div className="h-px flex-1 bg-linear-to-r from-border to-transparent" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <SyllabusCard subject="Physics" count="45" color="blue" />
-                <SyllabusCard subject="Chemistry" count="45" color="yellow" />
-                <SyllabusCard subject="Biology" count="90" color="rose" />
+                <SyllabusCard subject="Full syllabus" count={String(mock.totalQuestions)} color="blue" badge="Total" />
               </div>
             </div>
           </div>
@@ -142,7 +206,7 @@ export default function MockTestSetup({
             <div className="space-y-3">
               <div className="relative rounded-xl overflow-hidden bg-background ring-1 ring-border shadow-xl group">
                 <div className="aspect-video flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent z-10" />
                   <div className="text-center p-4 z-20">
                     <Video className="w-8 h-8 text-muted-foreground mx-auto mb-1" />
                     <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-wider italic leading-tight">
@@ -177,7 +241,7 @@ export default function MockTestSetup({
 
               <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/10">
                 <div className="flex gap-2">
-                  <BatteryCharging className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
+                  <BatteryCharging className="w-3.5 h-3.5 text-destructive shrink-0" />
                   <p className="text-[10px] text-muted-foreground leading-relaxed italic">
                     Please ensure your device is connected to a{" "}
                     <span className="text-destructive font-semibold underline decoration-destructive/30">
@@ -219,17 +283,27 @@ export default function MockTestSetup({
                 id="terms"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="peer h-5 w-5 rounded-md border-2 border-border bg-background text-primary focus:ring-primary focus:ring-offset-background transition-all cursor-pointer"
+                disabled={mock.locked}
+                className="peer h-5 w-5 rounded-md border-2 border-border bg-background text-primary focus:ring-primary focus:ring-offset-background transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
             <label
               htmlFor="terms"
-              className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none"
+              className={cn(
+                "text-xs text-muted-foreground leading-relaxed select-none",
+                mock.locked ? "cursor-default" : "cursor-pointer"
+              )}
             >
-              I confirm that I am the authorized candidate taking this exam. I have read the
-              instructions and agree that any{" "}
-              <span className="text-foreground font-medium">academic dishonesty</span> will result in
-              immediate disqualification and permanent ban from LMS Doors.
+              {mock.locked ? (
+                <>This mock test is not yet available. Check back later for updates.</>
+              ) : (
+                <>
+                  I confirm that I am the authorized candidate taking this exam. I have read the
+                  instructions and agree that any{" "}
+                  <span className="text-foreground font-medium">academic dishonesty</span> will result in
+                  immediate disqualification and permanent ban from LMS Doors.
+                </>
+              )}
             </label>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
@@ -239,7 +313,11 @@ export default function MockTestSetup({
             >
               Exit Test
             </Link>
-            {agreed ? (
+            {mock.locked ? (
+              <span className="px-8 py-3 rounded-xl font-bold text-sm flex items-center justify-center bg-muted text-muted-foreground cursor-not-allowed">
+                Coming Soon
+              </span>
+            ) : agreed ? (
               <Link
                 href={`/mock-tests/${resolvedParams.testSlug}/exam`}
                 className="px-8 py-3 rounded-xl font-bold text-sm flex items-center justify-center group transition-all bg-primary hover:opacity-95 text-primary-foreground shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 cursor-pointer"
@@ -316,10 +394,12 @@ function SyllabusCard({
   subject,
   count,
   color,
+  badge = "PART A+B",
 }: {
   subject: string;
   count: string;
   color: "blue" | "yellow" | "rose";
+  badge?: string;
 }) {
   const colors = {
     blue: {
@@ -359,7 +439,7 @@ function SyllabusCard({
             colors.border
           )}
         >
-          PART A+B
+          {badge}
         </span>
       </div>
       <div className="text-xl font-bold text-foreground">

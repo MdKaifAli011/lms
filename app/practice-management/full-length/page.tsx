@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -51,6 +52,7 @@ import {
   Trash2,
   Search,
   Loader2,
+  ListChecks,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -559,6 +561,11 @@ export default function FullLengthMockPage() {
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(paper)}>
                             <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild title="Manage subjects, sections & questions">
+                            <Link href={`/practice-management/full-length/${paper.id}/questions`}>
+                              <ListChecks className="h-4 w-4" />
+                            </Link>
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleDelete(paper.id)}>
                             <Trash2 className="h-4 w-4" />

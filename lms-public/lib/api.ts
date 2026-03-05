@@ -150,6 +150,17 @@ export async function getFullLengthMocksPaginated(filters: {
   }
 }
 
+/** Fetch a single full-length mock by slug (for mock-tests/[testSlug] page). */
+export async function getFullLengthMockBySlug(slug: string): Promise<FullLengthMock | null> {
+  try {
+    const data = await fetchApi<FullLengthMock>(`/api/full-length-mock/${encodeURIComponent(slug)}`);
+    return data && typeof data === "object" && data.id ? data : null;
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getFullLengthMockBySlug]", e);
+    return null;
+  }
+}
+
 // ——— Previous Year Papers ———
 export interface PreviousYearPaper {
   id: string;

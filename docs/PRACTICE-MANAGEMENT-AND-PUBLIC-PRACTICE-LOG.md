@@ -230,3 +230,52 @@ Level-wise hierarchy (1–7) and scope IDs (subjectId, unitId, …) exist in **L
 ---
 
 *End of log. Use this document to track fixes and alignment between admin practice-management, public practice, and APIs.*
+
+---
+
+## 7. Mock Test Questions (Subjects → Sections → Questions)
+
+To support **inserting test questions** per the JEE/NEET-style structure (Test → **Subjects** → **Sections** → **Questions**), add the following.
+
+### 7.1 Models to create
+
+Create these three files under `models/`:
+
+**`models/MockSubject.ts`** – Subjects within a full-length mock (e.g. Physics, Chemistry, Mathematics):
+
+- `mockId` (ObjectId, ref FullLengthMock), `name`, `slug`, `orderNumber`
+- Indexes: `{ mockId, slug }` unique, `{ mockId, orderNumber }`
+
+**`models/MockSection.ts`** – Sections within a subject (e.g. Section A MCQs, Section B NVQ):
+
+- `subjectId` (ObjectId, ref MockSubject), `name`, `type` (enum: "MCQ" | "NVQ"), `orderNumber`
+- Index: `{ subjectId, orderNumber }`
+
+**`models/MockQuestion.ts`** – Single question in a section:
+
+- `sectionId` (ObjectId, ref MockSection), `questionText`, `type` ("MCQ" | "NVQ")
+- **MCQ:** `options` (array of strings), `correctOptionIndex` (0-based)
+- **NVQ:** `numericalAnswer`, `numericalTolerance`, `numericalUnit`
+- **Common:** `marksCorrect`, `marksIncorrect`, `imageUrl`, `imageCaption`, `orderNumber`, `difficulty` (Easy/Medium/Hard)
+
+Use the same Mongoose pattern as `FullLengthMock.ts` (Schema, timestamps, `models.X ?? model(...)`).
+
+### 7.2 API routes to add
+
+- **`/api/mock-subjects`** – GET `?mockId=...` (list subjects for a mock), POST `{ mockId, name }` (slug from name).
+- **`/api/mock-subjects/[param]`** – GET, PUT, DELETE single subject.
+- **`/api/mock-sections`** – GET `?subjectId=...`, POST `{ subjectId, name, type }`.
+- **`/api/mock-sections/[param]`** – GET, PUT, DELETE single section.
+- **`/api/mock-questions`** – GET `?sectionId=...`, POST full question body (questionText, type, options, correctOptionIndex, numericalAnswer, numericalTolerance, numericalUnit, marksCorrect, marksIncorrect, imageUrl, imageCaption, orderNumber, difficulty).
+- **`/api/mock-questions/[param]`** – GET, PUT, DELETE single question.
+
+### 7.3 Admin UI
+
+- **Entry:** Full-length table already has a “Manage questions” (ListChecks) button linking to `/practice-management/full-length/[mockId]/questions`.
+- **Page:** Create **`app/practice-management/full-length/[mockId]/questions/page.tsx`** that:
+  1. Fetches the mock by ID and lists its **subjects** (tabs or accordion).
+  2. For each subject, lists **sections** (e.g. Section A MCQs, Section B NVQ) with Add/Edit/Delete.
+  3. For each section, lists **questions** with Insert Question (form: question text, type MCQ/NVQ, options + correct index or numerical answer + tolerance + unit, marking +4/-1, image URL + caption, order, difficulty).
+  4. Uses the new APIs above for all CRUD.
+
+This gives you **creation of subject → section → insert question** in line with the JEE Main mock test environment (subjects as tabs, sections with question types, per-question content and marking).

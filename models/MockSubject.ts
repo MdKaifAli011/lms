@@ -1,0 +1,2 @@
+// MockSubject
+export {};

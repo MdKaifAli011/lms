@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookMarked, BookOpen, ClipboardList, FileText } from "lucide-react";
+import { BookMarked, BookOpen, ClipboardList, FileText, FolderOpen } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -89,6 +89,17 @@ const data = {
         {
           title: "Previous Year Papers",
           url: "/practice-management/previous-years",
+        },
+      ],
+    },
+    {
+      title: "File Manager",
+      url: "/file-manager",
+      icon: FolderOpen,
+      items: [
+        {
+          title: "All Files",
+          url: "/file-manager",
         },
       ],
     },
