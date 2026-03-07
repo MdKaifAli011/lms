@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/db"
 import Exam from "@/models/Exam"
 import { slugify } from "@/lib/slugify"
+import { toTitleCase } from "@/lib/titleCase"
 
 // CORS headers
 const corsHeaders = {
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB()
     const body = await request.json()
-    const name = (body.name ?? "").trim()
+    const name = toTitleCase((body.name ?? "").trim())
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400, headers: corsHeaders })
     }

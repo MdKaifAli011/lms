@@ -112,10 +112,10 @@ export default function PracticeSlugPage() {
             )}
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold" asChild>
+            <Button size="default" className="h-11 px-6 text-base rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold" asChild>
               <Link href="#">Start Test (Coming soon)</Link>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-xl" asChild>
+            <Button size="default" variant="outline" className="h-11 px-6 text-base rounded-xl" asChild>
               <Link href="/practice" className="gap-2">
                 <ArrowLeft className="h-4 w-4" /> Back to Practice
               </Link>

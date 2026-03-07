@@ -3,6 +3,7 @@ import connectDB from "@/lib/db"
 import Definition from "@/models/Definition"
 import { slugify } from "@/lib/slugify"
 import { isMongoId } from "@/lib/slugify"
+import { toTitleCase } from "@/lib/titleCase"
 import mongoose from "mongoose"
 
 const ObjectId = mongoose.Types.ObjectId
@@ -55,7 +56,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json()
     const existing = await Definition.findById(param).lean() as { name?: string; slug?: string; subtopicId?: unknown } | null
     if (!existing) return NextResponse.json({ error: "Definition not found" }, { status: 404 })
-    const name = (body.name ?? existing.name).trim()
+    const name = toTitleCase(String(body.name ?? existing.name ?? "").trim())
     if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 })
     const subtopicId = body.subtopicId ?? existing.subtopicId
     if (!subtopicId) return NextResponse.json({ error: "subtopicId is required" }, { status: 400 })

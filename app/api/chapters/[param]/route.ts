@@ -3,6 +3,7 @@ import connectDB from "@/lib/db"
 import Chapter from "@/models/Chapter"
 import { slugify } from "@/lib/slugify"
 import { isMongoId } from "@/lib/slugify"
+import { toTitleCase } from "@/lib/titleCase"
 import mongoose from "mongoose"
 
 const ObjectId = mongoose.Types.ObjectId
@@ -55,7 +56,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json()
     const existing = await Chapter.findById(param).lean() as { name?: string; slug?: string; unitId?: unknown } | null
     if (!existing) return NextResponse.json({ error: "Chapter not found" }, { status: 404 })
-    const name = (body.name ?? existing.name).trim()
+    const name = toTitleCase(String(body.name ?? existing.name ?? "").trim())
     if (!name) return NextResponse.json({ error: "Name is required" }, { status: 400 })
     const unitId = body.unitId ?? existing.unitId
     if (!unitId) return NextResponse.json({ error: "unitId is required" }, { status: 400 })

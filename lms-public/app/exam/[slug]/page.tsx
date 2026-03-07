@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 import { getExamBySlugOrId, getSidebarTree } from "@/lib/api";
+import type { HierarchySubject } from "@/lib/buildHierarchy";
 import { getUniversalNav } from "@/lib/navigationService";
 import { generateEntityMetadata, normalizeApiSeo } from "@/lib/metadata";
 import { toTitleCase } from "@/lib/titleCase";
@@ -47,7 +48,7 @@ export default async function ExamSlugPage({ params }: PageProps) {
     getSidebarTree(examId),
     getUniversalNav({ examSlug: slug }),
   ]);
-  const hierarchy = sidebarData.subjects ?? [];
+  const hierarchy = (sidebarData.subjects ?? []) as HierarchySubject[];
 
   const breadcrumbs = [{ label: examName, href: `/exam/${slug}` }];
 

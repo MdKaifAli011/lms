@@ -4,6 +4,7 @@ import Chapter from "@/models/Chapter"
 import Topic from "@/models/Topic"
 import { slugify } from "@/lib/slugify"
 import { isMongoId } from "@/lib/slugify"
+import { toTitleCase } from "@/lib/titleCase"
 import mongoose from "mongoose"
 
 function toTopicJson(doc: Record<string, unknown>): Record<string, unknown> {
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB()
     const body = await request.json()
-    const name = (body.name ?? "").trim()
+    const name = toTitleCase((body.name ?? "").trim())
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 })
     }

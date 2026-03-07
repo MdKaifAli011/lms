@@ -3,6 +3,7 @@ import connectDB from "@/lib/db"
 import Exam from "@/models/Exam"
 import { slugify } from "@/lib/slugify"
 import { isMongoId } from "@/lib/slugify"
+import { toTitleCase } from "@/lib/titleCase"
 import mongoose from "mongoose"
 
 const ObjectId = mongoose.Types.ObjectId
@@ -108,7 +109,7 @@ export async function PUT(
       return NextResponse.json({ error: "Exam not found" }, { status: 404 })
     }
 
-    const name = (body.name ?? existing.name).trim()
+    const name = toTitleCase(String(body.name ?? existing.name ?? "").trim())
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 })
     }

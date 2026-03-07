@@ -131,28 +131,30 @@ export async function PUT(
 
     const level = body.level !== undefined ? parseInt(body.level, 10) : (existing as { level?: number }).level;
     if (body.level !== undefined) {
-      if (level < 1 || level > 7) {
+      const levelNum = parseInt(body.level, 10);
+      if (Number.isNaN(levelNum) || levelNum < 1 || levelNum > 7) {
         return NextResponse.json({ error: "Level must be between 1 and 7" }, { status: 400, headers: corsHeaders });
       }
-      update.level = level;
+      update.level = levelNum;
     }
 
-    if (level >= 2 && body.subjectId !== undefined) {
+    const effectiveLevel = level ?? 0;
+    if (effectiveLevel >= 2 && body.subjectId !== undefined) {
       update.subjectId = body.subjectId && mongoose.Types.ObjectId.isValid(body.subjectId) ? new mongoose.Types.ObjectId(body.subjectId) : null;
     }
-    if (level >= 3 && body.unitId !== undefined) {
+    if (effectiveLevel >= 3 && body.unitId !== undefined) {
       update.unitId = body.unitId && mongoose.Types.ObjectId.isValid(body.unitId) ? new mongoose.Types.ObjectId(body.unitId) : null;
     }
-    if (level >= 4 && body.chapterId !== undefined) {
+    if (effectiveLevel >= 4 && body.chapterId !== undefined) {
       update.chapterId = body.chapterId && mongoose.Types.ObjectId.isValid(body.chapterId) ? new mongoose.Types.ObjectId(body.chapterId) : null;
     }
-    if (level >= 5 && body.topicId !== undefined) {
+    if (effectiveLevel >= 5 && body.topicId !== undefined) {
       update.topicId = body.topicId && mongoose.Types.ObjectId.isValid(body.topicId) ? new mongoose.Types.ObjectId(body.topicId) : null;
     }
-    if (level >= 6 && body.subtopicId !== undefined) {
+    if (effectiveLevel >= 6 && body.subtopicId !== undefined) {
       update.subtopicId = body.subtopicId && mongoose.Types.ObjectId.isValid(body.subtopicId) ? new mongoose.Types.ObjectId(body.subtopicId) : null;
     }
-    if (level >= 7 && body.definitionId !== undefined) {
+    if (effectiveLevel >= 7 && body.definitionId !== undefined) {
       update.definitionId = body.definitionId && mongoose.Types.ObjectId.isValid(body.definitionId) ? new mongoose.Types.ObjectId(body.definitionId) : null;
     }
 

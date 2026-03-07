@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getExamBySlugOrId, getExams, getSidebarTree } from "@/lib/api";
+import type { HierarchySubject } from "@/lib/buildHierarchy";
 import { HierarchyShell } from "@/components/HierarchyShell";
 
 interface LayoutProps {
@@ -18,7 +19,7 @@ export default async function ExamSlugLayout({ params, children }: LayoutProps) 
     getSidebarTree(examId),
     getExams(),
   ]);
-  const hierarchy = sidebarData.subjects ?? [];
+  const hierarchy = (sidebarData.subjects ?? []) as HierarchySubject[];
   const exams = (examsRaw as { id: string; name?: string; slug?: string; status?: string }[]).filter(
     (e) => e.status === "Active"
   );

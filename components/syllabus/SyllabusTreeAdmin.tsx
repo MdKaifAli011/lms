@@ -12,7 +12,7 @@ import {
   FileText,
   Loader2,
 } from "lucide-react"
-import { capitalize } from "@/lib/utils"
+import { toTitleCase } from "@/lib/titleCase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -200,7 +200,7 @@ function SubjectBlock({
           {isExpanded ? <FolderOpen className="h-5 w-5" /> : <Folder className="h-5 w-5" />}
         </div>
         <span className="min-w-0 flex-1 text-lg font-semibold text-slate-800 dark:text-slate-100">
-          {capitalize(subject.name)}
+          {toTitleCase(subject.name)}
         </span>
         <RowInputs
           nodeId={subject.id}
@@ -308,7 +308,7 @@ function UnitRow({
       <div className="flex items-center gap-2 sm:gap-3 py-2 flex-wrap">
         <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500 dark:bg-blue-400" aria-hidden />
         <span className="min-w-0 flex-1 font-medium text-base text-slate-700 dark:text-slate-200">
-          {capitalize(unit.name)}
+          {toTitleCase(unit.name)}
         </span>
         <RowInputs
           nodeId={unit.id}
@@ -373,7 +373,7 @@ function ChapterRow({
     <div className="py-0.5">
       <div className="flex items-center gap-2 sm:gap-3 py-2 flex-wrap">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 dark:bg-blue-400" aria-hidden />
-        <span className="min-w-0 flex-1 text-base text-slate-700 dark:text-slate-200">{capitalize(chapter.name)}</span>
+        <span className="min-w-0 flex-1 text-base text-slate-700 dark:text-slate-200">{toTitleCase(chapter.name)}</span>
         <RowInputs
           nodeId={chapter.id}
           localValues={localValues}
@@ -437,7 +437,7 @@ function TopicRow({
     <div className="py-0.5">
       <div className="flex items-center gap-2 sm:gap-3 py-2 flex-wrap">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 dark:bg-blue-400" aria-hidden />
-        <span className="min-w-0 flex-1 text-base text-slate-700 dark:text-slate-200">{capitalize(topic.name)}</span>
+        <span className="min-w-0 flex-1 text-base text-slate-700 dark:text-slate-200">{toTitleCase(topic.name)}</span>
         <RowInputs
           nodeId={topic.id}
           localValues={localValues}
@@ -501,7 +501,7 @@ function SubtopicRow({
     <div className="py-0.5">
       <div className="flex items-center gap-2 sm:gap-3 py-2 flex-wrap">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 dark:bg-blue-400" aria-hidden />
-        <span className="min-w-0 flex-1 text-base text-slate-700 dark:text-slate-200">{capitalize(subtopic.name)}</span>
+        <span className="min-w-0 flex-1 text-base text-slate-700 dark:text-slate-200">{toTitleCase(subtopic.name)}</span>
         <RowInputs
           nodeId={subtopic.id}
           localValues={localValues}
@@ -556,7 +556,7 @@ function DefinitionRow({
       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
         <FileText className="h-4 w-4" />
       </span>
-      <span className="min-w-0 flex-1 text-base text-slate-600 dark:text-slate-300">{capitalize(definition.name)}</span>
+      <span className="min-w-0 flex-1 text-base text-slate-600 dark:text-slate-300">{toTitleCase(definition.name)}</span>
       <RowInputs
         nodeId={definition.id}
         localValues={localValues}

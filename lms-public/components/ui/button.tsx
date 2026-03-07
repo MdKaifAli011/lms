@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "outline" | "ghost";
-  size?: "default" | "sm";
+  size?: "default" | "sm" | "lg" | "icon" | "icon-sm";
   asChild?: boolean;
 }
 
@@ -19,6 +19,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         variant === "ghost" && "hover:bg-muted hover:text-foreground",
       size === "default" && "h-10 px-4 py-2",
       size === "sm" && "h-8 px-3 text-sm",
+      size === "lg" && "h-11 px-6 text-base",
+      size === "icon" && "size-9 rounded-lg [&_svg]:size-4",
+      size === "icon-sm" && "size-8 rounded-lg [&_svg]:size-4",
       className
     );
     if (asChild && React.isValidElement(children)) {

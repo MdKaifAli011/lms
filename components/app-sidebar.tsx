@@ -92,17 +92,7 @@ const data = {
         },
       ],
     },
-    {
-      title: "File Manager",
-      url: "/file-manager",
-      icon: FolderOpen,
-      items: [
-        {
-          title: "All Files",
-          url: "/file-manager",
-        },
-      ],
-    },
+   
   ],
 };
 

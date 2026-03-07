@@ -28,6 +28,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { SyllabusTreeAdmin, type SyllabusLevel, type SyllabusNode } from "@/components/syllabus/SyllabusTreeAdmin"
+import { toTitleCase } from "@/lib/titleCase"
 
 const LEVEL_API: Record<SyllabusLevel, string> = {
   subject: "subjects",
@@ -164,7 +165,7 @@ export default function SyllabusManagementPage() {
               <SelectContent>
                 {exams.map((e) => (
                   <SelectItem key={e.id} value={e.id}>
-                    {e.name}
+                    {toTitleCase(e.name)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -176,7 +177,7 @@ export default function SyllabusManagementPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                {hierarchy?.exam?.name ?? "Syllabus"} — Weightage & Marks
+                {toTitleCase(hierarchy?.exam?.name) || "Syllabus"} — Weightage & Marks
               </CardTitle>
               <CardDescription>
                 Edit weightage and marks for each item and click Update to save.
