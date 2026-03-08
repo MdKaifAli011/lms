@@ -53,8 +53,14 @@ import {
   GripVertical,
   Search,
   Loader2,
+  ListChecks,
 } from "lucide-react"
 import { toast } from "sonner"
+import { toTitleCase } from "@/lib/titleCase"
+
+/** Auto: duration = questions × 3 min, total marks = questions × 4. */
+const MINUTES_PER_QUESTION = 3
+const MARKS_PER_QUESTION = 4
 
 interface LevelWisePractice {
   id: string
@@ -137,6 +143,7 @@ export default function LevelWisePracticePage() {
     status: "Active",
     locked: false,
   })
+  const [overrideTotalMarks, setOverrideTotalMarks] = useState(false)
 
   // Fetch data
   useEffect(() => {
@@ -188,15 +195,22 @@ export default function LevelWisePracticePage() {
   const handleAdd = async () => {
     setAddSaving(true)
     try {
+      const title = toTitleCase((formData.title ?? "").trim())
+      if (!title) {
+        toast.error("Title is required")
+        setAddSaving(false)
+        return
+      }
       const res = await fetch("/api/level-wise-practice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          title,
           level: parseInt(formData.level),
-          durationMinutes: parseInt(formData.durationMinutes),
-          totalMarks: parseInt(formData.totalMarks),
-          totalQuestions: parseInt(formData.totalQuestions),
+          durationMinutes: 0,
+          totalMarks: 0,
+          totalQuestions: 0,
         }),
       })
       
@@ -219,15 +233,27 @@ export default function LevelWisePracticePage() {
     if (!editingPaper) return
     setEditSaving(true)
     try {
+      const totalQuestions = parseInt(formData.totalQuestions, 10) || 0
+      const durationMinutes = totalQuestions * MINUTES_PER_QUESTION
+      const totalMarks = overrideTotalMarks
+        ? parseInt(formData.totalMarks, 10) || 0
+        : totalQuestions * MARKS_PER_QUESTION
+      const title = toTitleCase((formData.title ?? "").trim())
+      if (!title) {
+        toast.error("Title is required")
+        setEditSaving(false)
+        return
+      }
       const res = await fetch(`/api/level-wise-practice/${editingPaper.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          title,
           level: parseInt(formData.level),
-          durationMinutes: parseInt(formData.durationMinutes),
-          totalMarks: parseInt(formData.totalMarks),
-          totalQuestions: parseInt(formData.totalQuestions),
+          durationMinutes,
+          totalMarks,
+          totalQuestions,
         }),
       })
       
@@ -261,6 +287,7 @@ export default function LevelWisePracticePage() {
   // Open edit dialog
   const openEdit = (paper: LevelWisePractice) => {
     setEditingPaper(paper)
+    const q = paper.totalQuestions || 0
     setFormData({
       examId: paper.examId,
       level: String(paper.level),
@@ -272,13 +299,14 @@ export default function LevelWisePracticePage() {
       definitionId: paper.definitionId || "",
       title: paper.title,
       description: paper.description || "",
-      durationMinutes: String(paper.durationMinutes),
+      durationMinutes: String(q * MINUTES_PER_QUESTION),
       totalMarks: String(paper.totalMarks),
       totalQuestions: String(paper.totalQuestions),
       difficulty: paper.difficulty,
       status: paper.status,
       locked: paper.locked,
     })
+    setOverrideTotalMarks(paper.totalMarks !== q * MARKS_PER_QUESTION)
     setIsEditOpen(true)
   }
 
@@ -295,13 +323,14 @@ export default function LevelWisePracticePage() {
       definitionId: "",
       title: "",
       description: "",
-      durationMinutes: "60",
-      totalMarks: "100",
-      totalQuestions: "30",
+      durationMinutes: "0",
+      totalMarks: "0",
+      totalQuestions: "0",
       difficulty: "Medium",
       status: "Active",
       locked: false,
     })
+    setOverrideTotalMarks(false)
   }
 
   return (
@@ -403,35 +432,6 @@ export default function LevelWisePracticePage() {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Enter description"
                   />
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="duration">Duration (min)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      value={formData.durationMinutes}
-                      onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="marks">Total Marks</Label>
-                    <Input
-                      id="marks"
-                      type="number"
-                      value={formData.totalMarks}
-                      onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="questions">Total Questions</Label>
-                    <Input
-                      id="questions"
-                      type="number"
-                      value={formData.totalQuestions}
-                      onChange={(e) => setFormData({ ...formData, totalQuestions: e.target.value })}
-                    />
-                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -581,7 +581,14 @@ export default function LevelWisePracticePage() {
                   filteredPapers.map((paper) => (
                     <TableRow key={paper.id}>
                       <TableCell>{paper.orderNumber}</TableCell>
-                      <TableCell className="font-medium">{paper.title}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link
+                          href={`/practice-management/level-wise/${paper.id}/questions`}
+                          className="text-primary hover:underline focus:underline focus:outline-none"
+                        >
+                          {toTitleCase(paper.title)}
+                        </Link>
+                      </TableCell>
                       <TableCell>{paper.examName}</TableCell>
                       <TableCell>{paper.levelName}</TableCell>
                       <TableCell>{paper.durationMinutes} min</TableCell>
@@ -595,6 +602,11 @@ export default function LevelWisePracticePage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="icon" asChild title="Manage questions">
+                            <Link href={`/practice-management/level-wise/${paper.id}/questions`}>
+                              <ListChecks className="h-4 w-4" />
+                            </Link>
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => openEdit(paper)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -669,31 +681,64 @@ export default function LevelWisePracticePage() {
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-duration">Duration (min)</Label>
-                <Input
-                  id="edit-duration"
-                  type="number"
-                  value={formData.durationMinutes}
-                  onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-marks">Total Marks</Label>
-                <Input
-                  id="edit-marks"
-                  type="number"
-                  value={formData.totalMarks}
-                  onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="edit-questions">Total Questions</Label>
                 <Input
                   id="edit-questions"
                   type="number"
+                  min={0}
                   value={formData.totalQuestions}
-                  onChange={(e) => setFormData({ ...formData, totalQuestions: e.target.value })}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    const q = parseInt(v, 10) || 0
+                    setFormData((prev) => ({
+                      ...prev,
+                      totalQuestions: v,
+                      durationMinutes: String(q * MINUTES_PER_QUESTION),
+                      ...(overrideTotalMarks ? {} : { totalMarks: String(q * MARKS_PER_QUESTION) }),
+                    }))
+                  }}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-duration">Duration (min) — auto</Label>
+                <Input
+                  id="edit-duration"
+                  type="number"
+                  readOnly
+                  className="bg-muted"
+                  value={String((parseInt(formData.totalQuestions, 10) || 0) * MINUTES_PER_QUESTION)}
+                />
+                <p className="text-[10px] text-muted-foreground">3 min per question</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-marks">Total Marks</Label>
+                <label className="flex items-center gap-1.5 text-xs">
+                  <input
+                    type="checkbox"
+                    checked={overrideTotalMarks}
+                    onChange={(e) => {
+                      setOverrideTotalMarks(e.target.checked)
+                      if (!e.target.checked) {
+                        const q = parseInt(formData.totalQuestions, 10) || 0
+                        setFormData((prev) => ({ ...prev, totalMarks: String(q * MARKS_PER_QUESTION) }))
+                      }
+                    }}
+                    className="h-3.5 w-3.5 rounded border-input"
+                  />
+                  Override
+                </label>
+                <Input
+                  id="edit-marks"
+                  type="number"
+                  min={0}
+                  value={formData.totalMarks}
+                  onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
+                  readOnly={!overrideTotalMarks}
+                  className={!overrideTotalMarks ? "bg-muted" : ""}
+                />
+                {!overrideTotalMarks && (
+                  <p className="text-[10px] text-muted-foreground">Auto: 4 marks per question</p>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">

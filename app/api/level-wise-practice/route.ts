@@ -9,6 +9,7 @@ import "@/models/Topic";
 import "@/models/Subtopic";
 import "@/models/Definition";
 import { slugify } from "@/lib/slugify";
+import { toTitleCase } from "@/lib/titleCase";
 import mongoose from "mongoose";
 
 const CONTENT_LEVEL_NAMES: Record<number, string> = {
@@ -42,6 +43,12 @@ export async function GET(request: NextRequest) {
     const examId = searchParams.get("examId");
     const level = searchParams.get("level");
     const status = searchParams.get("status");
+    const subjectId = searchParams.get("subjectId");
+    const unitId = searchParams.get("unitId");
+    const chapterId = searchParams.get("chapterId");
+    const topicId = searchParams.get("topicId");
+    const subtopicId = searchParams.get("subtopicId");
+    const definitionId = searchParams.get("definitionId");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "0", 10);
 
@@ -49,6 +56,12 @@ export async function GET(request: NextRequest) {
     if (examId) query.examId = examId;
     if (level) query.level = parseInt(level, 10);
     if (status) query.status = status;
+    if (subjectId && mongoose.Types.ObjectId.isValid(subjectId)) query.subjectId = new mongoose.Types.ObjectId(subjectId);
+    if (unitId && mongoose.Types.ObjectId.isValid(unitId)) query.unitId = new mongoose.Types.ObjectId(unitId);
+    if (chapterId && mongoose.Types.ObjectId.isValid(chapterId)) query.chapterId = new mongoose.Types.ObjectId(chapterId);
+    if (topicId && mongoose.Types.ObjectId.isValid(topicId)) query.topicId = new mongoose.Types.ObjectId(topicId);
+    if (subtopicId && mongoose.Types.ObjectId.isValid(subtopicId)) query.subtopicId = new mongoose.Types.ObjectId(subtopicId);
+    if (definitionId && mongoose.Types.ObjectId.isValid(definitionId)) query.definitionId = new mongoose.Types.ObjectId(definitionId);
 
     // Get total count for pagination
     const total = await LevelWisePractice.countDocuments(query);
@@ -138,7 +151,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    const title = (body.title ?? "").trim();
+    const title = toTitleCase((body.title ?? "").trim());
     if (!title) {
       return NextResponse.json({ error: "Title is required" }, { status: 400, headers: corsHeaders });
     }

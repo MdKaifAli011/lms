@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import LevelWisePractice from "@/models/LevelWisePractice";
 import { slugify } from "@/lib/slugify";
+import { toTitleCase } from "@/lib/titleCase";
 import mongoose from "mongoose";
 
 const CONTENT_LEVEL_NAMES: Record<number, string> = {
@@ -120,7 +121,7 @@ export async function PUT(
 
     // Update basic fields
     if (body.title !== undefined) {
-      const title = body.title.trim();
+      const title = toTitleCase(body.title.trim());
       if (!title) {
         return NextResponse.json({ error: "Title cannot be empty" }, { status: 400 });
       }

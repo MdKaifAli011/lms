@@ -13,6 +13,8 @@ type LastModifiedCreatedBarProps = {
   saveButtonLabel?: string
   /** Optional more-actions button (e.g. dropdown) */
   moreButton?: React.ReactNode
+  /** When false, the "Created" line is not shown. Default true. */
+  showCreated?: boolean
 }
 
 export function LastModifiedCreatedBar({
@@ -22,6 +24,7 @@ export function LastModifiedCreatedBar({
   saveStatus,
   saveButtonLabel = "Save Changes",
   moreButton,
+  showCreated = true,
 }: LastModifiedCreatedBarProps) {
   return (
     <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted/30 px-6 py-4">
@@ -30,10 +33,12 @@ export function LastModifiedCreatedBar({
           <span className="font-bold uppercase tracking-tighter">Last Modified:</span>
           <span className="text-foreground">{lastModified ?? "—"}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <span className="font-bold uppercase tracking-tighter">Created:</span>
-          <span className="text-foreground">{createdAt ?? "—"}</span>
-        </div>
+        {showCreated && (
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span className="font-bold uppercase tracking-tighter">Created:</span>
+            <span className="text-foreground">{createdAt ?? "—"}</span>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <Button

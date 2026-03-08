@@ -19,6 +19,7 @@ import { MessageCircle } from "lucide-react"
 import { ContentEditorCard } from "@/components/self-study/content-editor-card"
 import { ContentSeoLayout } from "@/components/self-study/content-seo-layout"
 import { LastModifiedCreatedBar } from "@/components/self-study/last-modified-bar"
+import { LevelWiseDirectDetailsPage } from "@/components/self-study/level-wise-direct-details-page"
 import { SeoSettingsForm } from "@/components/self-study/seo-settings-form"
 import { DEFAULT_SEO, type SeoData } from "@/components/self-study/types"
 
@@ -259,7 +260,16 @@ export default function ExamSlugPage({
       />
 
       <ContentSeoLayout
-        content={<ContentEditorCard />}
+        content={
+          <>
+            <ContentEditorCard />
+            <LevelWiseDirectDetailsPage
+              level={1}
+              examId={exam.id}
+              examSlug={exam.slug}
+            />
+          </>
+        }
         seoSidebar={<SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="exam-seo" />}
       />
     </div>
