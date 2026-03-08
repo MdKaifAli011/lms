@@ -256,7 +256,12 @@ export default function UnitSlugPage({
         content={
           <>
             <ContentEditorCard />
-            <LevelWiseDirectDetailsPage level={3} unitId={unit.id} />
+            <LevelWiseDirectDetailsPage
+              level={3}
+              subjectId={unit.subjectId}
+              unitId={unit.id}
+              unitName={unit.name}
+            />
           </>
         }
         seoSidebar={<SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="unit-seo" />}

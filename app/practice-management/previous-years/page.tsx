@@ -318,7 +318,7 @@ export default function PreviousYearPapersPage() {
                   Add Paper
                 </Button>
               </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Previous Year Paper</DialogTitle>
                 <DialogDescription>
@@ -590,7 +590,7 @@ export default function PreviousYearPapersPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Previous Year Paper</DialogTitle>
             <DialogDescription>Update the previous year paper details</DialogDescription>

@@ -256,7 +256,12 @@ export default function TopicSlugPage({
         content={
           <>
             <ContentEditorCard />
-            <LevelWiseDirectDetailsPage level={5} topicId={topic.id} />
+            <LevelWiseDirectDetailsPage
+              level={5}
+              topicId={topic.id}
+              topicName={topic.name}
+              chapterId={topic.chapterId}
+            />
           </>
         }
         seoSidebar={<SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="topic-seo" />}

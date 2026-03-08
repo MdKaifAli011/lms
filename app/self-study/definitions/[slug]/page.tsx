@@ -256,7 +256,12 @@ export default function DefinitionSlugPage({
         content={
           <>
             <ContentEditorCard />
-            <LevelWiseDirectDetailsPage level={7} definitionId={definition.id} />
+            <LevelWiseDirectDetailsPage
+              level={7}
+              definitionId={definition.id}
+              definitionName={definition.name}
+              subtopicId={definition.subtopicId}
+            />
           </>
         }
         seoSidebar={<SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="definition-seo" />}

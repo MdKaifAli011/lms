@@ -307,7 +307,7 @@ export default function FullLengthMockPage() {
                   Add Mock
                 </Button>
               </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Full Length Mock Test</DialogTitle>
                 <DialogDescription>
@@ -586,7 +586,7 @@ export default function FullLengthMockPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Full Length Mock Test</DialogTitle>
             <DialogDescription>Update the mock test details</DialogDescription>

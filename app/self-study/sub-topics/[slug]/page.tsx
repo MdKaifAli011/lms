@@ -256,7 +256,12 @@ export default function SubTopicSlugPage({
         content={
           <>
             <ContentEditorCard />
-            <LevelWiseDirectDetailsPage level={6} subtopicId={subTopic.id} />
+            <LevelWiseDirectDetailsPage
+              level={6}
+              subtopicId={subTopic.id}
+              subtopicName={subTopic.name}
+              topicId={subTopic.topicId}
+            />
           </>
         }
         seoSidebar={<SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="subtopic-seo" />}

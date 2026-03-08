@@ -267,6 +267,7 @@ export default function ExamSlugPage({
               level={1}
               examId={exam.id}
               examSlug={exam.slug}
+              examName={exam.name}
             />
           </>
         }

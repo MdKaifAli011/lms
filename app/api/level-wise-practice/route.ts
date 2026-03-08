@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
       image: body.image?.trim() || "",
     };
 
-    // Add hierarchy references based on level
+    // Add hierarchy references based on level (do not add keys above level; never store null)
     if (level >= 2 && body.subjectId && mongoose.Types.ObjectId.isValid(body.subjectId)) {
       docData.subjectId = new mongoose.Types.ObjectId(body.subjectId);
     }
@@ -217,6 +217,35 @@ export async function POST(request: NextRequest) {
     }
     if (level >= 7 && body.definitionId && mongoose.Types.ObjectId.isValid(body.definitionId)) {
       docData.definitionId = new mongoose.Types.ObjectId(body.definitionId);
+    }
+    // Ensure we never pass hierarchy keys above level (in case body contained them)
+    if (level < 2) {
+      delete docData.subjectId;
+      delete docData.unitId;
+      delete docData.chapterId;
+      delete docData.topicId;
+      delete docData.subtopicId;
+      delete docData.definitionId;
+    } else if (level < 3) {
+      delete docData.unitId;
+      delete docData.chapterId;
+      delete docData.topicId;
+      delete docData.subtopicId;
+      delete docData.definitionId;
+    } else if (level < 4) {
+      delete docData.chapterId;
+      delete docData.topicId;
+      delete docData.subtopicId;
+      delete docData.definitionId;
+    } else if (level < 5) {
+      delete docData.topicId;
+      delete docData.subtopicId;
+      delete docData.definitionId;
+    } else if (level < 6) {
+      delete docData.subtopicId;
+      delete docData.definitionId;
+    } else if (level < 7) {
+      delete docData.definitionId;
     }
 
     const doc = await LevelWisePractice.create(docData);
@@ -251,6 +280,46 @@ export async function POST(request: NextRequest) {
     console.error("POST /api/level-wise-practice error:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to create practice paper" },
+      { status: 500, headers: corsHeaders }
+    );
+  }
+}
+
+/** PATCH /api/level-wise-practice – one-time cleanup: remove null hierarchy keys above level from all documents */
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    if (body.cleanNullHierarchy !== true) {
+      return NextResponse.json({ error: "Send { cleanNullHierarchy: true } to run cleanup" }, { status: 400, headers: corsHeaders });
+    }
+    await connectDB();
+
+    const levels: { level: number; unset: Record<string, string> }[] = [
+      { level: 1, unset: { subjectId: "", unitId: "", chapterId: "", topicId: "", subtopicId: "", definitionId: "" } },
+      { level: 2, unset: { unitId: "", chapterId: "", topicId: "", subtopicId: "", definitionId: "" } },
+      { level: 3, unset: { chapterId: "", topicId: "", subtopicId: "", definitionId: "" } },
+      { level: 4, unset: { topicId: "", subtopicId: "", definitionId: "" } },
+      { level: 5, unset: { subtopicId: "", definitionId: "" } },
+      { level: 6, unset: { definitionId: "" } },
+    ];
+
+    let totalModified = 0;
+    for (const { level, unset } of levels) {
+      const res = await LevelWisePractice.updateMany(
+        { level },
+        { $unset: unset }
+      );
+      totalModified += res.modifiedCount;
+    }
+
+    return NextResponse.json(
+      { ok: true, message: "Cleanup done", modifiedCount: totalModified },
+      { headers: corsHeaders }
+    );
+  } catch (err) {
+    console.error("PATCH /api/level-wise-practice error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Cleanup failed" },
       { status: 500, headers: corsHeaders }
     );
   }

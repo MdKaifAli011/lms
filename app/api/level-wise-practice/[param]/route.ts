@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import LevelWisePractice from "@/models/LevelWisePractice";
+import LevelWiseQuestion from "@/models/LevelWiseQuestion";
 import { slugify } from "@/lib/slugify";
 import { toTitleCase } from "@/lib/titleCase";
 import mongoose from "mongoose";
@@ -151,7 +152,8 @@ export async function PUT(
     if (body.locked !== undefined) updateData.locked = body.locked === true;
     if (body.image !== undefined) updateData.image = body.image.trim();
 
-    // Update level and hierarchy
+    // Update level and hierarchy (do not store null; use $unset to remove keys above level)
+    const unsetData: Record<string, string> = {};
     if (body.level !== undefined) {
       const level = parseInt(body.level, 10);
       if (level < 1 || level > 7) {
@@ -159,81 +161,91 @@ export async function PUT(
       }
       updateData.level = level;
 
-      // Update hierarchy references based on new level
       if (level >= 2 && body.subjectId && mongoose.Types.ObjectId.isValid(body.subjectId)) {
         updateData.subjectId = new mongoose.Types.ObjectId(body.subjectId);
-      } else if (level < 2) {
-        updateData.subjectId = null;
+      } else {
+        unsetData.subjectId = "";
       }
-
       if (level >= 3 && body.unitId && mongoose.Types.ObjectId.isValid(body.unitId)) {
         updateData.unitId = new mongoose.Types.ObjectId(body.unitId);
-      } else if (level < 3) {
-        updateData.unitId = null;
+      } else {
+        unsetData.unitId = "";
       }
-
       if (level >= 4 && body.chapterId && mongoose.Types.ObjectId.isValid(body.chapterId)) {
         updateData.chapterId = new mongoose.Types.ObjectId(body.chapterId);
-      } else if (level < 4) {
-        updateData.chapterId = null;
+      } else {
+        unsetData.chapterId = "";
       }
-
       if (level >= 5 && body.topicId && mongoose.Types.ObjectId.isValid(body.topicId)) {
         updateData.topicId = new mongoose.Types.ObjectId(body.topicId);
-      } else if (level < 5) {
-        updateData.topicId = null;
+      } else {
+        unsetData.topicId = "";
       }
-
       if (level >= 6 && body.subtopicId && mongoose.Types.ObjectId.isValid(body.subtopicId)) {
         updateData.subtopicId = new mongoose.Types.ObjectId(body.subtopicId);
-      } else if (level < 6) {
-        updateData.subtopicId = null;
+      } else {
+        unsetData.subtopicId = "";
       }
-
       if (level >= 7 && body.definitionId && mongoose.Types.ObjectId.isValid(body.definitionId)) {
         updateData.definitionId = new mongoose.Types.ObjectId(body.definitionId);
-      } else if (level < 7) {
-        updateData.definitionId = null;
+      } else {
+        unsetData.definitionId = "";
       }
     } else {
-      // Update hierarchy references without changing level
       if (body.subjectId !== undefined) {
-        updateData.subjectId = body.subjectId && mongoose.Types.ObjectId.isValid(body.subjectId)
-          ? new mongoose.Types.ObjectId(body.subjectId)
-          : null;
+        if (body.subjectId && mongoose.Types.ObjectId.isValid(body.subjectId)) {
+          updateData.subjectId = new mongoose.Types.ObjectId(body.subjectId);
+        } else {
+          unsetData.subjectId = "";
+        }
       }
       if (body.unitId !== undefined) {
-        updateData.unitId = body.unitId && mongoose.Types.ObjectId.isValid(body.unitId)
-          ? new mongoose.Types.ObjectId(body.unitId)
-          : null;
+        if (body.unitId && mongoose.Types.ObjectId.isValid(body.unitId)) {
+          updateData.unitId = new mongoose.Types.ObjectId(body.unitId);
+        } else {
+          unsetData.unitId = "";
+        }
       }
       if (body.chapterId !== undefined) {
-        updateData.chapterId = body.chapterId && mongoose.Types.ObjectId.isValid(body.chapterId)
-          ? new mongoose.Types.ObjectId(body.chapterId)
-          : null;
+        if (body.chapterId && mongoose.Types.ObjectId.isValid(body.chapterId)) {
+          updateData.chapterId = new mongoose.Types.ObjectId(body.chapterId);
+        } else {
+          unsetData.chapterId = "";
+        }
       }
       if (body.topicId !== undefined) {
-        updateData.topicId = body.topicId && mongoose.Types.ObjectId.isValid(body.topicId)
-          ? new mongoose.Types.ObjectId(body.topicId)
-          : null;
+        if (body.topicId && mongoose.Types.ObjectId.isValid(body.topicId)) {
+          updateData.topicId = new mongoose.Types.ObjectId(body.topicId);
+        } else {
+          unsetData.topicId = "";
+        }
       }
       if (body.subtopicId !== undefined) {
-        updateData.subtopicId = body.subtopicId && mongoose.Types.ObjectId.isValid(body.subtopicId)
-          ? new mongoose.Types.ObjectId(body.subtopicId)
-          : null;
+        if (body.subtopicId && mongoose.Types.ObjectId.isValid(body.subtopicId)) {
+          updateData.subtopicId = new mongoose.Types.ObjectId(body.subtopicId);
+        } else {
+          unsetData.subtopicId = "";
+        }
       }
       if (body.definitionId !== undefined) {
-        updateData.definitionId = body.definitionId && mongoose.Types.ObjectId.isValid(body.definitionId)
-          ? new mongoose.Types.ObjectId(body.definitionId)
-          : null;
+        if (body.definitionId && mongoose.Types.ObjectId.isValid(body.definitionId)) {
+          updateData.definitionId = new mongoose.Types.ObjectId(body.definitionId);
+        } else {
+          unsetData.definitionId = "";
+        }
       }
     }
 
     updateData.updatedAt = new Date();
 
+    const updateOp: Record<string, unknown> = { $set: updateData };
+    if (Object.keys(unsetData).length > 0) {
+      updateOp.$unset = unsetData;
+    }
+
     const doc = await LevelWisePractice.findOneAndUpdate(
       query,
-      { $set: updateData },
+      updateOp,
       { new: true }
     )
       .populate("examId", "name slug")
@@ -297,7 +309,7 @@ export async function PUT(
   }
 }
 
-/** DELETE /api/level-wise-practice/[param] – delete a practice paper */
+/** DELETE /api/level-wise-practice/[param] – delete a practice paper and all its questions (cascading) */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ param: string }> }
@@ -309,15 +321,22 @@ export async function DELETE(
     const isObjectId = mongoose.Types.ObjectId.isValid(param);
     const query = isObjectId ? { _id: param } : { slug: param };
 
-    const doc = await LevelWisePractice.findOneAndDelete(query).lean();
-
+    const doc = await LevelWisePractice.findOne(query).select("_id").lean();
     if (!doc) {
       return NextResponse.json({ error: "Practice paper not found" }, { status: 404 });
     }
 
+    const practiceId = doc._id as mongoose.Types.ObjectId;
+
+    const questionsResult = await LevelWiseQuestion.deleteMany({ practiceId });
+    const questionsDeleted = questionsResult.deletedCount ?? 0;
+
+    await LevelWisePractice.findOneAndDelete(query);
+
     return NextResponse.json({
       message: "Practice paper deleted successfully",
-      id: (doc._id as { toString: () => string }).toString(),
+      id: practiceId.toString(),
+      questionsDeleted,
     });
   } catch (err) {
     console.error("DELETE /api/level-wise-practice/[param] error:", err);

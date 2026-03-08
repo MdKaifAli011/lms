@@ -68,6 +68,14 @@ export type LevelWiseDirectDetailsPageProps = {
   subtopicId?: string;
   definitionId?: string;
   examSlug?: string;
+  /** Optional display names for scope bar and create dialog (e.g. from current details page). */
+  examName?: string;
+  subjectName?: string;
+  unitName?: string;
+  chapterName?: string;
+  topicName?: string;
+  subtopicName?: string;
+  definitionName?: string;
 };
 
 interface PracticePaper {
@@ -120,18 +128,73 @@ type FormData = {
   explanationImageUrl: string;
 };
 
-function buildQueryParams(props: LevelWiseDirectDetailsPageProps): string {
+function buildQueryParamsFromScope(level: ContentLevel, scope: ResolvedScope): string {
   const params = new URLSearchParams();
-  params.set("level", String(props.level));
-  if (props.examId) params.set("examId", props.examId);
-  if (props.subjectId) params.set("subjectId", props.subjectId);
-  if (props.unitId) params.set("unitId", props.unitId);
-  if (props.chapterId) params.set("chapterId", props.chapterId);
-  if (props.topicId) params.set("topicId", props.topicId);
-  if (props.subtopicId) params.set("subtopicId", props.subtopicId);
-  if (props.definitionId) params.set("definitionId", props.definitionId);
+  params.set("level", String(level));
+  if (scope.examId) params.set("examId", scope.examId);
+  if (scope.subjectId) params.set("subjectId", scope.subjectId);
+  if (scope.unitId) params.set("unitId", scope.unitId);
+  if (scope.chapterId) params.set("chapterId", scope.chapterId);
+  if (scope.topicId) params.set("topicId", scope.topicId);
+  if (scope.subtopicId) params.set("subtopicId", scope.subtopicId);
+  if (scope.definitionId) params.set("definitionId", scope.definitionId);
   params.set("status", "Active");
   return params.toString();
+}
+
+/** Resolved hierarchy for display and create paper (IDs + names). */
+type ResolvedScope = {
+  examId: string | null;
+  subjectId: string | null;
+  unitId: string | null;
+  chapterId: string | null;
+  topicId: string | null;
+  subtopicId: string | null;
+  definitionId: string | null;
+  examName: string;
+  subjectName: string;
+  unitName: string;
+  chapterName: string;
+  topicName: string;
+  subtopicName: string;
+  definitionName: string;
+};
+
+function initialScope(props: LevelWiseDirectDetailsPageProps): ResolvedScope {
+  return {
+    examId: props.examId ?? null,
+    subjectId: props.subjectId ?? null,
+    unitId: props.unitId ?? null,
+    chapterId: props.chapterId ?? null,
+    topicId: props.topicId ?? null,
+    subtopicId: props.subtopicId ?? null,
+    definitionId: props.definitionId ?? null,
+    examName: props.examName ?? "",
+    subjectName: props.subjectName ?? "",
+    unitName: props.unitName ?? "",
+    chapterName: props.chapterName ?? "",
+    topicName: props.topicName ?? "",
+    subtopicName: props.subtopicName ?? "",
+    definitionName: props.definitionName ?? "",
+  };
+}
+
+/** Build scope label for current level, e.g. "Level 1 – Exam: NEET" or "Level 3 – Exam: NEET, Subject: Physics, Unit: Unit 1". */
+function scopeLabel(level: ContentLevel, scope: ResolvedScope): string {
+  return `Level ${level} – ${scopeLine(level, scope)}`;
+}
+
+/** Full scope line for display: "Exam: NEET, Subject: Physics, Unit: Unit 1" up to current level. */
+function scopeLine(level: ContentLevel, scope: ResolvedScope): string {
+  const parts: string[] = [];
+  if (level >= 1 && (scope.examName || scope.examId)) parts.push(`Exam: ${scope.examName ? toTitleCase(scope.examName) : "—"}`);
+  if (level >= 2 && (scope.subjectName || scope.subjectId)) parts.push(`Subject: ${scope.subjectName ? toTitleCase(scope.subjectName) : "—"}`);
+  if (level >= 3 && (scope.unitName || scope.unitId)) parts.push(`Unit: ${scope.unitName ? toTitleCase(scope.unitName) : "—"}`);
+  if (level >= 4 && (scope.chapterName || scope.chapterId)) parts.push(`Chapter: ${scope.chapterName ? toTitleCase(scope.chapterName) : "—"}`);
+  if (level >= 5 && (scope.topicName || scope.topicId)) parts.push(`Topic: ${scope.topicName ? toTitleCase(scope.topicName) : "—"}`);
+  if (level >= 6 && (scope.subtopicName || scope.subtopicId)) parts.push(`Subtopic: ${scope.subtopicName ? toTitleCase(scope.subtopicName) : "—"}`);
+  if (level >= 7 && (scope.definitionName || scope.definitionId)) parts.push(`Definition: ${scope.definitionName ? toTitleCase(scope.definitionName) : "—"}`);
+  return parts.length ? parts.join(", ") : "—";
 }
 
 const emptyPaperForm = (level: ContentLevel, examId?: string) => ({
@@ -159,6 +222,7 @@ const emptyQuestionForm = (): FormData => ({
 
 export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProps) {
   const { level, examId: propsExamId } = props;
+  const [resolvedScope, setResolvedScope] = React.useState<ResolvedScope>(() => initialScope(props));
   const [papers, setPapers] = React.useState<PracticePaper[]>([]);
   const [selectedPaperId, setSelectedPaperId] = React.useState<string | null>(null);
   const [questions, setQuestions] = React.useState<Question[]>([]);
@@ -186,6 +250,103 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [deleteTargetSingle, setDeleteTargetSingle] = React.useState<string | null>(null);
   const [deleteTargetBulk, setDeleteTargetBulk] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    setResolvedScope(initialScope(props));
+  }, [props.level, props.examId, props.subjectId, props.unitId, props.chapterId, props.topicId, props.subtopicId, props.definitionId, props.examName, props.subjectName, props.unitName, props.chapterName, props.topicName, props.subtopicName, props.definitionName]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    const scope = { ...initialScope(props) };
+
+    async function resolve() {
+      try {
+        if (scope.definitionId && !scope.subtopicId) {
+          const res = await fetch(`/api/definitions/${scope.definitionId}`);
+          if (cancelled) return;
+          if (res.ok) {
+            const d = await res.json();
+            scope.subtopicId = d.subtopicId ?? null;
+            if (d.name && !scope.definitionName) scope.definitionName = d.name;
+          }
+        }
+        if (scope.subtopicId && !scope.topicId) {
+          const res = await fetch(`/api/subtopics/${scope.subtopicId}`);
+          if (cancelled) return;
+          if (res.ok) {
+            const d = await res.json();
+            scope.topicId = d.topicId ?? null;
+            if (d.name && !scope.subtopicName) scope.subtopicName = d.name;
+          }
+        }
+        if (scope.topicId && !scope.chapterId) {
+          const res = await fetch(`/api/topics/${scope.topicId}`);
+          if (cancelled) return;
+          if (res.ok) {
+            const d = await res.json();
+            scope.chapterId = d.chapterId ?? null;
+            if (d.name && !scope.topicName) scope.topicName = d.name;
+          }
+        }
+        if (scope.chapterId && !scope.unitId) {
+          const res = await fetch(`/api/chapters/${scope.chapterId}`);
+          if (cancelled) return;
+          if (res.ok) {
+            const d = await res.json();
+            scope.unitId = d.unitId ?? null;
+            if (d.name && !scope.chapterName) scope.chapterName = d.name;
+          }
+        }
+        if (scope.unitId && !scope.subjectId) {
+          const res = await fetch(`/api/units/${scope.unitId}`);
+          if (cancelled) return;
+          if (res.ok) {
+            const d = await res.json();
+            scope.subjectId = d.subjectId ?? null;
+            if (d.name && !scope.unitName) scope.unitName = d.name;
+          }
+        }
+        if (scope.subjectId && !scope.examId) {
+          const res = await fetch(`/api/subjects/${scope.subjectId}`);
+          if (cancelled) return;
+          if (res.ok) {
+            const d = await res.json();
+            scope.examId = d.examId ?? null;
+            if (d.name && !scope.subjectName) scope.subjectName = d.name;
+          }
+        }
+        if (!cancelled) {
+          setResolvedScope((s) => ({
+            ...s,
+            examId: scope.examId ?? s.examId,
+            subjectId: scope.subjectId ?? s.subjectId,
+            unitId: scope.unitId ?? s.unitId,
+            chapterId: scope.chapterId ?? s.chapterId,
+            topicId: scope.topicId ?? s.topicId,
+            subtopicId: scope.subtopicId ?? s.subtopicId,
+            definitionId: scope.definitionId ?? s.definitionId,
+            examName: scope.examName || s.examName,
+            subjectName: scope.subjectName || s.subjectName,
+            unitName: scope.unitName || s.unitName,
+            chapterName: scope.chapterName || s.chapterName,
+            topicName: scope.topicName || s.topicName,
+            subtopicName: scope.subtopicName || s.subtopicName,
+            definitionName: scope.definitionName || s.definitionName,
+          }));
+        }
+      } catch {
+        // ignore
+      }
+    }
+    resolve();
+    return () => { cancelled = true; };
+  }, [props.examId, props.subjectId, props.unitId, props.chapterId, props.topicId, props.subtopicId, props.definitionId]);
+
+  React.useEffect(() => {
+    if (!resolvedScope.examId || resolvedScope.examName || exams.length === 0) return;
+    const exam = exams.find((e) => e.id === resolvedScope.examId);
+    if (exam?.name) setResolvedScope((s) => ({ ...s, examName: exam.name }));
+  }, [resolvedScope.examId, resolvedScope.examName, exams]);
 
   const levelName = LEVEL_NAMES[level] ?? "Content";
   const selectedPaper = React.useMemo(
@@ -228,12 +389,12 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   );
 
   React.useEffect(() => {
-    if (props.level === 1 && !props.examId) {
+    if (level === 1 && !resolvedScope.examId) {
       setPapers([]);
       setLoading(false);
       return;
     }
-    const query = buildQueryParams(props);
+    const query = buildQueryParamsFromScope(level, resolvedScope);
     let cancelled = false;
     setLoading(true);
     fetch(`/api/level-wise-practice?${query}`)
@@ -261,14 +422,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       cancelled = true;
     };
   }, [
-    props.examId,
-    props.subjectId,
-    props.unitId,
-    props.chapterId,
-    props.topicId,
-    props.subtopicId,
-    props.definitionId,
-    props.level,
+    level,
+    resolvedScope.examId,
+    resolvedScope.subjectId,
+    resolvedScope.unitId,
+    resolvedScope.chapterId,
+    resolvedScope.topicId,
+    resolvedScope.subtopicId,
+    resolvedScope.definitionId,
     selectedPaperId,
   ]);
 
@@ -284,8 +445,11 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   }, []);
 
   React.useEffect(() => {
-    if (createOpen) setPaperForm(emptyPaperForm(level, propsExamId || ""));
-  }, [createOpen, level, propsExamId]);
+    if (createOpen)
+      setPaperForm(
+        emptyPaperForm(level, resolvedScope.examId ?? undefined)
+      );
+  }, [createOpen, level, resolvedScope.examId]);
 
   const createPaper = async () => {
     const rawTitle = paperForm.title.trim();
@@ -293,7 +457,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       toast.error("Title is required");
       return;
     }
-    if (!paperForm.examId) {
+    if (!resolvedScope.examId && !paperForm.examId) {
       toast.error("Please select an exam");
       return;
     }
@@ -305,23 +469,23 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     const title = toTitleCase(rawTitle);
     setCreateSaving(true);
     try {
-      const body: Record<string, unknown> = {
-        examId: paperForm.examId,
-        level: levelNum,
-        title,
-        description: paperForm.description.trim(),
-        totalQuestions: 0,
-        durationMinutes: 0,
-        totalMarks: 0,
-        difficulty: paperForm.difficulty,
-        status: paperForm.status,
-      };
-      if (levelNum >= 2 && props.subjectId) body.subjectId = props.subjectId;
-      if (levelNum >= 3 && props.unitId) body.unitId = props.unitId;
-      if (levelNum >= 4 && props.chapterId) body.chapterId = props.chapterId;
-      if (levelNum >= 5 && props.topicId) body.topicId = props.topicId;
-      if (levelNum >= 6 && props.subtopicId) body.subtopicId = props.subtopicId;
-      if (levelNum >= 7 && props.definitionId) body.definitionId = props.definitionId;
+    const body: Record<string, unknown> = {
+      examId: resolvedScope.examId ?? paperForm.examId,
+      level: levelNum,
+      title,
+      description: paperForm.description.trim(),
+      totalQuestions: 0,
+      durationMinutes: 0,
+      totalMarks: 0,
+      difficulty: paperForm.difficulty,
+      status: paperForm.status,
+    };
+    if (levelNum >= 2 && resolvedScope.subjectId) body.subjectId = resolvedScope.subjectId;
+    if (levelNum >= 3 && resolvedScope.unitId) body.unitId = resolvedScope.unitId;
+    if (levelNum >= 4 && resolvedScope.chapterId) body.chapterId = resolvedScope.chapterId;
+    if (levelNum >= 5 && resolvedScope.topicId) body.topicId = resolvedScope.topicId;
+    if (levelNum >= 6 && resolvedScope.subtopicId) body.subtopicId = resolvedScope.subtopicId;
+    if (levelNum >= 7 && resolvedScope.definitionId) body.definitionId = resolvedScope.definitionId;
 
       const res = await fetch("/api/level-wise-practice", {
         method: "POST",
@@ -341,7 +505,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       setSelectedPaperId(created.id);
       setQuestions([]);
       setCreateOpen(false);
-      setPaperForm(emptyPaperForm(level, propsExamId));
+      setPaperForm(emptyPaperForm(level, resolvedScope.examId ?? undefined));
       toast.success("Practice paper created");
       fetchQuestions(created.id);
     } catch (e) {
@@ -1202,91 +1366,70 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
 
       {/* Create practice paper dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+        <DialogContent className="max-h-[90vh] flex flex-col sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Create practice paper</DialogTitle>
             <DialogDescription>
-              Create a level-wise practice paper for this {levelName.toLowerCase()}. Level and scope are pre-filled.
+              Level and scope are pre-filled from the current page. Enter title and options below.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label>Exam *</Label>
-              <Select
-                value={paperForm.examId}
-                onValueChange={(v) => setPaperForm((f) => ({ ...f, examId: v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select exam" />
-                </SelectTrigger>
-                <SelectContent>
-                  {exams.map((exam) => (
-                    <SelectItem key={exam.id} value={exam.id}>
-                      {exam.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>Level</Label>
-              <p className="rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                Level {paperForm.level} – {LEVEL_NAMES[parseInt(paperForm.level, 10) as ContentLevel]}
-              </p>
-            </div>
-            <div className="grid gap-2">
-              <Label>Title *</Label>
-              <Input
-                value={paperForm.title}
-                onChange={(e) => setPaperForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="Enter practice title"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label>Description</Label>
-              <Input
-                value={paperForm.description}
-                onChange={(e) => setPaperForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="Enter description"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-1 flex-col gap-4 overflow-y-auto py-4">
+            {/* Paper details */}
+            <div className="space-y-4">
               <div className="grid gap-2">
-                <Label>Difficulty</Label>
-                <Select
-                  value={paperForm.difficulty}
-                  onValueChange={(v) => setPaperForm((f) => ({ ...f, difficulty: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DIFFICULTY_OPTIONS.map((d) => (
-                      <SelectItem key={d} value={d}>
-                        {d}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Title *</Label>
+                <Input
+                  value={paperForm.title}
+                  onChange={(e) => setPaperForm((f) => ({ ...f, title: e.target.value }))}
+                  placeholder="Enter practice title"
+                />
               </div>
               <div className="grid gap-2">
-                <Label>Status</Label>
-                <Select
-                  value={paperForm.status}
-                  onValueChange={(v) => setPaperForm((f) => ({ ...f, status: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Description</Label>
+                <Input
+                  value={paperForm.description}
+                  onChange={(e) => setPaperForm((f) => ({ ...f, description: e.target.value }))}
+                  placeholder="Enter description"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>Difficulty</Label>
+                  <Select
+                    value={paperForm.difficulty}
+                    onValueChange={(v) => setPaperForm((f) => ({ ...f, difficulty: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DIFFICULTY_OPTIONS.map((d) => (
+                        <SelectItem key={d} value={d}>
+                          {d}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Status</Label>
+                  <Select
+                    value={paperForm.status}
+                    onValueChange={(v) => setPaperForm((f) => ({ ...f, status: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t pt-4">
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
               Cancel
             </Button>

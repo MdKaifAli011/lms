@@ -59,12 +59,12 @@ const levelWisePracticeSchema = new Schema<ILevelWisePractice>(
       default: 1,
       comment: "1=Exam, 2=Subject, 3=Unit, 4=Chapter, 5=Topic, 6=Subtopic, 7=Definition",
     },
-    subjectId: { type: Schema.Types.ObjectId, ref: "Subject", default: null },
-    unitId: { type: Schema.Types.ObjectId, ref: "Unit", default: null },
-    chapterId: { type: Schema.Types.ObjectId, ref: "Chapter", default: null },
-    topicId: { type: Schema.Types.ObjectId, ref: "Topic", default: null },
-    subtopicId: { type: Schema.Types.ObjectId, ref: "Subtopic", default: null },
-    definitionId: { type: Schema.Types.ObjectId, ref: "Definition", default: null },
+    subjectId: { type: Schema.Types.ObjectId, ref: "Subject" },
+    unitId: { type: Schema.Types.ObjectId, ref: "Unit" },
+    chapterId: { type: Schema.Types.ObjectId, ref: "Chapter" },
+    topicId: { type: Schema.Types.ObjectId, ref: "Topic" },
+    subtopicId: { type: Schema.Types.ObjectId, ref: "Subtopic" },
+    definitionId: { type: Schema.Types.ObjectId, ref: "Definition" },
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true, lowercase: true },
     description: { type: String, default: "" },
@@ -92,6 +92,40 @@ levelWisePracticeSchema.index({ examId: 1 });
 levelWisePracticeSchema.index({ level: 1 });
 levelWisePracticeSchema.index({ level: 1, orderNumber: 1 });
 levelWisePracticeSchema.index({ examId: 1, level: 1, orderNumber: 1 });
+
+/** Never store null for hierarchy fields above level; remove keys so DB does not persist them */
+levelWisePracticeSchema.pre("save", function (next) {
+  const level = this.level as number;
+  if (level < 2) {
+    delete (this as Record<string, unknown>).subjectId;
+    delete (this as Record<string, unknown>).unitId;
+    delete (this as Record<string, unknown>).chapterId;
+    delete (this as Record<string, unknown>).topicId;
+    delete (this as Record<string, unknown>).subtopicId;
+    delete (this as Record<string, unknown>).definitionId;
+  } else if (level < 3) {
+    delete (this as Record<string, unknown>).unitId;
+    delete (this as Record<string, unknown>).chapterId;
+    delete (this as Record<string, unknown>).topicId;
+    delete (this as Record<string, unknown>).subtopicId;
+    delete (this as Record<string, unknown>).definitionId;
+  } else if (level < 4) {
+    delete (this as Record<string, unknown>).chapterId;
+    delete (this as Record<string, unknown>).topicId;
+    delete (this as Record<string, unknown>).subtopicId;
+    delete (this as Record<string, unknown>).definitionId;
+  } else if (level < 5) {
+    delete (this as Record<string, unknown>).topicId;
+    delete (this as Record<string, unknown>).subtopicId;
+    delete (this as Record<string, unknown>).definitionId;
+  } else if (level < 6) {
+    delete (this as Record<string, unknown>).subtopicId;
+    delete (this as Record<string, unknown>).definitionId;
+  } else if (level < 7) {
+    delete (this as Record<string, unknown>).definitionId;
+  }
+  next();
+});
 
 const LevelWisePractice =
   models.LevelWisePractice ?? model<ILevelWisePractice>("LevelWisePractice", levelWisePracticeSchema);

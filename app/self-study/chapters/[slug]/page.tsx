@@ -256,7 +256,12 @@ export default function ChapterSlugPage({
         content={
           <>
             <ContentEditorCard />
-            <LevelWiseDirectDetailsPage level={4} chapterId={chapter.id} />
+            <LevelWiseDirectDetailsPage
+              level={4}
+              chapterId={chapter.id}
+              chapterName={chapter.name}
+              unitId={chapter.unitId}
+            />
           </>
         }
         seoSidebar={<SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="chapter-seo" />}

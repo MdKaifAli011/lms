@@ -682,7 +682,7 @@ export default function TopicsPage() {
                 Add New Topics
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[560px]">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Topics</DialogTitle>
                 <DialogDescription>

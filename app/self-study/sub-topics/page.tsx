@@ -611,7 +611,7 @@ export default function SubTopicsPage() {
                 Add New Sub Topics
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[560px]">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Sub Topics</DialogTitle>
                 <DialogDescription>

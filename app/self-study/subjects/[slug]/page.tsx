@@ -260,6 +260,7 @@ export default function SubjectSlugPage({
               level={2}
               examId={subject.examId}
               subjectId={subject.id}
+              subjectName={subject.name}
             />
           </>
         }
