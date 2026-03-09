@@ -960,17 +960,13 @@ export default function SubTopicsPage() {
                                     <TableCell>{st.today > 0 ? st.today : "-"}</TableCell>
                                     <TableCell className="text-right pr-2">
                                       <div className="flex items-center justify-end gap-1">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600" title="View" asChild>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="View" asChild>
                                           <Link href={`/self-study/sub-topics/${st.id}`}><Eye className="h-4 w-4" /></Link>
                                         </Button>
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className={`h-8 w-8 ${
-                                            !st.seo?.noIndex && !st.seo?.noFollow
-                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
-                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
-                                          }`}
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title={
                                             !st.seo?.noIndex && !st.seo?.noFollow
                                               ? "Unpublish (no index, no follow)"
@@ -984,9 +980,9 @@ export default function SubTopicsPage() {
                                         >
                                           {publishingId === st.id ? <Loader2 className="h-4 w-4 animate-spin" /> : !st.seo?.noIndex && !st.seo?.noFollow ? <GlobeLock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600" title="Edit" onClick={() => openEditDialog(st)}><Edit className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="sm" className={`h-8 w-8 ${st.status === "Active" ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"}`} title={st.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(st.id)}><Power className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600" title="Delete" onClick={() => handleDeleteSubTopic(st)}><Trash2 className="h-4 w-4" /></Button>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="Edit" onClick={() => openEditDialog(st)}><Edit className="h-4 w-4" /></Button>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title={st.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(st.id)}><Power className="h-4 w-4" /></Button>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="Delete" onClick={() => handleDeleteSubTopic(st)}><Trash2 className="h-4 w-4" /></Button>
                                       </div>
                                     </TableCell>
                                   </TableRow>

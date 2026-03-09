@@ -939,15 +939,11 @@ export default function DefinitionsPage() {
                                     <TableCell>{d.today > 0 ? d.today : "-"}</TableCell>
                                     <TableCell className="text-right pr-2">
                                       <div className="flex items-center justify-end gap-1">
-                                        <Link href={`/self-study/definitions/${d.id}`}><Button variant="ghost" size="sm" className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600" title="View"><Eye className="h-4 w-4" /></Button></Link>
+                                        <Link href={`/self-study/definitions/${d.id}`}><Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="View"><Eye className="h-4 w-4" /></Button></Link>
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className={`h-8 w-8 ${
-                                            !d.seo?.noIndex && !d.seo?.noFollow
-                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
-                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
-                                          }`}
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title={
                                             !d.seo?.noIndex && !d.seo?.noFollow
                                               ? "Unpublish (no index, no follow)"
@@ -961,9 +957,9 @@ export default function DefinitionsPage() {
                                         >
                                           {publishingId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : !d.seo?.noIndex && !d.seo?.noFollow ? <GlobeLock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600" title="Edit" onClick={() => openEditDialog(d)}><Edit className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="sm" className={`h-8 w-8 ${d.status === "Active" ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"}`} title={d.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(d.id)}><Power className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600" title="Delete" onClick={() => handleDeleteDefinition(d)}><Trash2 className="h-4 w-4" /></Button>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="Edit" onClick={() => openEditDialog(d)}><Edit className="h-4 w-4" /></Button>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title={d.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(d.id)}><Power className="h-4 w-4" /></Button>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-muted-foreground hover:text-foreground" title="Delete" onClick={() => handleDeleteDefinition(d)}><Trash2 className="h-4 w-4" /></Button>
                                       </div>
                                     </TableCell>
                                   </TableRow>

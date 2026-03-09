@@ -1194,7 +1194,7 @@ export default function UnitsPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600"
+                                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                       title="View"
                                       asChild
                                     >
@@ -1205,11 +1205,7 @@ export default function UnitsPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`h-8 w-8 ${
-                                        !unit.seo?.noIndex && !unit.seo?.noFollow
-                                          ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
-                                          : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
-                                      }`}
+                                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                       title={
                                         !unit.seo?.noIndex && !unit.seo?.noFollow
                                           ? "Unpublish (no index, no follow)"
@@ -1232,7 +1228,7 @@ export default function UnitsPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600"
+                                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                       title="Edit"
                                       onClick={() => openEditDialog(unit)}
                                     >
@@ -1241,11 +1237,7 @@ export default function UnitsPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className={`h-8 w-8 transition-colors ${
-                                        unit.status === "Active"
-                                          ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600"
-                                          : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-                                      }`}
+                                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                       title={unit.status === "Active" ? "Turn Off" : "Turn On"}
                                       onClick={() => handleToggleStatus(unit.id)}
                                     >
@@ -1254,7 +1246,7 @@ export default function UnitsPage() {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                                      className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                       title="Delete"
                                       onClick={() => handleDeleteUnit(unit)}
                                     >

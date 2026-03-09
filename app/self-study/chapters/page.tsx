@@ -1302,7 +1302,7 @@ export default function ChaptersPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600"
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title="View"
                                           asChild
                                         >
@@ -1313,11 +1313,7 @@ export default function ChaptersPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className={`h-8 w-8 ${
-                                            !chapter.seo?.noIndex && !chapter.seo?.noFollow
-                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
-                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
-                                          }`}
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title={
                                             !chapter.seo?.noIndex && !chapter.seo?.noFollow
                                               ? "Unpublish (no index, no follow)"
@@ -1340,7 +1336,7 @@ export default function ChaptersPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600"
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title="Edit"
                                           onClick={() => openEditDialog(chapter)}
                                         >
@@ -1349,11 +1345,7 @@ export default function ChaptersPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className={`h-8 w-8 transition-colors ${
-                                            chapter.status === "Active"
-                                              ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600"
-                                              : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-                                          }`}
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title={chapter.status === "Active" ? "Turn Off" : "Turn On"}
                                           onClick={() => handleToggleStatus(chapter.id)}
                                         >
@@ -1362,7 +1354,7 @@ export default function ChaptersPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600"
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title="Delete"
                                           onClick={() => handleDeleteChapter(chapter)}
                                         >

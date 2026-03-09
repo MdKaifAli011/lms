@@ -916,11 +916,7 @@ export default function ExamsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-8 w-8 ${
-                                  !exam.seo?.noIndex && !exam.seo?.noFollow
-                                    ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
-                                    : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
-                                }`}
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 title={
                                   !exam.seo?.noIndex && !exam.seo?.noFollow
                                     ? "Unpublish (no index, no follow)"
@@ -943,7 +939,7 @@ export default function ExamsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 title="Exam Info"
                               >
                                 <Info className="h-4 w-4" />
@@ -951,7 +947,7 @@ export default function ExamsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 text-green-500 hover:text-green-600 hover:bg-green-50"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 title="View Exam"
                                 asChild
                               >
@@ -964,7 +960,7 @@ export default function ExamsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 onClick={() => openEditDialog(exam)}
                                 title="Edit Exam"
                               >
@@ -973,11 +969,7 @@ export default function ExamsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-8 w-8 transition-colors ${
-                                  exam.status === "Active"
-                                    ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50"
-                                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-                                }`}
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 onClick={() => handleToggleStatus(exam.id)}
                                 title={`Turn ${exam.status === "Active" ? "Off" : "On"}`}
                               >
@@ -986,7 +978,7 @@ export default function ExamsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                 onClick={() => handleDeleteExam(exam.id)}
                                 title="Delete Exam"
                               >

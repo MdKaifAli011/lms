@@ -1005,11 +1005,7 @@ export default function SubjectsPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className={`h-8 w-8 ${
-                                            !subject.seo?.noIndex && !subject.seo?.noFollow
-                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
-                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
-                                          }`}
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           title={
                                             !subject.seo?.noIndex && !subject.seo?.noFollow
                                               ? "Unpublish (no index, no follow)"
@@ -1033,13 +1029,7 @@ export default function SubjectsPage() {
                                           variant="ghost"
                                           size="sm"
                                           disabled={getExamStatus(subject.examId) === "Inactive"}
-                                          className={`h-8 w-8 transition-colors ${
-                                            getExamStatus(subject.examId) === "Inactive"
-                                              ? "text-gray-300"
-                                              : subject.status === "Active"
-                                                ? "text-orange-500 hover:text-orange-600 hover:bg-orange-50"
-                                                : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
-                                          }`}
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           onClick={() => handleToggleSubjectStatus(subject.id)}
                                           title={`Turn ${subject.status === "Active" ? "Off" : "On"}`}
                                         >
@@ -1048,7 +1038,7 @@ export default function SubjectsPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           onClick={() => openEditDialog(subject)}
                                           title="Edit Subject"
                                         >
@@ -1057,7 +1047,7 @@ export default function SubjectsPage() {
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                           onClick={() => handleDeleteSubject(subject.id)}
                                           title="Delete Subject"
                                         >
