@@ -65,7 +65,15 @@ type Unit = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
-  seo?: { noIndex?: boolean; noFollow?: boolean }
+  lastModified?: string
+  hasContent?: boolean
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
 }
 
 export default function UnitsPage() {
@@ -518,10 +526,15 @@ export default function UnitsPage() {
       const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesExam = examFilter === "all" || String(subject.examId) === examFilter
       const matchesSubject = subjectFilter === "all" || String(u.subjectId) === subjectFilter
+      const metaFilled = !!(
+        u.seo?.metaTitle?.trim() &&
+        u.seo?.metaDescription?.trim() &&
+        u.seo?.metaKeywords?.trim()
+      )
       const matchesMeta =
         metaFilter === "all" ||
-        (metaFilter === "filled" && u.meta !== "-") ||
-        (metaFilter === "not-filled" && u.meta === "-")
+        (metaFilter === "filled" && metaFilled) ||
+        (metaFilter === "not-filled" && !metaFilled)
       return matchesSearch && matchesExam && matchesSubject && matchesMeta
     })
   }, [units, subjects, searchTerm, examFilter, subjectFilter, metaFilter])
@@ -1149,14 +1162,18 @@ export default function UnitsPage() {
                                     {capitalize(unit.name)}
                                   </Link>
                                 </TableCell>
-                                <TableCell className="text-muted-foreground">
-                                  {unit.content !== "-" ? unit.content : "unavailable"}
+                                <TableCell className="text-muted-foreground text-xs">
+                                  {unit.hasContent && unit.lastModified
+                                    ? unit.lastModified
+                                    : "—"}
                                 </TableCell>
                                 <TableCell>
-                                  {unit.meta !== "-" ? (
-                                    <Check className="inline h-4 w-4 text-green-500" />
+                                  {unit.seo?.metaTitle?.trim() &&
+                                  unit.seo?.metaDescription?.trim() &&
+                                  unit.seo?.metaKeywords?.trim() ? (
+                                    <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
                                   ) : (
-                                    "-"
+                                    "—"
                                   )}
                                 </TableCell>
                                 <TableCell>

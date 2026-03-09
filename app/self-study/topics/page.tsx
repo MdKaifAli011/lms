@@ -75,7 +75,15 @@ type Topic = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
-  seo?: { noIndex?: boolean; noFollow?: boolean }
+  lastModified?: string
+  hasContent?: boolean
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
 }
 
 export default function TopicsPage() {
@@ -610,10 +618,15 @@ export default function TopicsPage() {
       const matchesSubject = subjectFilter === "all" || String(unit.subjectId) === subjectFilter
       const matchesUnit = unitFilter === "all" || String(chapter.unitId) === unitFilter
       const matchesChapter = chapterFilter === "all" || String(t.chapterId) === chapterFilter
+      const metaFilled = !!(
+        t.seo?.metaTitle?.trim() &&
+        t.seo?.metaDescription?.trim() &&
+        t.seo?.metaKeywords?.trim()
+      )
       const matchesMeta =
         metaFilter === "all" ||
-        (metaFilter === "filled" && t.meta !== "-") ||
-        (metaFilter === "not-filled" && t.meta === "-")
+        (metaFilter === "filled" && metaFilled) ||
+        (metaFilter === "not-filled" && !metaFilled)
       return matchesSearch && matchesExam && matchesSubject && matchesUnit && matchesChapter && matchesMeta
     })
   }, [topics, chapters, units, subjects, searchTerm, examFilter, subjectFilter, unitFilter, chapterFilter, metaFilter])
@@ -1247,8 +1260,18 @@ export default function TopicsPage() {
                                         {capitalize(topic.name)}
                                       </Link>
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground">{topic.content !== "-" ? topic.content : "unavailable"}</TableCell>
-                                    <TableCell>{topic.meta !== "-" ? <Check className="inline h-4 w-4 text-green-500" /> : "-"}</TableCell>
+                                    <TableCell className="text-muted-foreground text-xs">
+                                      {topic.hasContent && topic.lastModified ? topic.lastModified : "—"}
+                                    </TableCell>
+                                    <TableCell>
+                                      {topic.seo?.metaTitle?.trim() &&
+                                      topic.seo?.metaDescription?.trim() &&
+                                      topic.seo?.metaKeywords?.trim() ? (
+                                        <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
+                                      ) : (
+                                        "—"
+                                      )}
+                                    </TableCell>
                                     <TableCell>
                                       {topic.visits > 0 ? (
                                         <div>

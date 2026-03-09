@@ -68,7 +68,15 @@ type Subject = {
   uniqueVisits: number
   today: number
   orderNumber: number
-  seo?: { noIndex?: boolean; noFollow?: boolean }
+  lastModified?: string
+  hasContent?: boolean
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
 }
 
 export default function SubjectsPage() {
@@ -221,10 +229,15 @@ export default function SubjectsPage() {
     .filter((s) => {
       const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesExam = examFilter === "all" || s.examId === examFilter
+      const metaFilled = !!(
+        s.seo?.metaTitle?.trim() &&
+        s.seo?.metaDescription?.trim() &&
+        s.seo?.metaKeywords?.trim()
+      )
       const matchesMeta =
         metaStatusFilter === "all" ||
-        (metaStatusFilter === "filled" && s.meta !== "-") ||
-        (metaStatusFilter === "not-filled" && s.meta === "-")
+        (metaStatusFilter === "filled" && metaFilled) ||
+        (metaStatusFilter === "not-filled" && !metaFilled)
       return matchesSearch && matchesExam && matchesMeta
     })
 
@@ -954,16 +967,18 @@ export default function SubjectsPage() {
                                         {capitalize(subject.name)}
                                       </Link>
                                     </TableCell>
-                                    <TableCell className="py-3 text-muted-foreground">
-                                      {subject.content !== "-" ? subject.content : (
-                                        <span className="italic">unavailable</span>
-                                      )}
+                                    <TableCell className="py-3 text-muted-foreground text-xs">
+                                      {subject.hasContent && subject.lastModified
+                                        ? subject.lastModified
+                                        : "—"}
                                     </TableCell>
                                     <TableCell className="py-3">
-                                      {subject.meta !== "-" ? (
-                                        <Check className="h-4 w-4 text-green-600" />
+                                      {subject.seo?.metaTitle?.trim() &&
+                                      subject.seo?.metaDescription?.trim() &&
+                                      subject.seo?.metaKeywords?.trim() ? (
+                                        <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
                                       ) : (
-                                        <span className="text-muted-foreground">-</span>
+                                        "—"
                                       )}
                                     </TableCell>
                                     <TableCell className="py-3">

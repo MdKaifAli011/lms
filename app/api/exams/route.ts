@@ -38,7 +38,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(list, { headers: corsHeaders })
     }
 
-    const list = exams.map((doc: Record<string, unknown>) => ({
+    const list = exams.map((doc: Record<string, unknown>) => {
+      const contentBody = doc.contentBody as string | undefined
+      const hasContent = !!(contentBody && String(contentBody).trim().length > 0)
+      const updatedAt = doc.updatedAt as Date | undefined
+      const lastMod = (doc.lastModified as string | undefined) ?? (updatedAt
+        ? new Date(updatedAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : undefined)
+      return {
       id: (doc._id as { toString: () => string }).toString(),
       name: doc.name,
       slug: doc.slug,
@@ -52,7 +65,8 @@ export async function GET(request: NextRequest) {
       today: doc.today ?? 0,
       descriptions: doc.descriptions ?? [],
       orderNumber: doc.orderNumber ?? 0,
-      lastModified: doc.lastModified ?? undefined,
+      lastModified: lastMod,
+      hasContent,
       createdAt: doc.createdAt
         ? new Date(doc.createdAt as Date).toLocaleString("en-US", {
             year: "numeric",
@@ -63,7 +77,8 @@ export async function GET(request: NextRequest) {
           })
         : undefined,
       seo: doc.seo ?? {},
-    }))
+    }
+    })
     return NextResponse.json(list, { headers: corsHeaders })
   } catch (err) {
     console.error("GET /api/exams error:", err)

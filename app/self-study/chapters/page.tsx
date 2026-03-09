@@ -67,7 +67,15 @@ type Chapter = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
-  seo?: { noIndex?: boolean; noFollow?: boolean }
+  lastModified?: string
+  hasContent?: boolean
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
 }
 
 export default function ChaptersPage() {
@@ -567,10 +575,15 @@ export default function ChaptersPage() {
       const matchesExam = examFilter === "all" || String(subject.examId) === examFilter
       const matchesSubject = subjectFilter === "all" || String(unit.subjectId) === subjectFilter
       const matchesUnit = unitFilter === "all" || String(c.unitId) === unitFilter
+      const metaFilled = !!(
+        c.seo?.metaTitle?.trim() &&
+        c.seo?.metaDescription?.trim() &&
+        c.seo?.metaKeywords?.trim()
+      )
       const matchesMeta =
         metaFilter === "all" ||
-        (metaFilter === "filled" && c.meta !== "-") ||
-        (metaFilter === "not-filled" && c.meta === "-")
+        (metaFilter === "filled" && metaFilled) ||
+        (metaFilter === "not-filled" && !metaFilled)
       return matchesSearch && matchesExam && matchesSubject && matchesUnit && matchesMeta
     })
   }, [chapters, units, subjects, searchTerm, examFilter, subjectFilter, unitFilter, metaFilter])
@@ -1257,14 +1270,18 @@ export default function ChaptersPage() {
                                         {capitalize(chapter.name)}
                                       </Link>
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground">
-                                      {chapter.content !== "-" ? chapter.content : "unavailable"}
+                                    <TableCell className="text-muted-foreground text-xs">
+                                      {chapter.hasContent && chapter.lastModified
+                                        ? chapter.lastModified
+                                        : "—"}
                                     </TableCell>
                                     <TableCell>
-                                      {chapter.meta !== "-" ? (
-                                        <Check className="inline h-4 w-4 text-green-500" />
+                                      {chapter.seo?.metaTitle?.trim() &&
+                                      chapter.seo?.metaDescription?.trim() &&
+                                      chapter.seo?.metaKeywords?.trim() ? (
+                                        <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
                                       ) : (
-                                        "-"
+                                        "—"
                                       )}
                                     </TableCell>
                                     <TableCell>

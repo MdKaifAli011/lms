@@ -10,6 +10,17 @@ import mongoose from "mongoose"
 function toChapterJson(doc: Record<string, unknown>): Record<string, unknown> {
   const createdAt = doc.createdAt as Date | undefined
   const updatedAt = doc.updatedAt as Date | undefined
+  const contentBody = doc.contentBody as string | undefined
+  const hasContent = !!(contentBody && String(contentBody).trim().length > 0)
+  const lastMod = (doc.lastModified as string | undefined) ?? (updatedAt
+    ? new Date(updatedAt).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : undefined)
   return {
     id: (doc._id as { toString: () => string }).toString(),
     unitId: (doc.unitId as { toString: () => string })?.toString(),
@@ -26,15 +37,8 @@ function toChapterJson(doc: Record<string, unknown>): Record<string, unknown> {
     orderNumber: doc.orderNumber ?? 0,
     weightage: doc.weightage,
     marks: doc.marks,
-    lastModified: doc.lastModified ?? (updatedAt
-      ? new Date(updatedAt).toLocaleString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : undefined),
+    lastModified: lastMod,
+    hasContent,
     contentBody: doc.contentBody ?? "",
     seo: doc.seo ?? {},
     createdAt: createdAt

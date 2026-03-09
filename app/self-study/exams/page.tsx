@@ -81,8 +81,16 @@ interface Exam {
   descriptions?: string[];
   orderNumber?: number;
   lastModified?: string;
+  /** True if exam has rich content (contentBody) */
+  hasContent?: boolean;
   createdAt?: string;
-  seo?: { noIndex?: boolean; noFollow?: boolean };
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    noIndex?: boolean;
+    noFollow?: boolean;
+  };
 }
 
 export default function ExamsPage() {
@@ -220,10 +228,15 @@ export default function ExamsPage() {
     const matchesStatus =
       statusFilter === "all" ||
       exam.status.toLowerCase() === statusFilter.toLowerCase();
+    const metaFilled = !!(
+      exam.seo?.metaTitle?.trim() &&
+      exam.seo?.metaDescription?.trim() &&
+      exam.seo?.metaKeywords?.trim()
+    );
     const matchesMetaStatus =
       metaStatusFilter === "all" ||
-      (metaStatusFilter === "filled" && exam.meta !== "-") ||
-      (metaStatusFilter === "not-filled" && exam.meta === "-");
+      (metaStatusFilter === "filled" && metaFilled) ||
+      (metaStatusFilter === "not-filled" && !metaFilled);
     return matchesSearch && matchesStatus && matchesMetaStatus;
   });
 
@@ -556,6 +569,9 @@ export default function ExamsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Card Descriptions (Max 4 items - Optional)</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Add up to 4 short lines shown on the exam card. Leave blank to hide.
+                    </p>
                     {newExam.descriptions.map((desc, index) => (
                       <Input
                         key={index}
@@ -833,8 +849,10 @@ export default function ExamsPage() {
                               exam.status === "Inactive" ? "line-through" : ""
                             }`}
                           >
-                            <div className="w-12 h-12 bg-gradient-to-br from-muted to-muted/80 rounded-lg flex items-center justify-center text-[10px] font-medium shadow-sm overflow-hidden">
-                              {/^https?:\/\//i.test(exam.image) ? (
+                            <div className="w-12 h-12 bg-gradient-to-br from-muted to-muted/80 rounded-lg flex items-center justify-center text-[10px] font-medium shadow-sm overflow-hidden shrink-0">
+                              {exam.image &&
+                                exam.image !== "No Image" &&
+                                (/^https?:\/\//i.test(exam.image) || /^data:image\//i.test(exam.image)) ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                   src={exam.image}
@@ -842,32 +860,35 @@ export default function ExamsPage() {
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
-                                "No Image"
+                                <span className="text-muted-foreground">No Image</span>
                               )}
                             </div>
                           </TableCell>
                           <TableCell
-                            className={`text-muted-foreground ${
+                            className={`text-muted-foreground text-xs ${
                               exam.status === "Inactive" ? "line-through" : ""
                             }`}
                           >
-                            {exam.content !== "-"
-                              ? exam.content
-                              : "unavailable"}
+                            {exam.hasContent && exam.lastModified
+                              ? exam.lastModified
+                              : "—"}
                           </TableCell>
                           <TableCell
                             className={`text-muted-foreground ${
                               exam.status === "Inactive" ? "line-through" : ""
                             }`}
                           >
-                            {exam.meta !== "-" ? (
-                              <div className="flex items-center gap-1">
-                                <Check className="h-4 w-4 text-green-500" />
-                                <span>{exam.meta}</span>
-                              </div>
-                            ) : (
-                              "-"
-                            )}
+                            {(() => {
+                              const t = exam.seo?.metaTitle?.trim();
+                              const d = exam.seo?.metaDescription?.trim();
+                              const k = exam.seo?.metaKeywords?.trim();
+                              const metaFilled = !!(t && d && k);
+                              return metaFilled ? (
+                                <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
+                              ) : (
+                                "—"
+                              );
+                            })()}
                           </TableCell>
                           <TableCell
                             className={
@@ -1036,7 +1057,7 @@ export default function ExamsPage() {
 
           {/* Edit Dialog */}
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Edit Exam</DialogTitle>
                 <DialogDescription>
@@ -1078,6 +1099,7 @@ export default function ExamsPage() {
                     </Label>
                     <Input
                       id="edit-card-image"
+                      placeholder="https://example.com/image.png"
                       value={editingExam.cardImageUrl || ""}
                       onChange={(e) =>
                         setEditingExam({
@@ -1087,18 +1109,20 @@ export default function ExamsPage() {
                       }
                     />
                   </div>
-                  <div className="grid gap-2">
+                  <div className="space-y-2">
                     <Label>Card Descriptions (Max 4 items - Optional)</Label>
-                    {(editingExam.descriptions || ["", "", "", ""]).map(
+                    <p className="text-xs text-muted-foreground">
+                      Add up to 4 short lines shown on the exam card. Leave blank to hide.
+                    </p>
+                    {Array.from({ length: 4 }, (_, index) => (editingExam.descriptions || [])[index] ?? "").map(
                       (desc, index) => (
                         <Input
                           key={index}
                           placeholder={`Description item ${index + 1}`}
                           value={desc}
                           onChange={(e) => {
-                            const newDescriptions = [
-                              ...(editingExam.descriptions || ["", "", "", ""]),
-                            ];
+                            const base = Array.from({ length: 4 }, (_, j) => (editingExam.descriptions || [])[j] ?? "");
+                            const newDescriptions = [...base];
                             newDescriptions[index] = e.target.value;
                             setEditingExam({
                               ...editingExam,

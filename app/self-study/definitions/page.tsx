@@ -73,7 +73,15 @@ type Definition = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
-  seo?: { noIndex?: boolean; noFollow?: boolean }
+  lastModified?: string
+  hasContent?: boolean
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    metaKeywords?: string
+    noIndex?: boolean
+    noFollow?: boolean
+  }
 }
 
 function uniqueNamesPerSubTopic(names: string[], existingNames: Set<string>): string[] {
@@ -519,7 +527,15 @@ export default function DefinitionsPage() {
       const matchesChapter = chapterFilter === "all" || String(topic.chapterId) === chapterFilter
       const matchesTopic = topicFilter === "all" || String(st.topicId) === topicFilter
       const matchesSubTopic = subTopicFilter === "all" || String(d.subtopicId) === subTopicFilter
-      const matchesMeta = metaFilter === "all" || (metaFilter === "filled" && d.meta !== "-") || (metaFilter === "not-filled" && d.meta === "-")
+      const metaFilled = !!(
+        d.seo?.metaTitle?.trim() &&
+        d.seo?.metaDescription?.trim() &&
+        d.seo?.metaKeywords?.trim()
+      )
+      const matchesMeta =
+        metaFilter === "all" ||
+        (metaFilter === "filled" && metaFilled) ||
+        (metaFilter === "not-filled" && !metaFilled)
       return matchesSearch && matchesExam && matchesSubject && matchesUnit && matchesChapter && matchesTopic && matchesSubTopic && matchesMeta
     })
   }, [definitions, subTopics, topics, chapters, units, subjects, searchTerm, examFilter, subjectFilter, unitFilter, chapterFilter, topicFilter, subTopicFilter, metaFilter])
@@ -907,8 +923,18 @@ export default function DefinitionsPage() {
                                         {capitalize(d.name)}
                                       </Link>
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground">{d.content !== "-" ? d.content : "unavailable"}</TableCell>
-                                    <TableCell>{d.meta !== "-" ? <Check className="inline h-4 w-4 text-green-500" /> : "-"}</TableCell>
+                                    <TableCell className="text-muted-foreground text-xs">
+                                      {d.hasContent && d.lastModified ? d.lastModified : "—"}
+                                    </TableCell>
+                                    <TableCell>
+                                      {d.seo?.metaTitle?.trim() &&
+                                      d.seo?.metaDescription?.trim() &&
+                                      d.seo?.metaKeywords?.trim() ? (
+                                        <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
+                                      ) : (
+                                        "—"
+                                      )}
+                                    </TableCell>
                                     <TableCell>{d.visits > 0 ? <div><div className="font-medium">{d.visits}</div><div className="text-xs text-muted-foreground">({d.uniqueVisits} unique)</div></div> : "-"}</TableCell>
                                     <TableCell>{d.today > 0 ? d.today : "-"}</TableCell>
                                     <TableCell className="text-right pr-2">
