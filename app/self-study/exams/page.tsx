@@ -392,24 +392,39 @@ export default function ExamsPage() {
     }
   };
 
-  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
-    setPublishingId(id)
+  const handlePublish = async (
+    id: string,
+    noIndex: boolean,
+    noFollow: boolean,
+  ) => {
+    setPublishingId(id);
     try {
       const res = await fetch(`${API_BASE}/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ noIndex, noFollow }),
-      })
-      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
-      const updated = (await res.json()) as Exam
-      setExams((prev) => prev.map((e) => (e.id === updated.id ? { ...e, seo: updated.seo ?? e.seo } : e)))
-      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+      });
+      if (!res.ok)
+        throw new Error(await res.text().catch(() => res.statusText));
+      const updated = (await res.json()) as Exam;
+      setExams((prev) =>
+        prev.map((e) =>
+          e.id === updated.id ? { ...e, seo: updated.seo ?? e.seo } : e,
+        ),
+      );
+      toast.success(
+        noIndex
+          ? "Unpublished (no index, no follow)"
+          : "Published (allow index & follow)",
+      );
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+      toast.error(
+        e instanceof Error ? e.message : "Failed to update publish status",
+      );
     } finally {
-      setPublishingId(null)
+      setPublishingId(null);
     }
-  }
+  };
 
   const enableReordering = () => {
     setIsReorderingEnabled(true);
@@ -570,7 +585,8 @@ export default function ExamsPage() {
                   <div className="space-y-2">
                     <Label>Card Descriptions (Max 4 items - Optional)</Label>
                     <p className="text-xs text-muted-foreground">
-                      Add up to 4 short lines shown on the exam card. Leave blank to hide.
+                      Add up to 4 short lines shown on the exam card. Leave
+                      blank to hide.
                     </p>
                     {newExam.descriptions.map((desc, index) => (
                       <Input
@@ -851,8 +867,9 @@ export default function ExamsPage() {
                           >
                             <div className="w-12 h-12 bg-gradient-to-br from-muted to-muted/80 rounded-lg flex items-center justify-center text-[10px] font-medium shadow-sm overflow-hidden shrink-0">
                               {exam.image &&
-                                exam.image !== "No Image" &&
-                                (/^https?:\/\//i.test(exam.image) || /^data:image\//i.test(exam.image)) ? (
+                              exam.image !== "No Image" &&
+                              (/^https?:\/\//i.test(exam.image) ||
+                                /^data:image\//i.test(exam.image)) ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                   src={exam.image}
@@ -860,7 +877,9 @@ export default function ExamsPage() {
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
-                                <span className="text-muted-foreground">No Image</span>
+                                <span className="text-muted-foreground">
+                                  No Image
+                                </span>
                               )}
                             </div>
                           </TableCell>
@@ -884,7 +903,10 @@ export default function ExamsPage() {
                               const k = exam.seo?.metaKeywords?.trim();
                               const metaFilled = !!(t && d && k);
                               return metaFilled ? (
-                                <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
+                                <Check
+                                  className="h-4 w-4 shrink-0 text-green-500"
+                                  aria-label="Meta filled"
+                                />
                               ) : (
                                 "—"
                               );
@@ -924,13 +946,19 @@ export default function ExamsPage() {
                                 }
                                 disabled={publishingId === exam.id}
                                 onClick={() => {
-                                  const isPublished = !exam.seo?.noIndex && !exam.seo?.noFollow
-                                  handlePublish(exam.id, isPublished, isPublished)
+                                  const isPublished =
+                                    !exam.seo?.noIndex && !exam.seo?.noFollow;
+                                  handlePublish(
+                                    exam.id,
+                                    isPublished,
+                                    isPublished,
+                                  );
                                 }}
                               >
                                 {publishingId === exam.id ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : !exam.seo?.noIndex && !exam.seo?.noFollow ? (
+                                ) : !exam.seo?.noIndex &&
+                                  !exam.seo?.noFollow ? (
                                   <GlobeLock className="h-4 w-4" />
                                 ) : (
                                   <Globe className="h-4 w-4" />
@@ -1104,26 +1132,32 @@ export default function ExamsPage() {
                   <div className="space-y-2">
                     <Label>Card Descriptions (Max 4 items - Optional)</Label>
                     <p className="text-xs text-muted-foreground">
-                      Add up to 4 short lines shown on the exam card. Leave blank to hide.
+                      Add up to 4 short lines shown on the exam card. Leave
+                      blank to hide.
                     </p>
-                    {Array.from({ length: 4 }, (_, index) => (editingExam.descriptions || [])[index] ?? "").map(
-                      (desc, index) => (
-                        <Input
-                          key={index}
-                          placeholder={`Description item ${index + 1}`}
-                          value={desc}
-                          onChange={(e) => {
-                            const base = Array.from({ length: 4 }, (_, j) => (editingExam.descriptions || [])[j] ?? "");
-                            const newDescriptions = [...base];
-                            newDescriptions[index] = e.target.value;
-                            setEditingExam({
-                              ...editingExam,
-                              descriptions: newDescriptions,
-                            });
-                          }}
-                        />
-                      ),
-                    )}
+                    {Array.from(
+                      { length: 4 },
+                      (_, index) =>
+                        (editingExam.descriptions || [])[index] ?? "",
+                    ).map((desc, index) => (
+                      <Input
+                        key={index}
+                        placeholder={`Description item ${index + 1}`}
+                        value={desc}
+                        onChange={(e) => {
+                          const base = Array.from(
+                            { length: 4 },
+                            (_, j) => (editingExam.descriptions || [])[j] ?? "",
+                          );
+                          const newDescriptions = [...base];
+                          newDescriptions[index] = e.target.value;
+                          setEditingExam({
+                            ...editingExam,
+                            descriptions: newDescriptions,
+                          });
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
               )}

@@ -21,6 +21,12 @@ function toTopicJson(doc: Record<string, unknown>): Record<string, unknown> {
         minute: "2-digit",
       })
     : undefined)
+  const rawSeo = (doc.seo as Record<string, unknown> | undefined) ?? {}
+  const seo = {
+    ...rawSeo,
+    noIndex: (rawSeo.noIndex as boolean) !== false,
+    noFollow: (rawSeo.noFollow as boolean) !== false,
+  }
   return {
     id: (doc._id as { toString: () => string }).toString(),
     chapterId: (doc.chapterId as { toString: () => string })?.toString(),
@@ -40,7 +46,7 @@ function toTopicJson(doc: Record<string, unknown>): Record<string, unknown> {
     lastModified: lastMod,
     hasContent,
     contentBody: doc.contentBody ?? "",
-    seo: doc.seo ?? {},
+    seo,
     createdAt: createdAt
       ? new Date(createdAt).toLocaleString("en-US", {
           year: "numeric",

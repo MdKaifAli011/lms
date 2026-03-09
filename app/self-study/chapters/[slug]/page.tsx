@@ -158,6 +158,33 @@ export default function ChapterSlugPage({
     }
   }, [chapter?.id, content, seo])
 
+  const handlePublishChange = React.useCallback(
+    async (noIndex: boolean, noFollow: boolean) => {
+      if (!chapter?.id) return
+      setPublishSaving(true)
+      try {
+        const res = await fetch(`${API_BASE}/${chapter.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contentBody: content,
+            seo: { ...seo, noIndex, noFollow },
+          }),
+        })
+        if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+        const updated = (await res.json()) as Chapter
+        setChapter(updated)
+        setSeo((prev) => ({ ...prev, noIndex, noFollow }))
+        toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+      } finally {
+        setPublishSaving(false)
+      }
+    },
+    [chapter?.id, content, seo]
+  )
+
   if (!loaded) {
     return (
       <div className="flex min-h-0 flex-1 min-w-0 flex-col">

@@ -51,6 +51,12 @@ export async function GET(request: NextRequest) {
             minute: "2-digit",
           })
         : undefined)
+      const rawSeo = (doc.seo as Record<string, unknown> | undefined) ?? {}
+      const seo = {
+        ...rawSeo,
+        noIndex: (rawSeo.noIndex as boolean) !== false,
+        noFollow: (rawSeo.noFollow as boolean) !== false,
+      }
       return {
       id: (doc._id as { toString: () => string }).toString(),
       name: doc.name,
@@ -76,7 +82,7 @@ export async function GET(request: NextRequest) {
             minute: "2-digit",
           })
         : undefined,
-      seo: doc.seo ?? {},
+      seo,
     }
     })
     return NextResponse.json(list, { headers: corsHeaders })

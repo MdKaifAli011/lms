@@ -53,7 +53,7 @@ const topicSchema = new Schema<ITopic>(
     contentBody: { type: String },
     seo: {
       type: Schema.Types.Mixed,
-      default: () => ({}),
+      default: () => ({ noIndex: true, noFollow: true }),
     },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },

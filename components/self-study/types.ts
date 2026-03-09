@@ -19,6 +19,6 @@ export const DEFAULT_SEO: SeoData = {
   ogDescription: "",
   ogImageUrl: "",
   canonicalUrl: "",
-  noIndex: false,
-  noFollow: false,
+  noIndex: true,
+  noFollow: true,
 }
