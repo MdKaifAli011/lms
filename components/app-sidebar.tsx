@@ -49,6 +49,10 @@ const data = {
           title: "Definitions",
           url: "/self-study/definitions",
         },
+        {
+          title: "Visit Block List",
+          url: "/self-study/blocked-ips",
+        },
       ],
     },
     {

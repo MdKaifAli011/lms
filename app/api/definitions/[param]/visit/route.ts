@@ -4,12 +4,15 @@ import Subtopic from "@/models/Subtopic"
 import Definition from "@/models/Definition"
 import { isMongoId } from "@/lib/slugify"
 import mongoose from "mongoose"
+import { getClientIp } from "@/lib/visit-block"
+import { isIpBlocked } from "@/lib/visit-block"
 
 /**
  * POST /api/definitions/[param]/visit – increment visit count.
  * param can be:
  * - MongoDB definition _id (24-char hex) → no query needed
  * - definition slug → requires subtopic context: ?subtopic=slug or ?subtopicId=id
+ * Blocked IPs do not increment counts.
  */
 export async function POST(
   request: NextRequest,
@@ -21,16 +24,21 @@ export async function POST(
       return NextResponse.json({ error: "Definition id or slug is required" }, { status: 400 })
     }
 
+    const clientIp = getClientIp(request)
+    const skipCount = !!(clientIp && (await isIpBlocked(clientIp)))
+
     await connectDB()
 
     let doc: { visits?: number; today?: number } | null = null
 
     if (isMongoId(param)) {
-      doc = await Definition.findByIdAndUpdate(
-        param,
-        { $inc: { visits: 1, today: 1 } },
-        { new: true }
-      )
+      doc = skipCount
+        ? await Definition.findById(param).select("visits today").lean()
+        : await Definition.findByIdAndUpdate(
+            param,
+            { $inc: { visits: 1, today: 1 } },
+            { new: true }
+          )
         .select("visits today")
         .lean()
     } else {
@@ -54,11 +62,13 @@ export async function POST(
         )
       }
 
-      doc = await Definition.findOneAndUpdate(
-        { slug, subtopicId },
-        { $inc: { visits: 1, today: 1 } },
-        { new: true }
-      )
+      doc = skipCount
+        ? await Definition.findOne({ slug, subtopicId }).select("visits today").lean()
+        : await Definition.findOneAndUpdate(
+            { slug, subtopicId },
+            { $inc: { visits: 1, today: 1 } },
+            { new: true }
+          )
         .select("visits today")
         .lean()
     }

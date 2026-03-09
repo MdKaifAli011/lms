@@ -4,12 +4,15 @@ import Subject from "@/models/Subject"
 import Unit from "@/models/Unit"
 import { isMongoId } from "@/lib/slugify"
 import mongoose from "mongoose"
+import { getClientIp } from "@/lib/visit-block"
+import { isIpBlocked } from "@/lib/visit-block"
 
 /**
  * POST /api/units/[param]/visit – increment visit count.
  * param can be:
  * - MongoDB unit _id (24-char hex) → no query needed
  * - unit slug (e.g. "unit-1") → requires subject context: ?subject=slug or ?subjectId=id
+ * Blocked IPs do not increment counts.
  */
 export async function POST(
   request: NextRequest,
@@ -21,18 +24,23 @@ export async function POST(
       return NextResponse.json({ error: "Unit id or slug is required" }, { status: 400 })
     }
 
+    const clientIp = getClientIp(request)
+    const skipCount = !!(clientIp && (await isIpBlocked(clientIp)))
+
     await connectDB()
 
     let doc: { visits?: number; today?: number } | null = null
 
     if (isMongoId(param)) {
-      doc = await Unit.findByIdAndUpdate(
-        param,
-        { $inc: { visits: 1, today: 1 } },
-        { new: true }
-      )
-        .select("visits today")
-        .lean()
+      doc = skipCount
+        ? await Unit.findById(param).select("visits today").lean()
+        : await Unit.findByIdAndUpdate(
+            param,
+            { $inc: { visits: 1, today: 1 } },
+            { new: true }
+          )
+            .select("visits today")
+            .lean()
     } else {
       const slug = param.trim().toLowerCase()
       const { searchParams } = new URL(request.url)
@@ -54,13 +62,15 @@ export async function POST(
         )
       }
 
-      doc = await Unit.findOneAndUpdate(
-        { slug, subjectId },
-        { $inc: { visits: 1, today: 1 } },
-        { new: true }
-      )
-        .select("visits today")
-        .lean()
+      doc = skipCount
+        ? await Unit.findOne({ slug, subjectId }).select("visits today").lean()
+        : await Unit.findOneAndUpdate(
+            { slug, subjectId },
+            { $inc: { visits: 1, today: 1 } },
+            { new: true }
+          )
+            .select("visits today")
+            .lean()
     }
 
     if (!doc) {

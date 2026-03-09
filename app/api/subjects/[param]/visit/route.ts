@@ -4,12 +4,15 @@ import Exam from "@/models/Exam"
 import Subject from "@/models/Subject"
 import { isMongoId } from "@/lib/slugify"
 import mongoose from "mongoose"
+import { getClientIp } from "@/lib/visit-block"
+import { isIpBlocked } from "@/lib/visit-block"
 
 /**
  * POST /api/subjects/[param]/visit – increment visit count.
  * param can be:
  * - MongoDB subject _id (24-char hex) → no query needed
  * - subject slug (e.g. "physics") → requires exam context: ?exam=slug or ?examId=id
+ * Blocked IPs do not increment counts.
  */
 export async function POST(
   request: NextRequest,
@@ -21,18 +24,23 @@ export async function POST(
       return NextResponse.json({ error: "Subject id or slug is required" }, { status: 400 })
     }
 
+    const clientIp = getClientIp(request)
+    const skipCount = !!(clientIp && (await isIpBlocked(clientIp)))
+
     await connectDB()
 
     let doc: { visits?: number; today?: number } | null = null
 
     if (isMongoId(param)) {
-      doc = await Subject.findByIdAndUpdate(
-        param,
-        { $inc: { visits: 1, today: 1 } },
-        { new: true }
-      )
-        .select("visits today")
-        .lean()
+      doc = skipCount
+        ? await Subject.findById(param).select("visits today").lean()
+        : await Subject.findByIdAndUpdate(
+            param,
+            { $inc: { visits: 1, today: 1 } },
+            { new: true }
+          )
+            .select("visits today")
+            .lean()
     } else {
       const slug = param.trim().toLowerCase()
       const { searchParams } = new URL(request.url)
@@ -54,13 +62,15 @@ export async function POST(
         )
       }
 
-      doc = await Subject.findOneAndUpdate(
-        { slug, examId },
-        { $inc: { visits: 1, today: 1 } },
-        { new: true }
-      )
-        .select("visits today")
-        .lean()
+      doc = skipCount
+        ? await Subject.findOne({ slug, examId }).select("visits today").lean()
+        : await Subject.findOneAndUpdate(
+            { slug, examId },
+            { $inc: { visits: 1, today: 1 } },
+            { new: true }
+          )
+            .select("visits today")
+            .lean()
     }
 
     if (!doc) {
