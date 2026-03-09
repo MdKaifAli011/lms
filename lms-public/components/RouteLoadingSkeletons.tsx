@@ -175,6 +175,96 @@ export function MainContentSkeleton({ className }: { className?: string }) {
 }
 
 /**
+ * Quiz page: breadcrumbs, section title, quiz card (header + question + options grid + prev/next).
+ * Main content only (used inside HierarchyShell for /quiz routes).
+ */
+export function QuizPageSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("max-w-7xl mx-auto", className)}>
+      <div className="route-loading-bar-inline" aria-hidden />
+      <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6">
+        <div className="mb-3 sm:mb-4 flex items-center gap-1">
+          <Skeleton className="h-5 w-20 rounded" />
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-5 w-24 rounded" />
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-5 w-32 rounded" />
+        </div>
+        <div className="mb-4 flex items-center gap-2">
+          <Skeleton className="h-5 w-5 rounded" />
+          <Skeleton className="h-6 sm:h-7 w-48 sm:w-64 rounded-lg" />
+        </div>
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="border-b border-border/60 bg-muted/30 px-4 sm:px-6 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Skeleton className="h-5 w-40 sm:w-52 rounded" />
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-4 w-16 rounded" />
+                <Skeleton className="h-4 w-14 rounded" />
+              </div>
+            </div>
+            <div className="flex gap-1 mt-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="h-2 w-2 rounded-full" />
+              ))}
+            </div>
+          </div>
+          <div className="p-4 sm:p-6">
+            <Skeleton className="h-4 w-28 mb-2 rounded" />
+            <Skeleton className="h-5 w-full max-w-xl mb-6 rounded" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-14 rounded-xl" />
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-between gap-3 mt-8 pt-6 border-t border-border">
+              <Skeleton className="h-10 w-24 rounded-lg" />
+              <Skeleton className="h-10 w-28 rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Flashcards page: breadcrumbs, section title, flashcard card (flip area + prev/next).
+ * Main content only (used inside HierarchyShell for /flashcards routes).
+ */
+export function FlashcardPageSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("max-w-7xl mx-auto", className)}>
+      <div className="route-loading-bar-inline" aria-hidden />
+      <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6">
+        <div className="mb-3 sm:mb-4 flex items-center gap-1">
+          <Skeleton className="h-5 w-20 rounded" />
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-5 w-24 rounded" />
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-5 w-32 rounded" />
+        </div>
+        <div className="mb-4 flex items-center gap-2">
+          <Skeleton className="h-6 sm:h-7 w-48 sm:w-64 rounded-lg" />
+        </div>
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="p-4 sm:p-6">
+            <Skeleton className="h-4 w-24 mb-3 rounded" />
+            <Skeleton className="h-[180px] sm:h-[200px] w-full rounded-xl mb-2" />
+            <Skeleton className="h-3 w-24 mx-auto rounded" />
+            <div className="flex flex-wrap justify-between gap-3 mt-6 pt-4 border-t border-border">
+              <Skeleton className="h-9 w-24 rounded-lg" />
+              <Skeleton className="h-9 w-20 rounded-lg" />
+              <Skeleton className="h-9 w-20 rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Syllabus page: breadcrumbs, header, tree-like skeleton, Expand/Collapse buttons.
  * Main content only (used inside HierarchyShell).
  */

@@ -74,8 +74,22 @@ export function HierarchySidebar({
   const [manualExpanded, setManualExpanded] = useState<Set<string>>(new Set());
   const defaultExpandedRef = useRef(false);
 
-  const active = useMemo(() => {
+  /** When user chose Quiz or Flashcards from right sidebar, left menu links go to .../quiz or .../flashcards. */
+  const isQuizPage = useMemo(() => {
     const parts = pathname?.split("/").filter(Boolean) ?? [];
+    return parts[parts.length - 1] === "quiz";
+  }, [pathname]);
+  const isFlashcardsPage = useMemo(() => {
+    const parts = pathname?.split("/").filter(Boolean) ?? [];
+    return parts[parts.length - 1] === "flashcards";
+  }, [pathname]);
+
+  const quizSuffix = isQuizPage ? "/quiz" : isFlashcardsPage ? "/flashcards" : "";
+
+  /** Active segment from path; strip /quiz and /flashcards so content/quiz/flashcards for same level all highlight. */
+  const active = useMemo(() => {
+    const pathStripped = pathname?.replace(/\/quiz\/?$/, "").replace(/\/flashcards\/?$/, "") ?? "";
+    const parts = pathStripped.split("/").filter(Boolean);
     const i = parts.indexOf("exam");
     return {
       subject: parts[i + 2],
@@ -181,7 +195,7 @@ export function HierarchySidebar({
                   <div key={subject.id} className="space-y-2">
                     <BranchRow
                       level="subject"
-                      href={`/exam/${examSlug}/${subjectSlug}`}
+                      href={`/exam/${examSlug}/${subjectSlug}${quizSuffix}`}
                       label={getLabel(subject)}
                       active={subjectActive}
                       expanded={expanded(subjectId, subjectActive)}
@@ -198,7 +212,7 @@ export function HierarchySidebar({
                             <div key={unit.id} className="space-y-2">
                               <BranchRow
                                 level="unit"
-                                href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}`}
+                                href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}${quizSuffix}`}
                                 label={getLabel(unit)}
                                 active={unitActive}
                                 expanded={expanded(unitId, unitActive)}
@@ -215,7 +229,7 @@ export function HierarchySidebar({
                                       <div key={chapter.id} className="space-y-2">
                                         <BranchRow
                                           level="chapter"
-                                          href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}/${chapterSlug}`}
+                                          href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}/${chapterSlug}${quizSuffix}`}
                                           label={getLabel(chapter)}
                                           active={chapterActive}
                                           expanded={expanded(chapterId, chapterActive)}
@@ -231,7 +245,7 @@ export function HierarchySidebar({
                                               return (
                                                 <TopicRow
                                                   key={topic.id}
-                                                  href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}/${chapterSlug}/${topicSlug}`}
+                                                  href={`/exam/${examSlug}/${subjectSlug}/${unitSlug}/${chapterSlug}/${topicSlug}${quizSuffix}`}
                                                   label={toTitleCase(topic.name)}
                                                   active={topicActive}
                                                   isLast={isLast}

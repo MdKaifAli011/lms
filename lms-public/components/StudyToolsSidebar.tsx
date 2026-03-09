@@ -5,13 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   StickyNote,
-  Bot,
   BookOpen,
-  Bookmark,
+  ClipboardList,
+  FileQuestion,
   Settings,
   Share2,
   HelpCircle,
-  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +37,41 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
     examSlug && pathname && pathname === `/exam/${examSlug}/syllabus`
   );
 
+  /** Base path for current hierarchy (no /syllabus, /quiz, or /flashcards). */
+  const basePath =
+    examSlug && pathname?.startsWith(`/exam/${examSlug}`)
+      ? pathname
+          .replace(/\/syllabus\/?$/, "")
+          .replace(/\/quiz\/?$/, "")
+          .replace(/\/flashcards\/?$/, "")
+          .replace(/\/$/, "") || `/exam/${examSlug}`
+      : null;
+
+  /** Quiz page for current hierarchy level. */
+  const quizHref = basePath ? `${basePath}/quiz` : null;
+  const isQuizPage = Boolean(quizHref && pathname === quizHref);
+
+  /** Flashcards page for current hierarchy level. */
+  const flashcardsHref = basePath ? `${basePath}/flashcards` : null;
+  const isFlashcardsPage = Boolean(flashcardsHref && pathname === flashcardsHref);
+
+  /** Content page (Take Notes): from Syllabus → exam home; else base path. */
+  const contentHref =
+    examSlug && pathname?.startsWith(`/exam/${examSlug}`)
+      ? pathname.endsWith("/syllabus")
+        ? `/exam/${examSlug}`
+        : basePath ?? `/exam/${examSlug}`
+      : null;
+
+  /** On content pages (not Syllabus, Quiz, or Flashcards), show Take Notes as default active. */
+  const isNotesDefaultActive = Boolean(
+    examSlug &&
+      pathname?.startsWith(`/exam/${examSlug}`) &&
+      !isSyllabusPage &&
+      !isQuizPage &&
+      !isFlashcardsPage
+  );
+
   useEffect(() => {
     if (isMobile) return;
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -59,10 +93,19 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
           },
         ]
       : []),
-    { icon: StickyNote, label: "Take Notes", onClick: () => {} },
-    { icon: Bot, label: "Ask AI Tutor", onClick: () => {} },
-    { icon: BookOpen, label: "Flashcards", onClick: () => {} },
-    { icon: Bookmark, label: "Bookmark", onClick: () => {} },
+    ...(quizHref
+      ? [
+          {
+            icon: FileQuestion,
+            label: "Quiz",
+            href: quizHref,
+          },
+        ]
+      : []),
+    ...(contentHref
+      ? [{ icon: StickyNote, label: "Take Notes", href: contentHref }]
+      : [{ icon: StickyNote, label: "Take Notes", onClick: () => {} }]),
+    ...(flashcardsHref ? [{ icon: BookOpen, label: "Flashcards", href: flashcardsHref }] : [{ icon: BookOpen, label: "Flashcards", onClick: () => {} }]),
   ];
 
   const quickActions = [
@@ -82,10 +125,11 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
   if (isMobile) {
     const mobileTools = [
       ...(examSlug ? [{ icon: ClipboardList, label: "Syllabus", onClick: () => {}, isPrimary: false, href: `/exam/${examSlug}/syllabus` }] : []),
-      { icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false },
-      { icon: Bot, label: "AI Tutor", onClick: () => {}, isPrimary: true },
-      { icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false },
-      { icon: Bookmark, label: "Saved", onClick: () => {}, isPrimary: false },
+      ...(contentHref ? [{ icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false, href: contentHref }] : [{ icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false }]),
+      ...(flashcardsHref ? [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false, href: flashcardsHref }] : [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false }]),
+      ...(quizHref
+        ? [{ icon: FileQuestion, label: "Quiz", onClick: () => {}, isPrimary: false, href: quizHref }]
+        : []),
       { icon: Settings, label: "More", onClick: () => {}, isPrimary: false },
     ];
     return (
@@ -108,57 +152,49 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
             const Icon = tool.icon;
             const toolHref = (tool as { href?: string }).href;
             if (toolHref) {
-              const isActive = pathname === toolHref;
+              const isActive =
+                pathname === toolHref ||
+                (tool.label === "Notes" && isNotesDefaultActive) ||
+                (tool.label === "Cards" && isFlashcardsPage);
               return (
                 <Link
                   key={index}
                   href={toolHref}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1 flex-1 transition-colors",
+                    "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors rounded-lg mx-0.5",
                     isActive
-                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+                      ? "bg-blue-700 text-white dark:bg-blue-800 dark:text-white shadow-sm"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                   )}
                   aria-label={tool.label}
                   aria-current={isActive ? "page" : undefined}
                 >
-                  <div className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-lg",
-                    isActive && "bg-blue-100 dark:bg-blue-900/40"
-                  )}>
+                  <div className="flex items-center justify-center w-8 h-8 rounded-md shrink-0">
                     <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
                   </div>
-                  <span className="text-[10px] font-medium truncate max-w-[52px] text-center">{tool.label}</span>
+                  <span className="text-[10px] font-medium truncate max-w-[60px] sm:max-w-[52px] text-center px-0.5">{tool.label}</span>
                 </Link>
               );
             }
-            if (tool.isPrimary) {
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={tool.onClick}
-                  className="flex flex-1 items-center justify-center min-w-0 min-h-[40px] -mt-4"
-                  aria-label={tool.label}
-                >
-                  <div className="flex items-center justify-center w-11 h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md">
-                    <Icon className="h-5 w-5" strokeWidth={2.5} />
-                  </div>
-                </button>
-              );
-            }
+            const notesActive = tool.label === "Notes" && isNotesDefaultActive;
             return (
               <button
                 key={index}
                 type="button"
                 onClick={tool.onClick}
-                className="flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1 flex-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors rounded-lg mx-0.5",
+                  notesActive
+                    ? "bg-blue-700 text-white dark:bg-blue-800 dark:text-white shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                )}
                 aria-label={tool.label}
+                aria-current={notesActive ? "page" : undefined}
               >
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg">
+                <div className="flex items-center justify-center w-8 h-8 rounded-md shrink-0">
                   <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
                 </div>
-                <span className="text-[10px] font-medium truncate max-w-[52px] text-center">{tool.label}</span>
+                <span className="text-[10px] font-medium truncate max-w-[60px] sm:max-w-[52px] text-center px-0.5">{tool.label}</span>
               </button>
             );
           })}
@@ -194,7 +230,11 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
               const Icon = tool.icon;
               const href = (tool as { href?: string }).href;
               if (href) {
-                const isActive = isSyllabusPage;
+                const isActive =
+                  (tool.label === "Syllabus" && isSyllabusPage) ||
+                  (tool.label === "Quiz" && isQuizPage) ||
+                  (tool.label === "Take Notes" && isNotesDefaultActive) ||
+                  (tool.label === "Flashcards" && isFlashcardsPage);
                 return (
                   <Button
                     key={index}
@@ -203,7 +243,7 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                       "w-full justify-start gap-3 h-auto py-2.5 px-2 transition-colors",
                       !isExpanded && "justify-center px-0",
                       isActive
-                        ? "bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                        ? "bg-blue-700 hover:bg-blue-800 text-white dark:bg-blue-800 dark:hover:bg-blue-700 dark:text-white"
                         : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
                     )}
                     title={!isExpanded ? tool.label : undefined}
@@ -221,8 +261,11 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                   key={index}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 h-auto py-2.5 px-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100 transition-colors",
-                    !isExpanded && "justify-center px-0"
+                    "w-full justify-start gap-3 h-auto py-2.5 px-2 transition-colors",
+                    !isExpanded && "justify-center px-0",
+                    tool.label === "Take Notes" && isNotesDefaultActive
+                      ? "bg-blue-700 hover:bg-blue-800 text-white dark:bg-blue-800 dark:hover:bg-blue-700 dark:text-white"
+                      : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
                   )}
                   onClick={(tool as { onClick?: () => void }).onClick}
                   title={!isExpanded ? tool.label : undefined}
