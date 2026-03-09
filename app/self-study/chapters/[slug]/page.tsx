@@ -49,6 +49,7 @@ export default function ChapterSlugPage({
   const [content, setContent] = React.useState("")
   const [seo, setSeo] = React.useState<SeoData>(DEFAULT_SEO)
   const [saveStatus, setSaveStatus] = React.useState<"idle" | "saving" | "saved">("idle")
+  const [publishSaving, setPublishSaving] = React.useState(false)
   const initialContentFromApiRef = React.useRef("")
   const editorReadyRef = React.useRef(false)
 
@@ -250,6 +251,10 @@ export default function ChapterSlugPage({
         createdAt={chapter.createdAt}
         onSave={saveContentAndSeo}
         saveStatus={saveStatus}
+        noIndex={seo.noIndex}
+        noFollow={seo.noFollow}
+        onPublishChange={handlePublishChange}
+        publishSaving={publishSaving}
       />
 
       <ContentSeoLayout
