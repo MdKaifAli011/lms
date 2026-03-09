@@ -84,15 +84,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
   }, [isHovering, isMobile]);
 
   const studyTools = [
-    ...(examSlug
-      ? [
-          {
-            icon: ClipboardList,
-            label: "Syllabus",
-            href: `/exam/${examSlug}/syllabus`,
-          },
-        ]
-      : []),
+    ...(contentHref
+      ? [{ icon: StickyNote, label: "Take Notes", href: contentHref }]
+      : [{ icon: StickyNote, label: "Take Notes", onClick: () => {} }]),
     ...(quizHref
       ? [
           {
@@ -102,10 +96,16 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
           },
         ]
       : []),
-    ...(contentHref
-      ? [{ icon: StickyNote, label: "Take Notes", href: contentHref }]
-      : [{ icon: StickyNote, label: "Take Notes", onClick: () => {} }]),
     ...(flashcardsHref ? [{ icon: BookOpen, label: "Flashcards", href: flashcardsHref }] : [{ icon: BookOpen, label: "Flashcards", onClick: () => {} }]),
+    ...(examSlug
+      ? [
+          {
+            icon: ClipboardList,
+            label: "Syllabus",
+            href: `/exam/${examSlug}/syllabus`,
+          },
+        ]
+      : []),
   ];
 
   const quickActions = [
@@ -124,12 +124,12 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
 
   if (isMobile) {
     const mobileTools = [
-      ...(examSlug ? [{ icon: ClipboardList, label: "Syllabus", onClick: () => {}, isPrimary: false, href: `/exam/${examSlug}/syllabus` }] : []),
       ...(contentHref ? [{ icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false, href: contentHref }] : [{ icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false }]),
-      ...(flashcardsHref ? [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false, href: flashcardsHref }] : [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false }]),
       ...(quizHref
         ? [{ icon: FileQuestion, label: "Quiz", onClick: () => {}, isPrimary: false, href: quizHref }]
         : []),
+      ...(flashcardsHref ? [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false, href: flashcardsHref }] : [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false }]),
+      ...(examSlug ? [{ icon: ClipboardList, label: "Syllabus", onClick: () => {}, isPrimary: false, href: `/exam/${examSlug}/syllabus` }] : []),
       { icon: Settings, label: "More", onClick: () => {}, isPrimary: false },
     ];
     return (
