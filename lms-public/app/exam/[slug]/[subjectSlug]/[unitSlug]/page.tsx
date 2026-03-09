@@ -18,6 +18,7 @@ import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { HierarchyListSection } from "@/components/HierarchyListSection";
 import { RecordVisit } from "@/components/RecordVisit";
+import { LevelQuiz } from "@/components/LevelQuiz";
 
 interface PageProps {
   params: Promise<{ slug: string; subjectSlug: string; unitSlug: string }>;
@@ -112,6 +113,13 @@ export default async function UnitPage({ params }: PageProps) {
         </div>
       ) : null}
       <HierarchyListSection variant="chapters" items={chapters} />
+      <LevelQuiz
+        level={3}
+        examId={examId}
+        examSlug={examSlug}
+        subjectId={subjectBySlug.id}
+        unitId={unitBySlug.id}
+      />
       <div className="mt-8 sm:mt-10 md:mt-12">
         <NavigationButtons prev={nav.prev} next={nav.next} />
       </div>

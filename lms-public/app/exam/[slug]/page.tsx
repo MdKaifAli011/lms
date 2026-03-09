@@ -14,6 +14,7 @@ import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { SubjectCardGrid } from "@/components/SubjectCardGrid";
 import { RecordVisit } from "@/components/RecordVisit";
+import { LevelQuiz } from "@/components/LevelQuiz";
 import { BookOpen } from "lucide-react";
 
 interface PageProps {
@@ -78,6 +79,7 @@ export default async function ExamSlugPage({ params }: PageProps) {
       <div className="mt-6 sm:mt-8 md:mt-10">
         <SubjectCardGrid examSlug={slug} subjects={hierarchy} />
       </div>
+      <LevelQuiz level={1} examId={examId} examSlug={slug} />
       <div className="mt-8 sm:mt-10 md:mt-12">
         <NavigationButtons prev={nav.prev} next={nav.next} />
       </div>

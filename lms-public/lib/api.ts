@@ -90,6 +90,76 @@ export async function getLevelWisePractices(filters?: { examId?: string; level?:
   }
 }
 
+/** Level-wise practice papers filtered by hierarchy (for exam/subject/unit/chapter/topic/subtopic/definition pages). */
+export async function getLevelWisePracticesByHierarchy(filters: {
+  level: number;
+  examId: string;
+  subjectId?: string;
+  unitId?: string;
+  chapterId?: string;
+  topicId?: string;
+  subtopicId?: string;
+  definitionId?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{ papers: LevelWisePractice[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    params.set("level", String(filters.level));
+    params.set("examId", filters.examId);
+    if (filters.subjectId) params.set("subjectId", filters.subjectId);
+    if (filters.unitId) params.set("unitId", filters.unitId);
+    if (filters.chapterId) params.set("chapterId", filters.chapterId);
+    if (filters.topicId) params.set("topicId", filters.topicId);
+    if (filters.subtopicId) params.set("subtopicId", filters.subtopicId);
+    if (filters.definitionId) params.set("definitionId", filters.definitionId);
+    if (filters.status) params.set("status", filters.status);
+    if (filters.page != null) params.set("page", String(filters.page));
+    if (filters.limit != null) params.set("limit", String(filters.limit));
+    const q = params.toString();
+    const res = await fetchApi<{ papers: LevelWisePractice[]; total: number }>(`/api/level-wise-practice?${q}`);
+    return { papers: Array.isArray(res.papers) ? res.papers : [], total: res.total || 0 };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getLevelWisePracticesByHierarchy]", e);
+    return { papers: [], total: 0 };
+  }
+}
+
+/** Single question in a level-wise practice paper */
+export interface LevelWisePracticeQuestion {
+  id: string;
+  practiceId: string;
+  questionText: string;
+  type: "MCQ" | "NVQ";
+  options: string[];
+  correctOptionIndex: number;
+  numericalAnswer: string;
+  numericalTolerance: number;
+  numericalUnit: string;
+  marksCorrect: number;
+  marksIncorrect: number;
+  imageUrl?: string;
+  imageCaption?: string;
+  orderNumber: number;
+  difficulty: string;
+  explanation?: string;
+  explanationImageUrl?: string;
+}
+
+/** GET /api/level-wise-practice/[param]/questions – list questions for a practice paper */
+export async function getLevelWisePracticeQuestions(practiceIdOrSlug: string): Promise<LevelWisePracticeQuestion[]> {
+  try {
+    const list = await fetchApi<LevelWisePracticeQuestion[]>(
+      `/api/level-wise-practice/${encodeURIComponent(practiceIdOrSlug)}/questions`
+    );
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getLevelWisePracticeQuestions]", e);
+    return [];
+  }
+}
+
 // ——— Full Length Mock Tests ———
 export interface FullLengthMock {
   id: string;

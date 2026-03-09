@@ -20,6 +20,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { RecordVisit } from "@/components/RecordVisit";
+import { LevelQuiz } from "@/components/LevelQuiz";
 
 interface PageProps {
   params: Promise<{
@@ -183,6 +184,17 @@ export default async function DefinitionPage({ params }: PageProps) {
           <ContentRenderer content={contentBody} />
         </div>
       ) : null}
+      <LevelQuiz
+        level={7}
+        examId={examId}
+        examSlug={examSlug}
+        subjectId={subjectBySlug.id}
+        unitId={unitBySlug.id}
+        chapterId={chapterBySlug.id}
+        topicId={topicBySlug.id}
+        subtopicId={subtopicBySlug.id}
+        definitionId={definitionBySlug.id}
+      />
       <div className="mt-8 sm:mt-10 md:mt-12">
         <NavigationButtons prev={nav.prev} next={nav.next} />
       </div>
