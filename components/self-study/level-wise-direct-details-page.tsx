@@ -21,6 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Loader2,
   PenLine,
   Plus,
@@ -28,6 +33,8 @@ import {
   Trash2,
   Filter,
   Check,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { toTitleCase } from "@/lib/titleCase";
@@ -230,6 +237,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   const [questionsLoading, setQuestionsLoading] = React.useState(false);
   const [exams, setExams] = React.useState<ExamOption[]>([]);
 
+  /** Collapsible: which papers are expanded (questions loaded on first expand). */
+  const [expandedPapers, setExpandedPapers] = React.useState<Set<string>>(new Set());
+  /** Collapsible: which questions are expanded (per question id). */
+  const [expandedQuestions, setExpandedQuestions] = React.useState<Set<string>>(new Set());
+  /** Questions by paper id (lazy-loaded when paper is expanded). */
+  const [paperQuestionsCache, setPaperQuestionsCache] = React.useState<Record<string, Question[]>>({});
+  const [loadingPaperId, setLoadingPaperId] = React.useState<string | null>(null);
+
   const [createOpen, setCreateOpen] = React.useState(false);
   const [createSaving, setCreateSaving] = React.useState(false);
   const [paperForm, setPaperForm] = React.useState(() =>
@@ -250,6 +265,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [deleteTargetSingle, setDeleteTargetSingle] = React.useState<string | null>(null);
   const [deleteTargetBulk, setDeleteTargetBulk] = React.useState<string[]>([]);
+  const [deleteTargetPaperId, setDeleteTargetPaperId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setResolvedScope(initialScope(props));
@@ -363,6 +379,43 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       .finally(() => setQuestionsLoading(false));
   }, []);
 
+  /** Fetch questions for a paper and store in cache; used when paper is expanded. */
+  const ensurePaperQuestions = React.useCallback((paperId: string) => {
+    if (paperQuestionsCache[paperId] !== undefined) return;
+    setLoadingPaperId(paperId);
+    fetch(`/api/level-wise-practice/${paperId}/questions`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: list }));
+      })
+      .catch(() => setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: [] })))
+      .finally(() => setLoadingPaperId(null));
+  }, [paperQuestionsCache]);
+
+  const togglePaperExpanded = React.useCallback((paperId: string, open: boolean) => {
+    setExpandedPapers((prev) => {
+      const next = new Set(prev);
+      if (open) next.add(paperId);
+      else next.delete(paperId);
+      return next;
+    });
+  }, []);
+
+  const toggleQuestionExpanded = React.useCallback((questionId: string) => {
+    setExpandedQuestions((prev) => {
+      const next = new Set(prev);
+      if (next.has(questionId)) next.delete(questionId);
+      else next.add(questionId);
+      return next;
+    });
+  }, []);
+
+  /** Update cached questions for a paper (after add/edit/delete). */
+  const setCachedQuestions = React.useCallback((paperId: string, list: Question[]) => {
+    setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: list }));
+  }, []);
+
   const syncPaper = React.useCallback(
     async (practiceId: string, count: number) => {
       const durationMinutes = count * MINUTES_PER_QUESTION;
@@ -434,8 +487,11 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   ]);
 
   React.useEffect(() => {
-    if (selectedPaperId) fetchQuestions(selectedPaperId);
-  }, [selectedPaperId, fetchQuestions]);
+    if (selectedPaperId)
+      setQuestions(paperQuestionsCache[selectedPaperId] ?? []);
+    else
+      setQuestions([]);
+  }, [selectedPaperId, paperQuestionsCache]);
 
   React.useEffect(() => {
     fetch("/api/exams?contextapi=1")
@@ -503,11 +559,12 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         )
       );
       setSelectedPaperId(created.id);
+      setPaperQuestionsCache((prev) => ({ ...prev, [created.id]: [] }));
+      setExpandedPapers((prev) => new Set(prev).add(created.id));
       setQuestions([]);
       setCreateOpen(false);
       setPaperForm(emptyPaperForm(level, resolvedScope.examId ?? undefined));
       toast.success("Practice paper created");
-      fetchQuestions(created.id);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to create");
     } finally {
@@ -535,8 +592,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     };
   }
 
-  const openAdd = () => {
-    if (!selectedPaperId) return;
+  const openAdd = (paperId?: string) => {
+    const pid = paperId ?? selectedPaperId;
+    if (!pid) return;
+    setSelectedPaperId(pid);
     setFormSlots((prev) => [...prev, emptyQuestionForm()]);
     setForm(emptyQuestionForm());
     setEditingId(null);
@@ -565,7 +624,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     });
   };
 
-  const openEdit = (q: Question) => {
+  const openEdit = (paperId: string, q: Question) => {
+    setSelectedPaperId(paperId);
     setForm({
       questionText: q.questionText,
       type: q.type,
@@ -648,6 +708,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         );
         if (!res.ok) throw new Error("Failed to update");
         const updated = await res.json();
+        const newList = (paperQuestionsCache[selectedPaperId!] ?? []).map((q) =>
+          q.id === editingId ? { ...q, ...updated } : q
+        );
+        setCachedQuestions(selectedPaperId!, newList);
         setQuestions((prev) =>
           prev.map((q) => (q.id === editingId ? { ...q, ...updated } : q))
         );
@@ -664,7 +728,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         );
         if (!res.ok) throw new Error("Failed to create");
         const created = await res.json();
-        const newList = [...questions, created].sort((a, b) => a.orderNumber - b.orderNumber);
+        const currentList = paperQuestionsCache[selectedPaperId!] ?? [];
+        const newList = [...currentList, created].sort((a, b) => a.orderNumber - b.orderNumber);
+        setCachedQuestions(selectedPaperId!, newList);
         setQuestions(newList);
         toast.success("Question added");
         await syncPaper(selectedPaperId, newList.length);
@@ -697,7 +763,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     }
     setSaving(true);
     try {
-      let newList = [...questions];
+      const initialList = paperQuestionsCache[selectedPaperId] ?? [];
+      let newList = [...initialList];
       for (const { slot } of toSave) {
         const payload = buildPayload(slot);
         const res = await fetch(`/api/level-wise-practice/${selectedPaperId}/questions`, {
@@ -710,6 +777,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         newList = [...newList, created];
       }
       newList.sort((a, b) => a.orderNumber - b.orderNumber);
+      setCachedQuestions(selectedPaperId, newList);
       setQuestions(newList);
       setFormSlots([]);
       setShowInlineForm(false);
@@ -749,7 +817,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       });
       if (!res.ok) throw new Error("Failed to create");
       const created = await res.json();
-      const newList = [...questions, created].sort((a, b) => a.orderNumber - b.orderNumber);
+      const currentList = paperQuestionsCache[selectedPaperId] ?? [];
+      const newList = [...currentList, created].sort((a, b) => a.orderNumber - b.orderNumber);
+      setCachedQuestions(selectedPaperId, newList);
       setQuestions(newList);
       setFormSlots((prev) => {
         const next = prev.filter((_, j) => j !== slotIndex);
@@ -765,38 +835,44 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     }
   };
 
-  const openDeleteSingle = (id: string) => {
+  const openDeleteSingle = (paperId: string, id: string) => {
     setDeleteTargetSingle(id);
     setDeleteTargetBulk([]);
+    setDeleteTargetPaperId(paperId);
     setDeleteDialogOpen(true);
   };
 
-  const openDeleteBulk = () => {
+  const openDeleteBulk = (paperId: string) => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     setDeleteTargetSingle(null);
     setDeleteTargetBulk(ids);
+    setDeleteTargetPaperId(paperId);
     setDeleteDialogOpen(true);
   };
 
   const performDelete = async () => {
     const ids = deleteTargetSingle ? [deleteTargetSingle] : deleteTargetBulk;
-    if (ids.length === 0 || !selectedPaperId) {
+    const paperId = deleteTargetPaperId;
+    if (ids.length === 0 || !paperId) {
       setDeleteDialogOpen(false);
       setDeleteTargetSingle(null);
       setDeleteTargetBulk([]);
+      setDeleteTargetPaperId(null);
       return;
     }
     try {
       await Promise.all(
         ids.map((id) =>
-          fetch(`/api/level-wise-practice/${selectedPaperId}/questions/${id}`, {
+          fetch(`/api/level-wise-practice/${paperId}/questions/${id}`, {
             method: "DELETE",
           })
         )
       );
-      const newList = questions.filter((q) => !ids.includes(q.id));
-      setQuestions(newList);
+      const currentList = paperQuestionsCache[paperId] ?? [];
+      const newList = currentList.filter((q) => !ids.includes(q.id));
+      setCachedQuestions(paperId, newList);
+      if (paperId === selectedPaperId) setQuestions(newList);
       setSelectedIds((prev) => {
         const next = new Set(prev);
         ids.forEach((id) => next.delete(id));
@@ -805,31 +881,31 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       toast.success(
         ids.length === 1 ? "Question deleted" : `${ids.length} questions deleted`
       );
-      await syncPaper(selectedPaperId, newList.length);
+      await syncPaper(paperId, newList.length);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to delete");
     } finally {
       setDeleteDialogOpen(false);
       setDeleteTargetSingle(null);
       setDeleteTargetBulk([]);
+      setDeleteTargetPaperId(null);
     }
   };
 
-  const toggleSelectAll = () => {
-    const displayed = [...questions]
-      .sort((a, b) => a.orderNumber - b.orderNumber)
-      .slice(0, showPerPage);
-    const allSelected = displayed.length > 0 && displayed.every((q) => selectedIds.has(q.id));
+  const toggleSelectAll = (paperId: string) => {
+    const list = paperQuestionsCache[paperId] ?? [];
+    const sorted = [...list].sort((a, b) => a.orderNumber - b.orderNumber);
+    const allSelected = sorted.length > 0 && sorted.every((q) => selectedIds.has(q.id));
     if (allSelected) {
       setSelectedIds((prev) => {
         const next = new Set(prev);
-        displayed.forEach((q) => next.delete(q.id));
+        sorted.forEach((q) => next.delete(q.id));
         return next;
       });
     } else {
       setSelectedIds((prev) => {
         const next = new Set(prev);
-        displayed.forEach((q) => next.add(q.id));
+        sorted.forEach((q) => next.add(q.id));
         return next;
       });
     }
@@ -848,6 +924,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     .sort((a, b) => a.orderNumber - b.orderNumber)
     .slice(0, showPerPage);
 
+  /** Truncate question text for collapsible trigger */
+  const truncate = (text: string, maxLen: number) =>
+    text.length <= maxLen ? text : text.slice(0, maxLen).trim() + "…";
+
   return (
     <>
       <Card className="overflow-hidden border border-border bg-card shadow-sm">
@@ -863,35 +943,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {papers.length > 1 && (
-                <Select
-                  value={selectedPaperId ?? ""}
-                  onValueChange={(v) => setSelectedPaperId(v || null)}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select paper" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {papers
-                      .sort((a, b) => a.orderNumber - b.orderNumber)
-                      .map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {toTitleCase(p.title)}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              )}
               <Button onClick={() => setCreateOpen(true)} variant="outline" size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
                 New paper
               </Button>
-              {selectedPaperId && (
-                <Button onClick={openAdd} size="sm" className="gap-1.5">
-                  <Plus className="h-4 w-4" />
-                  Add question
-                </Button>
-              )}
             </div>
           </div>
         </CardHeader>
@@ -912,454 +967,558 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                 Create first practice paper
               </Button>
             </div>
-          ) : !selectedPaperId ? null : (
-            <>
-              {questionsLoading ? (
-                <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span className="text-sm">Loading questions…</span>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* List header */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-base font-semibold">Questions List ({questions.length})</h3>
-                      {questions.length > 0 && (
-                        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <input
-                            type="checkbox"
-                            checked={
-                              displayedQuestions.length > 0 &&
-                              displayedQuestions.every((q) => selectedIds.has(q.id))
-                            }
-                            onChange={toggleSelectAll}
-                            className="h-4 w-4 rounded border-input"
+          ) : (
+            <div className="space-y-4">
+              {/* Create-question panel (shown when adding to a paper) */}
+              {formSlots.length > 0 && selectedPaperId && (
+                <div ref={formRef} className="space-y-3 rounded-lg border-2 border-primary/20 bg-muted/10 p-4">
+                  {formSlots.map((slotForm, slotIndex) => (
+                    <Card key={`slot-${slotIndex}`} className="border border-border">
+                      <CardHeader className="flex flex-row items-center justify-between gap-4 pb-1.5 pt-3 px-4">
+                        <CardTitle className="text-base">
+                          New Question {formSlots.length > 1 ? `(${slotIndex + 1} of ${formSlots.length})` : ""}
+                        </CardTitle>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground shrink-0">Type</Label>
+                            <Select
+                              value={slotForm.type}
+                              onValueChange={(v: "MCQ" | "NVQ") =>
+                                updateFormSlot(slotIndex, { type: v })
+                              }
+                            >
+                              <SelectTrigger className="w-24 h-9">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="MCQ">MCQ</SelectItem>
+                                <SelectItem value="NVQ">NVQ</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Label className="text-xs text-muted-foreground shrink-0">Marks (✓)</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              className="h-9 w-16"
+                              value={slotForm.marksCorrect}
+                              onChange={(e) =>
+                                updateFormSlot(slotIndex, {
+                                  marksCorrect: parseInt(e.target.value, 10) || 0,
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Label className="text-xs text-muted-foreground shrink-0">Marks (✗)</Label>
+                            <Input
+                              type="number"
+                              min={0}
+                              className="h-9 w-16"
+                              value={slotForm.marksIncorrect}
+                              onChange={(e) =>
+                                updateFormSlot(slotIndex, {
+                                  marksIncorrect: parseInt(e.target.value, 10) || 0,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3 px-4 pb-4 pt-0">
+                        <div className="space-y-2">
+                          <Label>Question text *</Label>
+                          <textarea
+                            className={textareaClass}
+                            value={slotForm.questionText}
+                            onChange={(e) => updateFormSlot(slotIndex, { questionText: e.target.value })}
+                            placeholder="Enter the question..."
                           />
-                          Select All
-                        </label>
-                      )}
-                      {selectedIds.size > 0 && (
-                        <Button variant="destructive" size="sm" onClick={openDeleteBulk}>
-                          <Trash2 className="mr-1.5 h-4 w-4" />
-                          Delete selected ({selectedIds.size})
-                        </Button>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" title="Filter">
-                        <Filter className="h-4 w-4" />
-                      </Button>
-                      <label className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        Show:
-                        <Select
-                          value={String(showPerPage)}
-                          onValueChange={(v) => setShowPerPage(parseInt(v, 10))}
-                        >
-                          <SelectTrigger className="h-9 w-20">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[10, 20, 50].map((n) => (
-                              <SelectItem key={n} value={String(n)}>
-                                {n}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </label>
-                      <Button onClick={openAdd} size="sm">
-                        <Plus className="mr-1.5 h-4 w-4" />
-                        Add question
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Create-question panel */}
-                  {formSlots.length > 0 && (
-                    <div ref={formRef} className="space-y-3 rounded-lg border-2 border-primary/20 bg-muted/10 p-4">
-                      {formSlots.map((slotForm, slotIndex) => (
-                        <Card key={`slot-${slotIndex}`} className="border border-border">
-                          <CardHeader className="flex flex-row items-center justify-between gap-4 pb-1.5 pt-3 px-4">
-                            <CardTitle className="text-base">
-                              New Question {formSlots.length > 1 ? `(${slotIndex + 1} of ${formSlots.length})` : ""}
-                            </CardTitle>
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-2">
-                                <Label className="text-xs text-muted-foreground shrink-0">Type</Label>
-                                <Select
-                                  value={slotForm.type}
-                                  onValueChange={(v: "MCQ" | "NVQ") =>
-                                    updateFormSlot(slotIndex, { type: v })
-                                  }
-                                >
-                                  <SelectTrigger className="w-24 h-9">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="MCQ">MCQ</SelectItem>
-                                    <SelectItem value="NVQ">NVQ</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Label className="text-xs text-muted-foreground shrink-0">Marks (✓)</Label>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  className="h-9 w-16"
-                                  value={slotForm.marksCorrect}
-                                  onChange={(e) =>
-                                    updateFormSlot(slotIndex, {
-                                      marksCorrect: parseInt(e.target.value, 10) || 0,
-                                    })
-                                  }
-                                />
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Label className="text-xs text-muted-foreground shrink-0">Marks (✗)</Label>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  className="h-9 w-16"
-                                  value={slotForm.marksIncorrect}
-                                  onChange={(e) =>
-                                    updateFormSlot(slotIndex, {
-                                      marksIncorrect: parseInt(e.target.value, 10) || 0,
-                                    })
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-3 px-4 pb-4 pt-0">
-                            <div className="space-y-2">
-                              <Label>Question text *</Label>
-                              <textarea
-                                className={textareaClass}
-                                value={slotForm.questionText}
-                                onChange={(e) => updateFormSlot(slotIndex, { questionText: e.target.value })}
-                                placeholder="Enter the question..."
-                              />
-                            </div>
-                            {slotForm.type === "MCQ" && (
-                              <div className="space-y-2">
-                                <Label>Options</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {slotForm.options.map((opt, i) => (
-                                    <div key={i} className="flex items-center gap-2">
-                                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
-                                        {OPTION_LETTERS[i] ?? i + 1}
-                                      </span>
-                                      <Input
-                                        className={inputClass}
-                                        value={opt}
-                                        onChange={(e) => {
-                                          const next = [...slotForm.options];
-                                          next[i] = e.target.value;
-                                          updateFormSlot(slotIndex, { options: next });
-                                        }}
-                                        placeholder={`Option ${OPTION_LETTERS[i] ?? i + 1}`}
-                                      />
-                                      <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="icon"
-                                        className="shrink-0"
-                                        onClick={() => {
-                                          if (slotForm.options.length <= 2) return;
-                                          const next = slotForm.options.filter((_, j) => j !== i);
-                                          updateFormSlot(slotIndex, {
-                                            options: next,
-                                            correctOptionIndex: Math.min(
-                                              slotForm.correctOptionIndex,
-                                              Math.max(0, next.length - 1)
-                                            ),
-                                          });
-                                        }}
-                                        disabled={slotForm.options.length <= 2}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  ))}
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    updateFormSlot(slotIndex, {
-                                      options: [...slotForm.options, ""],
-                                    })
-                                  }
-                                >
-                                  Add option
-                                </Button>
-                                <div className="space-y-1">
-                                  <Label>Correct option</Label>
-                                  <Select
-                                    value={String(
-                                      Math.min(
-                                        slotForm.correctOptionIndex,
-                                        slotForm.options.length - 1
-                                      )
-                                    )}
-                                    onValueChange={(v) =>
+                        </div>
+                        {slotForm.type === "MCQ" && (
+                          <div className="space-y-2">
+                            <Label>Options</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {slotForm.options.map((opt, i) => (
+                                <div key={i} className="flex items-center gap-2">
+                                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
+                                    {OPTION_LETTERS[i] ?? i + 1}
+                                  </span>
+                                  <Input
+                                    className={inputClass}
+                                    value={opt}
+                                    onChange={(e) => {
+                                      const next = [...slotForm.options];
+                                      next[i] = e.target.value;
+                                      updateFormSlot(slotIndex, { options: next });
+                                    }}
+                                    placeholder={`Option ${OPTION_LETTERS[i] ?? i + 1}`}
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="shrink-0"
+                                    onClick={() => {
+                                      if (slotForm.options.length <= 2) return;
+                                      const next = slotForm.options.filter((_, j) => j !== i);
                                       updateFormSlot(slotIndex, {
-                                        correctOptionIndex: parseInt(v, 10),
-                                      })
-                                    }
+                                        options: next,
+                                        correctOptionIndex: Math.min(
+                                          slotForm.correctOptionIndex,
+                                          Math.max(0, next.length - 1)
+                                        ),
+                                      });
+                                    }}
+                                    disabled={slotForm.options.length <= 2}
                                   >
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {slotForm.options.map((_, i) => (
-                                        <SelectItem key={i} value={String(i)}>
-                                          Option {OPTION_LETTERS[i] ?? i + 1}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
                                 </div>
-                              </div>
-                            )}
-                            {slotForm.type === "NVQ" && (
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="space-y-2">
-                                  <Label>Numerical answer</Label>
-                                  <Input
-                                    value={slotForm.numericalAnswer}
-                                    onChange={(e) =>
-                                      updateFormSlot(slotIndex, { numericalAnswer: e.target.value })
-                                    }
-                                    placeholder="e.g. 42 or 3.14"
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>Tolerance</Label>
-                                  <Input
-                                    type="number"
-                                    step="any"
-                                    value={slotForm.numericalTolerance}
-                                    onChange={(e) =>
-                                      updateFormSlot(slotIndex, {
-                                        numericalTolerance: parseFloat(e.target.value) || 0,
-                                      })
-                                    }
-                                  />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>Unit (optional)</Label>
-                                  <Input
-                                    value={slotForm.numericalUnit}
-                                    onChange={(e) =>
-                                      updateFormSlot(slotIndex, { numericalUnit: e.target.value })
-                                    }
-                                    placeholder="e.g. m/s"
-                                  />
-                                </div>
-                              </div>
-                            )}
-                            <div className="space-y-2">
-                              <Label>Explanation (optional)</Label>
-                              <textarea
-                                className={textareaClass}
-                                value={slotForm.explanation}
-                                onChange={(e) =>
-                                  updateFormSlot(slotIndex, { explanation: e.target.value })
-                                }
-                                placeholder="Why this answer is correct..."
-                              />
-                              <Label className="text-xs text-muted-foreground">Explanation image URL (optional)</Label>
-                              <Input
-                                className={inputClass}
-                                value={slotForm.explanationImageUrl ?? ""}
-                                onChange={(e) =>
-                                  updateFormSlot(slotIndex, { explanationImageUrl: e.target.value })
-                                }
-                                placeholder="https://..."
-                              />
+                              ))}
                             </div>
-                            <div className="flex gap-2">
-                              <Button variant="outline" onClick={() => removeFormSlot(slotIndex)}>
-                                Remove
-                              </Button>
-                              <Button
-                                onClick={() => saveFormSlot(slotIndex)}
-                                disabled={savingSlot !== null}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                updateFormSlot(slotIndex, {
+                                  options: [...slotForm.options, ""],
+                                })
+                              }
+                            >
+                              Add option
+                            </Button>
+                            <div className="space-y-1">
+                              <Label>Correct option</Label>
+                              <Select
+                                value={String(
+                                  Math.min(
+                                    slotForm.correctOptionIndex,
+                                    slotForm.options.length - 1
+                                  )
+                                )}
+                                onValueChange={(v) =>
+                                  updateFormSlot(slotIndex, {
+                                    correctOptionIndex: parseInt(v, 10),
+                                  })
+                                }
                               >
-                                {savingSlot === slotIndex && (
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                )}
-                                Save this question
-                              </Button>
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {slotForm.options.map((_, i) => (
+                                    <SelectItem key={i} value={String(i)}>
+                                      Option {OPTION_LETTERS[i] ?? i + 1}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-2">
-                        <Button onClick={openAddMore} variant="outline" size="sm">
-                          <Plus className="mr-1.5 h-4 w-4" />
-                          Add more question
-                        </Button>
-                        <Button onClick={saveAllSlots} disabled={saving} size="sm">
-                          {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
-                          Save all ({formSlots.filter((s) => s.questionText.trim()).length})
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setFormSlots([]);
-                            setShowInlineForm(false);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Question list */}
-                  <div className="space-y-3">
-                    {displayedQuestions.length === 0 ? (
-                      <div className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-                        No questions yet. Click &quot;Add question&quot; to create one.
-                      </div>
-                    ) : (
-                      displayedQuestions.map((q) => (
-                        <Card key={q.id} className="overflow-hidden border-border">
-                          <CardContent className="p-3">
-                            <div className="flex gap-3">
-                              <div className="flex shrink-0 items-start gap-2 pt-0.5">
-                                <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-2 text-xs font-medium text-muted-foreground">
-                                  {q.orderNumber}
-                                </span>
-                                <input
-                                  type="checkbox"
-                                  checked={selectedIds.has(q.id)}
-                                  onChange={() => toggleSelectOne(q.id)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="mt-1 h-4 w-4 rounded border-input"
-                                />
-                              </div>
-                              <div className="min-w-0 flex-1 space-y-3">
-                                <div className="flex items-start justify-between gap-2">
-                                  <p className="min-w-0 flex-1 font-medium text-foreground">
-                                    {q.questionText}
-                                  </p>
-                                  <div className="flex shrink-0 items-center gap-2">
-                                    <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-950/50 dark:text-green-400">
-                                      +{q.marksCorrect ?? 4}
-                                    </span>
-                                    <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950/50 dark:text-red-400">
-                                      −{q.marksIncorrect ?? 1}
-                                    </span>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                                      onClick={() => openEdit(q)}
-                                      title="Edit"
-                                    >
-                                      <Pencil className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                      onClick={() => openDeleteSingle(q.id)}
-                                      title="Delete"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-
-                                {q.type === "MCQ" && q.options?.length > 0 && (
-                                  <div className="grid grid-cols-2 gap-2">
-                                    {q.options.map((opt, i) => {
-                                      const isCorrect = i === (q.correctOptionIndex ?? 0);
-                                      return (
-                                        <div
-                                          key={i}
-                                          className={`flex items-center gap-2 rounded-md border p-2 ${
-                                            isCorrect
-                                              ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40"
-                                              : "border-border bg-muted/30"
-                                          }`}
-                                        >
-                                          <span
-                                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
-                                              isCorrect
-                                                ? "bg-green-500 text-white"
-                                                : "bg-muted text-muted-foreground"
-                                            }`}
-                                          >
-                                            {OPTION_LETTERS[i] ?? i + 1}
-                                          </span>
-                                          <span className="min-w-0 flex-1 text-sm">{opt}</span>
-                                          {isCorrect && <Check className="h-4 w-4 shrink-0 text-green-600" />}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-
-                                {q.type === "NVQ" && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <span className="text-muted-foreground">Answer:</span>
-                                    <span className="font-medium">{q.numericalAnswer || "—"}</span>
-                                    {q.numericalUnit && (
-                                      <span className="text-muted-foreground">{q.numericalUnit}</span>
-                                    )}
-                                  </div>
-                                )}
-
-                                {((q.explanation ?? "").trim() || (q.explanationImageUrl ?? "").trim()) ? (
-                                  <div className="rounded-lg border border-border bg-muted/20 p-4">
-                                    <p className="text-xs font-medium uppercase tracking-tighter text-muted-foreground">
-                                      Explanation
-                                    </p>
-                                    {(q.explanationImageUrl ?? "").trim() ? (
-                                      <div className="mt-2">
-                                        <img
-                                          src={q.explanationImageUrl}
-                                          alt="Explanation"
-                                          className="max-h-48 rounded-md border border-border object-contain"
-                                        />
-                                      </div>
-                                    ) : null}
-                                    {(q.explanation ?? "").trim() ? (
-                                      <p className="mt-2 text-sm text-foreground">{q.explanation}</p>
-                                    ) : null}
-                                  </div>
-                                ) : null}
-                              </div>
+                          </div>
+                        )}
+                        {slotForm.type === "NVQ" && (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label>Numerical answer</Label>
+                              <Input
+                                value={slotForm.numericalAnswer}
+                                onChange={(e) =>
+                                  updateFormSlot(slotIndex, { numericalAnswer: e.target.value })
+                                }
+                                placeholder="e.g. 42 or 3.14"
+                              />
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-
-                  {questions.length > showPerPage && (
-                    <p className="text-center text-sm text-muted-foreground">
-                      Showing {displayedQuestions.length} of {questions.length} questions. Increase &quot;Show&quot; to see more.
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
-                    <Button onClick={openAdd} variant="outline" size="sm">
+                            <div className="space-y-2">
+                              <Label>Tolerance</Label>
+                              <Input
+                                type="number"
+                                step="any"
+                                value={slotForm.numericalTolerance}
+                                onChange={(e) =>
+                                  updateFormSlot(slotIndex, {
+                                    numericalTolerance: parseFloat(e.target.value) || 0,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Unit (optional)</Label>
+                              <Input
+                                value={slotForm.numericalUnit}
+                                onChange={(e) =>
+                                  updateFormSlot(slotIndex, { numericalUnit: e.target.value })
+                                }
+                                placeholder="e.g. m/s"
+                              />
+                            </div>
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          <Label>Explanation (optional)</Label>
+                          <textarea
+                            className={textareaClass}
+                            value={slotForm.explanation}
+                            onChange={(e) =>
+                              updateFormSlot(slotIndex, { explanation: e.target.value })
+                            }
+                            placeholder="Why this answer is correct..."
+                          />
+                          <Label className="text-xs text-muted-foreground">Explanation image URL (optional)</Label>
+                          <Input
+                            className={inputClass}
+                            value={slotForm.explanationImageUrl ?? ""}
+                            onChange={(e) =>
+                              updateFormSlot(slotIndex, { explanationImageUrl: e.target.value })
+                            }
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" onClick={() => removeFormSlot(slotIndex)}>
+                            Remove
+                          </Button>
+                          <Button
+                            onClick={() => saveFormSlot(slotIndex)}
+                            disabled={savingSlot !== null}
+                          >
+                            {savingSlot === slotIndex && (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Save this question
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <div className="flex flex-wrap items-center gap-2 border-t border-border pt-2">
+                    <Button onClick={openAddMore} variant="outline" size="sm">
                       <Plus className="mr-1.5 h-4 w-4" />
-                      Add question
+                      Add more question
+                    </Button>
+                    <Button onClick={saveAllSlots} disabled={saving} size="sm">
+                      {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                      Save all ({formSlots.filter((s) => s.questionText.trim()).length})
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setFormSlots([]);
+                        setShowInlineForm(false);
+                      }}
+                    >
+                      Cancel
                     </Button>
                   </div>
                 </div>
               )}
-            </>
+
+              {/* Collapsible papers */}
+              <div className="space-y-2">
+                {[...papers]
+                  .sort((a, b) => a.orderNumber - b.orderNumber)
+                  .map((paper) => {
+                    const isPaperOpen = expandedPapers.has(paper.id);
+                    const paperQuestions = paperQuestionsCache[paper.id] ?? [];
+                    const sortedPaperQuestions = [...paperQuestions].sort(
+                      (a, b) => a.orderNumber - b.orderNumber
+                    );
+                    return (
+                      <Collapsible
+                        key={paper.id}
+                        open={isPaperOpen}
+                        onOpenChange={(open) => {
+                          togglePaperExpanded(paper.id, open);
+                          if (open) ensurePaperQuestions(paper.id);
+                        }}
+                      >
+                        <Card className="overflow-hidden border-border">
+                          <CollapsibleTrigger asChild>
+                            <button
+                              type="button"
+                              className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              {isPaperOpen ? (
+                                <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+                              )}
+                              <div className="min-w-0 flex-1">
+                                <h3 className="font-semibold text-foreground">
+                                  {toTitleCase(paper.title)}
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                  {paperQuestions.length > 0
+                                    ? `${paperQuestions.length} question${paperQuestions.length !== 1 ? "s" : ""}`
+                                    : paper.totalQuestions != null
+                                      ? `${paper.totalQuestions} question${paper.totalQuestions !== 1 ? "s" : ""}`
+                                      : "—"}
+                                  {" · "}
+                                  {paper.durationMinutes ?? 0} min
+                                  {paper.totalMarks != null ? ` · ${paper.totalMarks} marks` : ""}
+                                </p>
+                              </div>
+                            </button>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="border-t border-border bg-muted/20 p-4 space-y-3">
+                              {loadingPaperId === paper.id ? (
+                                <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
+                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                  <span className="text-sm">Loading questions…</span>
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/60 bg-background px-3 py-2.5">
+                                    <div className="flex items-center gap-3">
+                                      <h4 className="text-sm font-semibold">
+                                        Questions ({sortedPaperQuestions.length})
+                                      </h4>
+                                      {sortedPaperQuestions.length > 0 && (
+                                        <>
+                                          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <input
+                                              type="checkbox"
+                                              checked={
+                                                sortedPaperQuestions.length > 0 &&
+                                                sortedPaperQuestions.every((q) => selectedIds.has(q.id))
+                                              }
+                                              onChange={() => toggleSelectAll(paper.id)}
+                                              className="h-4 w-4 rounded border-input"
+                                            />
+                                            Select all
+                                          </label>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-1 h-8"
+                                            onClick={() => {
+                                              setExpandedQuestions((prev) => {
+                                                const next = new Set(prev);
+                                                sortedPaperQuestions.forEach((q) => next.add(q.id));
+                                                return next;
+                                              });
+                                            }}
+                                            title="Expand all questions in this paper"
+                                          >
+                                            <ChevronDown className="h-3.5 w-3.5" />
+                                            Expand all
+                                          </Button>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-1 h-8"
+                                            onClick={() => {
+                                              setExpandedQuestions((prev) => {
+                                                const next = new Set(prev);
+                                                sortedPaperQuestions.forEach((q) => next.delete(q.id));
+                                                return next;
+                                              });
+                                            }}
+                                            title="Collapse all questions in this paper"
+                                          >
+                                            <ChevronRight className="h-3.5 w-3.5" />
+                                            Collapse all
+                                          </Button>
+                                        </>
+                                      )}
+                                      {selectedIds.size > 0 && sortedPaperQuestions.some((q) => selectedIds.has(q.id)) && (
+                                        <Button
+                                          variant="destructive"
+                                          size="sm"
+                                          onClick={() => openDeleteBulk(paper.id)}
+                                        >
+                                          <Trash2 className="mr-1.5 h-4 w-4" />
+                                          Delete selected ({selectedIds.size})
+                                        </Button>
+                                      )}
+                                    </div>
+                                    <Button
+                                      onClick={() => openAdd(paper.id)}
+                                      size="sm"
+                                      className="gap-1.5"
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                      Add question
+                                    </Button>
+                                  </div>
+
+                                  {sortedPaperQuestions.length === 0 ? (
+                                    <div className="rounded-lg border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
+                                      No questions yet. Click &quot;Add question&quot; to create one.
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-2">
+                                      {sortedPaperQuestions.map((q) => {
+                                        const isQuestionOpen = expandedQuestions.has(q.id);
+                                        return (
+                                          <Collapsible
+                                            key={q.id}
+                                            open={isQuestionOpen}
+                                            onOpenChange={(open) => {
+                                              setExpandedQuestions((prev) => {
+                                                const next = new Set(prev);
+                                                if (open) next.add(q.id);
+                                                else next.delete(q.id);
+                                                return next;
+                                              });
+                                            }}
+                                          >
+                                            <Card className="overflow-hidden border-border">
+                                              <CollapsibleTrigger asChild>
+                                                <button
+                                                  type="button"
+                                                  className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                                >
+                                                  {isQuestionOpen ? (
+                                                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                                  ) : (
+                                                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                                  )}
+                                                  <span className="inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-muted px-2 text-xs font-medium text-muted-foreground">
+                                                    {q.orderNumber}
+                                                  </span>
+                                                  <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+                                                    {truncate(q.questionText, 80)}
+                                                  </p>
+                                                  <span className="shrink-0 text-xs text-muted-foreground">
+                                                    {q.type}
+                                                  </span>
+                                                </button>
+                                              </CollapsibleTrigger>
+                                              <CollapsibleContent>
+                                                <CardContent className="border-t border-border p-3 pt-3">
+                                                  <div className="flex gap-3">
+                                                    <div className="flex shrink-0 items-start gap-2 pt-0.5">
+                                                      <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.has(q.id)}
+                                                        onChange={() => toggleSelectOne(q.id)}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="mt-1 h-4 w-4 rounded border-input"
+                                                      />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1 space-y-3">
+                                                      <div className="flex items-start justify-between gap-2">
+                                                        <p className="min-w-0 flex-1 font-medium text-foreground">
+                                                          {q.questionText}
+                                                        </p>
+                                                        <div className="flex shrink-0 items-center gap-2">
+                                                          <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-950/50 dark:text-green-400">
+                                                            +{q.marksCorrect ?? 4}
+                                                          </span>
+                                                          <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950/50 dark:text-red-400">
+                                                            −{q.marksIncorrect ?? 1}
+                                                          </span>
+                                                          <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              openEdit(paper.id, q);
+                                                            }}
+                                                            title="Edit"
+                                                          >
+                                                            <Pencil className="h-4 w-4" />
+                                                          </Button>
+                                                          <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                            onClick={(e) => {
+                                                              e.stopPropagation();
+                                                              openDeleteSingle(paper.id, q.id);
+                                                            }}
+                                                            title="Delete"
+                                                          >
+                                                            <Trash2 className="h-4 w-4" />
+                                                          </Button>
+                                                        </div>
+                                                      </div>
+
+                                                      {q.type === "MCQ" && q.options?.length > 0 && (
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                          {q.options.map((opt, i) => {
+                                                            const isCorrect = i === (q.correctOptionIndex ?? 0);
+                                                            return (
+                                                              <div
+                                                                key={i}
+                                                                className={`flex items-center gap-2 rounded-md border p-2 ${
+                                                                  isCorrect
+                                                                    ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40"
+                                                                    : "border-border bg-muted/30"
+                                                                }`}
+                                                              >
+                                                                <span
+                                                                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
+                                                                    isCorrect
+                                                                      ? "bg-green-500 text-white"
+                                                                      : "bg-muted text-muted-foreground"
+                                                                  }`}
+                                                                >
+                                                                  {OPTION_LETTERS[i] ?? i + 1}
+                                                                </span>
+                                                                <span className="min-w-0 flex-1 text-sm">{opt}</span>
+                                                                {isCorrect && <Check className="h-4 w-4 shrink-0 text-green-600" />}
+                                                              </div>
+                                                            );
+                                                          })}
+                                                        </div>
+                                                      )}
+
+                                                      {q.type === "NVQ" && (
+                                                        <div className="flex items-center gap-2 text-sm">
+                                                          <span className="text-muted-foreground">Answer:</span>
+                                                          <span className="font-medium">{q.numericalAnswer || "—"}</span>
+                                                          {q.numericalUnit && (
+                                                            <span className="text-muted-foreground">{q.numericalUnit}</span>
+                                                          )}
+                                                        </div>
+                                                      )}
+
+                                                      {((q.explanation ?? "").trim() || (q.explanationImageUrl ?? "").trim()) ? (
+                                                        <div className="rounded-lg border border-border bg-muted/20 p-4">
+                                                          <p className="text-xs font-medium uppercase tracking-tighter text-muted-foreground">
+                                                            Explanation
+                                                          </p>
+                                                          {(q.explanationImageUrl ?? "").trim() ? (
+                                                            <div className="mt-2">
+                                                              <img
+                                                                src={q.explanationImageUrl}
+                                                                alt="Explanation"
+                                                                className="max-h-48 rounded-md border border-border object-contain"
+                                                              />
+                                                            </div>
+                                                          ) : null}
+                                                          {(q.explanation ?? "").trim() ? (
+                                                            <p className="mt-2 text-sm text-foreground">{q.explanation}</p>
+                                                          ) : null}
+                                                        </div>
+                                                      ) : null}
+                                                    </div>
+                                                  </div>
+                                                </CardContent>
+                                              </CollapsibleContent>
+                                            </Card>
+                                          </Collapsible>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </CollapsibleContent>
+                        </Card>
+                      </Collapsible>
+                    );
+                  })}
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -1445,7 +1604,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       <Dialog
         open={deleteDialogOpen}
         onOpenChange={(open) =>
-          !open && (setDeleteDialogOpen(false), setDeleteTargetSingle(null), setDeleteTargetBulk([]))
+          !open && (setDeleteDialogOpen(false), setDeleteTargetSingle(null), setDeleteTargetBulk([]), setDeleteTargetPaperId(null))
         }
       >
         <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
