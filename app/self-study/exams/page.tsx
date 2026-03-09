@@ -6,12 +6,10 @@ import { toast } from "sonner";
 import {
   Plus,
   Search,
-  Eye,
   Edit,
   Trash2,
   GripVertical,
   Power,
-  Info,
   Check,
   Globe,
   GlobeLock,
@@ -963,27 +961,6 @@ export default function ExamsPage() {
                                 ) : (
                                   <Globe className="h-4 w-4" />
                                 )}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                title="Exam Info"
-                              >
-                                <Info className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                title="View Exam"
-                                asChild
-                              >
-                                <Link
-                                  href={`/self-study/exams/${encodeURIComponent(exam.slug)}`}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Link>
                               </Button>
                               <Button
                                 variant="ghost"

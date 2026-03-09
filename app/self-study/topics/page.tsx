@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import {
   Plus,
   Search,
-  Eye,
   Edit,
   Trash2,
   Power,
@@ -1721,19 +1720,6 @@ export default function TopicsPage() {
                                       </TableCell>
                                       <TableCell className="text-right pr-2">
                                         <div className="flex items-center justify-end gap-1">
-                                          <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                            title="View"
-                                            asChild
-                                          >
-                                            <Link
-                                              href={`/self-study/topics/${topic.id}`}
-                                            >
-                                              <Eye className="h-4 w-4" />
-                                            </Link>
-                                          </Button>
                                           <Button
                                             variant="ghost"
                                             size="sm"
