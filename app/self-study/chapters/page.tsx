@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft } from "lucide-react"
+import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft, Globe, GlobeLock, Loader2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -67,6 +67,7 @@ type Chapter = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
+  seo?: { noIndex?: boolean; noFollow?: boolean }
 }
 
 export default function ChaptersPage() {
@@ -101,6 +102,7 @@ export default function ChaptersPage() {
   const [chapterToDelete, setChapterToDelete] = React.useState<Chapter | null>(null)
 
   const [isReorderingEnabled, setIsReorderingEnabled] = React.useState(false)
+  const [publishingId, setPublishingId] = React.useState<string | null>(null)
   const [draggedChapter, setDraggedChapter] = React.useState<Chapter | null>(null)
   const [dragOverChapter, setDragOverChapter] = React.useState<Chapter | null>(null)
 
@@ -453,6 +455,25 @@ export default function ChaptersPage() {
       setChapters((prev) => prev.map((c) => (c.id === chapterId ? { ...c, status: nextStatus } : c)))
     } catch {
       toast.error("Failed to update status")
+    }
+  }
+
+  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
+    setPublishingId(id)
+    try {
+      const res = await fetch(`${CHAPTERS_API}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noIndex, noFollow }),
+      })
+      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+      const updated = (await res.json()) as Chapter
+      setChapters((prev) => prev.map((c) => (c.id === updated.id ? { ...c, seo: updated.seo ?? c.seo } : c)))
+      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+    } finally {
+      setPublishingId(null)
     }
   }
 
@@ -1271,6 +1292,33 @@ export default function ChaptersPage() {
                                           <Link href={`/self-study/chapters/${chapter.id}`}>
                                             <Eye className="h-4 w-4" />
                                           </Link>
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={`h-8 w-8 ${
+                                            !chapter.seo?.noIndex && !chapter.seo?.noFollow
+                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                                          }`}
+                                          title={
+                                            !chapter.seo?.noIndex && !chapter.seo?.noFollow
+                                              ? "Unpublish (no index, no follow)"
+                                              : "Publish (allow index & follow)"
+                                          }
+                                          disabled={publishingId === chapter.id}
+                                          onClick={() => {
+                                            const isPublished = !chapter.seo?.noIndex && !chapter.seo?.noFollow
+                                            handlePublish(chapter.id, isPublished, isPublished)
+                                          }}
+                                        >
+                                          {publishingId === chapter.id ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                          ) : !chapter.seo?.noIndex && !chapter.seo?.noFollow ? (
+                                            <GlobeLock className="h-4 w-4" />
+                                          ) : (
+                                            <Globe className="h-4 w-4" />
+                                          )}
                                         </Button>
                                         <Button
                                           variant="ghost"

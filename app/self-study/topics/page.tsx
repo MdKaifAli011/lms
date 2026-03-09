@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft } from "lucide-react"
+import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft, Globe, GlobeLock, Loader2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -75,6 +75,7 @@ type Topic = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
+  seo?: { noIndex?: boolean; noFollow?: boolean }
 }
 
 export default function TopicsPage() {
@@ -111,6 +112,7 @@ export default function TopicsPage() {
   const [topicToDelete, setTopicToDelete] = React.useState<Topic | null>(null)
 
   const [isReorderingEnabled, setIsReorderingEnabled] = React.useState(false)
+  const [publishingId, setPublishingId] = React.useState<string | null>(null)
   const [draggedTopic, setDraggedTopic] = React.useState<Topic | null>(null)
   const [dragOverTopic, setDragOverTopic] = React.useState<Topic | null>(null)
 
@@ -500,6 +502,25 @@ export default function TopicsPage() {
       setTopics((prev) => prev.map((t) => (t.id === topicId ? { ...t, status: nextStatus } : t)))
     } catch {
       toast.error("Failed to update status")
+    }
+  }
+
+  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
+    setPublishingId(id)
+    try {
+      const res = await fetch(`${TOPICS_API}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noIndex, noFollow }),
+      })
+      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+      const updated = (await res.json()) as Topic
+      setTopics((prev) => prev.map((t) => (t.id === updated.id ? { ...t, seo: updated.seo ?? t.seo } : t)))
+      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+    } finally {
+      setPublishingId(null)
     }
   }
 
@@ -1241,6 +1262,27 @@ export default function TopicsPage() {
                                       <div className="flex items-center justify-end gap-1">
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600" title="View" asChild>
                                           <Link href={`/self-study/topics/${topic.id}`}><Eye className="h-4 w-4" /></Link>
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={`h-8 w-8 ${
+                                            !topic.seo?.noIndex && !topic.seo?.noFollow
+                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                                          }`}
+                                          title={
+                                            !topic.seo?.noIndex && !topic.seo?.noFollow
+                                              ? "Unpublish (no index, no follow)"
+                                              : "Publish (allow index & follow)"
+                                          }
+                                          disabled={publishingId === topic.id}
+                                          onClick={() => {
+                                            const isPublished = !topic.seo?.noIndex && !topic.seo?.noFollow
+                                            handlePublish(topic.id, isPublished, isPublished)
+                                          }}
+                                        >
+                                          {publishingId === topic.id ? <Loader2 className="h-4 w-4 animate-spin" /> : !topic.seo?.noIndex && !topic.seo?.noFollow ? <GlobeLock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                                         </Button>
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600" title="Edit" onClick={() => openEditDialog(topic)}><Edit className="h-4 w-4" /></Button>
                                         <Button variant="ghost" size="sm" className={`h-8 w-8 transition-colors ${topic.status === "Active" ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"}`} title={topic.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(topic.id)}><Power className="h-4 w-4" /></Button>

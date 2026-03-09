@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft } from "lucide-react"
+import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft, Globe, GlobeLock, Loader2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -73,6 +73,7 @@ type Definition = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
+  seo?: { noIndex?: boolean; noFollow?: boolean }
 }
 
 function uniqueNamesPerSubTopic(names: string[], existingNames: Set<string>): string[] {
@@ -127,6 +128,7 @@ export default function DefinitionsPage() {
   const [definitionToDelete, setDefinitionToDelete] = React.useState<Definition | null>(null)
 
   const [isReorderingEnabled, setIsReorderingEnabled] = React.useState(false)
+  const [publishingId, setPublishingId] = React.useState<string | null>(null)
   const [draggedDefinition, setDraggedDefinition] = React.useState<Definition | null>(null)
   const [dragOverDefinition, setDragOverDefinition] = React.useState<Definition | null>(null)
 
@@ -432,6 +434,25 @@ export default function DefinitionsPage() {
       await fetchDefinitions()
       toast.success(`Status set to ${nextStatus}`)
     } catch { toast.error("Failed to update status") }
+  }
+
+  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
+    setPublishingId(id)
+    try {
+      const res = await fetch(`${DEFINITIONS_API}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noIndex, noFollow }),
+      })
+      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+      const updated = (await res.json()) as Definition
+      setDefinitions((prev) => prev.map((x) => (x.id === updated.id ? { ...x, seo: updated.seo ?? x.seo } : x)))
+      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+    } finally {
+      setPublishingId(null)
+    }
   }
 
   const enableReordering = () => setIsReorderingEnabled(true)
@@ -893,6 +914,27 @@ export default function DefinitionsPage() {
                                     <TableCell className="text-right pr-2">
                                       <div className="flex items-center justify-end gap-1">
                                         <Link href={`/self-study/definitions/${d.id}`}><Button variant="ghost" size="sm" className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600" title="View"><Eye className="h-4 w-4" /></Button></Link>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={`h-8 w-8 ${
+                                            !d.seo?.noIndex && !d.seo?.noFollow
+                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                                          }`}
+                                          title={
+                                            !d.seo?.noIndex && !d.seo?.noFollow
+                                              ? "Unpublish (no index, no follow)"
+                                              : "Publish (allow index & follow)"
+                                          }
+                                          disabled={publishingId === d.id}
+                                          onClick={() => {
+                                            const isPublished = !d.seo?.noIndex && !d.seo?.noFollow
+                                            handlePublish(d.id, isPublished, isPublished)
+                                          }}
+                                        >
+                                          {publishingId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : !d.seo?.noIndex && !d.seo?.noFollow ? <GlobeLock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
+                                        </Button>
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600" title="Edit" onClick={() => openEditDialog(d)}><Edit className="h-4 w-4" /></Button>
                                         <Button variant="ghost" size="sm" className={`h-8 w-8 ${d.status === "Active" ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"}`} title={d.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(d.id)}><Power className="h-4 w-4" /></Button>
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600" title="Delete" onClick={() => handleDeleteDefinition(d)}><Trash2 className="h-4 w-4" /></Button>

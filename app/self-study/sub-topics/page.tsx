@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft } from "lucide-react"
+import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft, Globe, GlobeLock, Loader2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -71,6 +71,7 @@ type SubTopic = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
+  seo?: { noIndex?: boolean; noFollow?: boolean }
 }
 
 export default function SubTopicsPage() {
@@ -110,6 +111,7 @@ export default function SubTopicsPage() {
   const [subTopicToDelete, setSubTopicToDelete] = React.useState<SubTopic | null>(null)
 
   const [isReorderingEnabled, setIsReorderingEnabled] = React.useState(false)
+  const [publishingId, setPublishingId] = React.useState<string | null>(null)
   const [draggedSubTopic, setDraggedSubTopic] = React.useState<SubTopic | null>(null)
   const [dragOverSubTopic, setDragOverSubTopic] = React.useState<SubTopic | null>(null)
 
@@ -451,6 +453,25 @@ export default function SubTopicsPage() {
       setSubTopics((prev) => prev.map((s) => (s.id === id ? { ...s, status: nextStatus } : s)))
     } catch {
       toast.error("Failed to update status")
+    }
+  }
+
+  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
+    setPublishingId(id)
+    try {
+      const res = await fetch(`${SUBTOPICS_API}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noIndex, noFollow }),
+      })
+      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+      const updated = (await res.json()) as SubTopic
+      setSubTopics((prev) => prev.map((s) => (s.id === updated.id ? { ...s, seo: updated.seo ?? s.seo } : s)))
+      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+    } finally {
+      setPublishingId(null)
     }
   }
 
@@ -915,6 +936,27 @@ export default function SubTopicsPage() {
                                       <div className="flex items-center justify-end gap-1">
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-green-500 hover:bg-green-50 hover:text-green-600" title="View" asChild>
                                           <Link href={`/self-study/sub-topics/${st.id}`}><Eye className="h-4 w-4" /></Link>
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={`h-8 w-8 ${
+                                            !st.seo?.noIndex && !st.seo?.noFollow
+                                              ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                                              : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                                          }`}
+                                          title={
+                                            !st.seo?.noIndex && !st.seo?.noFollow
+                                              ? "Unpublish (no index, no follow)"
+                                              : "Publish (allow index & follow)"
+                                          }
+                                          disabled={publishingId === st.id}
+                                          onClick={() => {
+                                            const isPublished = !st.seo?.noIndex && !st.seo?.noFollow
+                                            handlePublish(st.id, isPublished, isPublished)
+                                          }}
+                                        >
+                                          {publishingId === st.id ? <Loader2 className="h-4 w-4 animate-spin" /> : !st.seo?.noIndex && !st.seo?.noFollow ? <GlobeLock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
                                         </Button>
                                         <Button variant="ghost" size="sm" className="h-8 w-8 text-amber-500 hover:bg-amber-50 hover:text-amber-600" title="Edit" onClick={() => openEditDialog(st)}><Edit className="h-4 w-4" /></Button>
                                         <Button variant="ghost" size="sm" className={`h-8 w-8 ${st.status === "Active" ? "text-orange-500 hover:bg-orange-50 hover:text-orange-600" : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"}`} title={st.status === "Active" ? "Turn Off" : "Turn On"} onClick={() => handleToggleStatus(st.id)}><Power className="h-4 w-4" /></Button>

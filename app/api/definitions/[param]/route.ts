@@ -88,6 +88,29 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ param: string }> }) {
+  try {
+    const { param } = await params
+    if (!param || !isMongoId(param)) return NextResponse.json({ error: "Valid definition id is required" }, { status: 400 })
+    await connectDB()
+    const body = await request.json()
+    const noIndex = body.noIndex === true
+    const noFollow = body.noFollow === true
+    const existing = await Definition.findById(param).lean()
+    if (!existing) return NextResponse.json({ error: "Definition not found" }, { status: 404 })
+    await Definition.collection.updateOne(
+      { _id: new ObjectId(param) },
+      { $set: { "seo.noIndex": noIndex, "seo.noFollow": noFollow, updatedAt: new Date() } }
+    )
+    const updated = await Definition.findById(param).lean()
+    if (!updated) return NextResponse.json({ error: "Definition not found" }, { status: 404 })
+    return NextResponse.json(toDefinitionJson(updated as Record<string, unknown>))
+  } catch (err) {
+    console.error("PATCH /api/definitions/[param] error:", err)
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Failed to update" }, { status: 500 })
+  }
+}
+
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ param: string }> }) {
   try {
     const { param } = await params

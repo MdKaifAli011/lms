@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
             minute: "2-digit",
           })
         : undefined,
+      seo: doc.seo ?? {},
     }))
     return NextResponse.json(list, { headers: corsHeaders })
   } catch (err) {

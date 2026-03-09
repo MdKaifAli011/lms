@@ -163,6 +163,42 @@ export async function PUT(
   }
 }
 
+/** PATCH /api/subjects/[param] – update only publish (seo.noIndex, seo.noFollow) */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ param: string }> }
+) {
+  try {
+    const { param } = await params
+    if (!param || !isMongoId(param)) {
+      return NextResponse.json({ error: "Valid subject id is required" }, { status: 400 })
+    }
+    await connectDB()
+    const body = await request.json()
+    const noIndex = body.noIndex === true
+    const noFollow = body.noFollow === true
+    const existing = await Subject.findById(param).lean()
+    if (!existing) {
+      return NextResponse.json({ error: "Subject not found" }, { status: 404 })
+    }
+    await Subject.collection.updateOne(
+      { _id: new ObjectId(param) },
+      { $set: { "seo.noIndex": noIndex, "seo.noFollow": noFollow, updatedAt: new Date() } }
+    )
+    const updated = await Subject.findById(param).lean()
+    if (!updated) {
+      return NextResponse.json({ error: "Subject not found" }, { status: 404 })
+    }
+    return NextResponse.json(toSubjectJson(updated as Record<string, unknown>))
+  } catch (err) {
+    console.error("PATCH /api/subjects/[param] error:", err)
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to update" },
+      { status: 500 }
+    )
+  }
+}
+
 /** DELETE /api/subjects/[param] – delete subject; param must be MongoDB _id. Cascades: deletes all units for this subject. */
 export async function DELETE(
   _request: NextRequest,

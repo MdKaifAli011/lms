@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft } from "lucide-react"
+import { Plus, Search, Eye, Edit, Trash2, Power, Check, GripVertical, ArrowLeft, Globe, GlobeLock, Loader2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -65,6 +65,7 @@ type Unit = {
   uniqueVisits: number
   today: number
   status: "Active" | "Inactive"
+  seo?: { noIndex?: boolean; noFollow?: boolean }
 }
 
 export default function UnitsPage() {
@@ -96,6 +97,7 @@ export default function UnitsPage() {
   const [unitToDelete, setUnitToDelete] = React.useState<Unit | null>(null)
 
   const [isReorderingEnabled, setIsReorderingEnabled] = React.useState(false)
+  const [publishingId, setPublishingId] = React.useState<string | null>(null)
   const [draggedUnit, setDraggedUnit] = React.useState<Unit | null>(null)
   const [dragOverUnit, setDragOverUnit] = React.useState<Unit | null>(null)
 
@@ -409,6 +411,25 @@ export default function UnitsPage() {
       setUnits((prev) => prev.map((u) => (u.id === id ? { ...u, status: nextStatus } : u)))
     } catch {
       toast.error("Failed to update status")
+    }
+  }
+
+  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
+    setPublishingId(id)
+    try {
+      const res = await fetch(`${UNITS_API}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noIndex, noFollow }),
+      })
+      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+      const updated = (await res.json()) as Unit
+      setUnits((prev) => prev.map((u) => (u.id === updated.id ? { ...u, seo: updated.seo ?? u.seo } : u)))
+      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+    } finally {
+      setPublishingId(null)
     }
   }
 
@@ -1163,6 +1184,33 @@ export default function UnitsPage() {
                                       <Link href={`/self-study/units/${unit.id}`}>
                                         <Eye className="h-4 w-4" />
                                       </Link>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`h-8 w-8 ${
+                                        !unit.seo?.noIndex && !unit.seo?.noFollow
+                                          ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                                          : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                                      }`}
+                                      title={
+                                        !unit.seo?.noIndex && !unit.seo?.noFollow
+                                          ? "Unpublish (no index, no follow)"
+                                          : "Publish (allow index & follow)"
+                                      }
+                                      disabled={publishingId === unit.id}
+                                      onClick={() => {
+                                        const isPublished = !unit.seo?.noIndex && !unit.seo?.noFollow
+                                        handlePublish(unit.id, isPublished, isPublished)
+                                      }}
+                                    >
+                                      {publishingId === unit.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : !unit.seo?.noIndex && !unit.seo?.noFollow ? (
+                                        <GlobeLock className="h-4 w-4" />
+                                      ) : (
+                                        <Globe className="h-4 w-4" />
+                                      )}
                                     </Button>
                                     <Button
                                       variant="ghost"

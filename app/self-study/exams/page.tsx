@@ -13,6 +13,9 @@ import {
   Power,
   Info,
   Check,
+  Globe,
+  GlobeLock,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +82,7 @@ interface Exam {
   orderNumber?: number;
   lastModified?: string;
   createdAt?: string;
+  seo?: { noIndex?: boolean; noFollow?: boolean };
 }
 
 export default function ExamsPage() {
@@ -98,6 +102,7 @@ export default function ExamsPage() {
   const [draggedExam, setDraggedExam] = React.useState<Exam | null>(null);
   const [dragOverExam, setDragOverExam] = React.useState<Exam | null>(null);
   const [isReorderingEnabled, setIsReorderingEnabled] = React.useState(false);
+  const [publishingId, setPublishingId] = React.useState<string | null>(null);
   const [newExam, setNewExam] = React.useState({
     name: "",
     status: "Active" as "Active" | "Inactive",
@@ -373,6 +378,25 @@ export default function ExamsPage() {
       toast.error(msg);
     }
   };
+
+  const handlePublish = async (id: string, noIndex: boolean, noFollow: boolean) => {
+    setPublishingId(id)
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ noIndex, noFollow }),
+      })
+      if (!res.ok) throw new Error(await res.text().catch(() => res.statusText))
+      const updated = (await res.json()) as Exam
+      setExams((prev) => prev.map((e) => (e.id === updated.id ? { ...e, seo: updated.seo ?? e.seo } : e)))
+      toast.success(noIndex ? "Unpublished (no index, no follow)" : "Published (allow index & follow)")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update publish status")
+    } finally {
+      setPublishingId(null)
+    }
+  }
 
   const enableReordering = () => {
     setIsReorderingEnabled(true);
@@ -868,6 +892,33 @@ export default function ExamsPage() {
                           </TableCell>
                           <TableCell className="text-right py-4 pr-2">
                             <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`h-8 w-8 ${
+                                  !exam.seo?.noIndex && !exam.seo?.noFollow
+                                    ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                                    : "text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                                }`}
+                                title={
+                                  !exam.seo?.noIndex && !exam.seo?.noFollow
+                                    ? "Unpublish (no index, no follow)"
+                                    : "Publish (allow index & follow)"
+                                }
+                                disabled={publishingId === exam.id}
+                                onClick={() => {
+                                  const isPublished = !exam.seo?.noIndex && !exam.seo?.noFollow
+                                  handlePublish(exam.id, isPublished, isPublished)
+                                }}
+                              >
+                                {publishingId === exam.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : !exam.seo?.noIndex && !exam.seo?.noFollow ? (
+                                  <GlobeLock className="h-4 w-4" />
+                                ) : (
+                                  <Globe className="h-4 w-4" />
+                                )}
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"

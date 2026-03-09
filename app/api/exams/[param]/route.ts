@@ -175,6 +175,48 @@ export async function PUT(
   }
 }
 
+/** PATCH /api/exams/[param] – update only publish (seo.noIndex, seo.noFollow); param must be MongoDB _id */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ param: string }> }
+) {
+  try {
+    const { param } = await params
+    if (!param || !isMongoId(param)) {
+      return NextResponse.json({ error: "Valid exam id is required" }, { status: 400 })
+    }
+    await connectDB()
+    const body = await request.json()
+    const noIndex = body.noIndex === true
+    const noFollow = body.noFollow === true
+    const existing = await Exam.findById(param).lean()
+    if (!existing) {
+      return NextResponse.json({ error: "Exam not found" }, { status: 404 })
+    }
+    await Exam.collection.updateOne(
+      { _id: new ObjectId(param) },
+      {
+        $set: {
+          "seo.noIndex": noIndex,
+          "seo.noFollow": noFollow,
+          updatedAt: new Date(),
+        },
+      }
+    )
+    const updated = await Exam.findById(param).lean()
+    if (!updated) {
+      return NextResponse.json({ error: "Exam not found" }, { status: 404 })
+    }
+    return NextResponse.json(toExamJson(updated as Parameters<typeof toExamJson>[0]))
+  } catch (err) {
+    console.error("PATCH /api/exams/[param] error:", err)
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to update" },
+      { status: 500 }
+    )
+  }
+}
+
 /** DELETE /api/exams/[param] – delete exam (and cascade delete all its subjects); param must be MongoDB _id */
 export async function DELETE(
   _request: NextRequest,

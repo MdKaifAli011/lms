@@ -88,6 +88,29 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ param: string }> }) {
+  try {
+    const { param } = await params
+    if (!param || !isMongoId(param)) return NextResponse.json({ error: "Valid unit id is required" }, { status: 400 })
+    await connectDB()
+    const body = await request.json()
+    const noIndex = body.noIndex === true
+    const noFollow = body.noFollow === true
+    const existing = await Unit.findById(param).lean()
+    if (!existing) return NextResponse.json({ error: "Unit not found" }, { status: 404 })
+    await Unit.collection.updateOne(
+      { _id: new ObjectId(param) },
+      { $set: { "seo.noIndex": noIndex, "seo.noFollow": noFollow, updatedAt: new Date() } }
+    )
+    const updated = await Unit.findById(param).lean()
+    if (!updated) return NextResponse.json({ error: "Unit not found" }, { status: 404 })
+    return NextResponse.json(toUnitJson(updated as Record<string, unknown>))
+  } catch (err) {
+    console.error("PATCH /api/units/[param] error:", err)
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Failed to update" }, { status: 500 })
+  }
+}
+
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ param: string }> }) {
   try {
     const { param } = await params
