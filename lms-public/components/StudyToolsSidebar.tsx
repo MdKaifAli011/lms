@@ -161,10 +161,10 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                   key={index}
                   href={toolHref}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors rounded-lg mx-0.5",
+                    "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors duration-200 ease-out rounded-lg mx-0.5",
                     isActive
-                      ? "bg-blue-700 text-white dark:bg-blue-800 dark:text-white shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90"
+                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                   )}
                   aria-label={tool.label}
                   aria-current={isActive ? "page" : undefined}
@@ -183,10 +183,10 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                 type="button"
                 onClick={tool.onClick}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors rounded-lg mx-0.5",
+                  "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors duration-200 ease-out rounded-lg mx-0.5",
                   notesActive
-                    ? "bg-blue-700 text-white dark:bg-blue-800 dark:text-white shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90"
+                    : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                 )}
                 aria-label={tool.label}
                 aria-current={notesActive ? "page" : undefined}
@@ -240,11 +240,11 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                     key={index}
                     variant="ghost"
                     className={cn(
-                      "w-full justify-start gap-3 h-auto py-2.5 px-2 transition-colors",
+                      "w-full justify-start gap-3 h-auto py-2.5 px-2 rounded-lg transition-colors duration-200 ease-out",
                       !isExpanded && "justify-center px-0",
                       isActive
-                        ? "bg-blue-700 hover:bg-blue-800 text-white dark:bg-blue-800 dark:hover:bg-blue-700 dark:text-white"
-                        : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 dark:hover:text-primary-foreground"
+                        : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                     )}
                     title={!isExpanded ? tool.label : undefined}
                     asChild
@@ -261,11 +261,11 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                   key={index}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 h-auto py-2.5 px-2 transition-colors",
+                    "w-full justify-start gap-3 h-auto py-2.5 px-2 rounded-lg transition-colors duration-200 ease-out",
                     !isExpanded && "justify-center px-0",
                     tool.label === "Take Notes" && isNotesDefaultActive
-                      ? "bg-blue-700 hover:bg-blue-800 text-white dark:bg-blue-800 dark:hover:bg-blue-700 dark:text-white"
-                      : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 dark:hover:text-primary-foreground"
+                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                   )}
                   onClick={(tool as { onClick?: () => void }).onClick}
                   title={!isExpanded ? tool.label : undefined}
@@ -289,7 +289,7 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                     <Button
                       key={index}
                       variant="ghost"
-                      className="w-full justify-start gap-3 h-auto py-2.5 px-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                      className="w-full justify-start gap-3 h-auto py-2.5 px-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary transition-colors duration-200 ease-out"
                       onClick={action.onClick}
                     >
                       <Icon className="h-5 w-5 shrink-0" />
