@@ -7,9 +7,12 @@
  */
 
 import type {ExcalidrawInitialElements} from '../../ui/ExcalidrawModal';
-import type {AppState, BinaryFiles} from '@excalidraw/excalidraw/types';
 import type {NodeKey} from 'lexical';
 import type {JSX} from 'react';
+
+/** Local types when @excalidraw/excalidraw/types is not available */
+type AppState = Record<string, unknown>;
+type BinaryFiles = Record<string, unknown>;
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {useLexicalEditable} from '@lexical/react/useLexicalEditable';

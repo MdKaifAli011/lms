@@ -6,16 +6,17 @@
  *
  */
 
-import type {
-  ExcalidrawElement,
-  NonDeleted,
-} from '@excalidraw/excalidraw/element/types';
-import type {AppState, BinaryFiles} from '@excalidraw/excalidraw/types';
 import type {JSX} from 'react';
 
 import {exportToSvg} from '@excalidraw/excalidraw';
 import * as React from 'react';
 import {useEffect, useState} from 'react';
+
+/** Local types when @excalidraw/excalidraw types are not available */
+type AppState = Record<string, unknown>;
+type BinaryFiles = Record<string, unknown>;
+type ExcalidrawElement = Record<string, unknown>;
+type NonDeleted<T> = T;
 
 type ImageType = 'svg' | 'canvas';
 
@@ -100,7 +101,7 @@ export default function ExcalidrawImage({
         appState,
         elements,
         files,
-      });
+      } as unknown as Parameters<typeof exportToSvg>[0]);
       removeStyleFromSvg_HACK(svg);
 
       svg.setAttribute('width', '100%');

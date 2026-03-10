@@ -94,37 +94,40 @@ levelWisePracticeSchema.index({ level: 1, orderNumber: 1 });
 levelWisePracticeSchema.index({ examId: 1, level: 1, orderNumber: 1 });
 
 /** Never store null for hierarchy fields above level; remove keys so DB does not persist them */
+/** Never store null for hierarchy fields above level; remove keys so DB does not persist them */
 levelWisePracticeSchema.pre("save", function (next) {
   const level = this.level as number;
+  // Double cast required: Mongoose Document type is not assignable to Record<string, unknown>
+  const doc = this as unknown as Record<string, unknown>;
   if (level < 2) {
-    delete (this as Record<string, unknown>).subjectId;
-    delete (this as Record<string, unknown>).unitId;
-    delete (this as Record<string, unknown>).chapterId;
-    delete (this as Record<string, unknown>).topicId;
-    delete (this as Record<string, unknown>).subtopicId;
-    delete (this as Record<string, unknown>).definitionId;
+    delete doc.subjectId;
+    delete doc.unitId;
+    delete doc.chapterId;
+    delete doc.topicId;
+    delete doc.subtopicId;
+    delete doc.definitionId;
   } else if (level < 3) {
-    delete (this as Record<string, unknown>).unitId;
-    delete (this as Record<string, unknown>).chapterId;
-    delete (this as Record<string, unknown>).topicId;
-    delete (this as Record<string, unknown>).subtopicId;
-    delete (this as Record<string, unknown>).definitionId;
+    delete doc.unitId;
+    delete doc.chapterId;
+    delete doc.topicId;
+    delete doc.subtopicId;
+    delete doc.definitionId;
   } else if (level < 4) {
-    delete (this as Record<string, unknown>).chapterId;
-    delete (this as Record<string, unknown>).topicId;
-    delete (this as Record<string, unknown>).subtopicId;
-    delete (this as Record<string, unknown>).definitionId;
+    delete doc.chapterId;
+    delete doc.topicId;
+    delete doc.subtopicId;
+    delete doc.definitionId;
   } else if (level < 5) {
-    delete (this as Record<string, unknown>).topicId;
-    delete (this as Record<string, unknown>).subtopicId;
-    delete (this as Record<string, unknown>).definitionId;
+    delete doc.topicId;
+    delete doc.subtopicId;
+    delete doc.definitionId;
   } else if (level < 6) {
-    delete (this as Record<string, unknown>).subtopicId;
-    delete (this as Record<string, unknown>).definitionId;
+    delete doc.subtopicId;
+    delete doc.definitionId;
   } else if (level < 7) {
-    delete (this as Record<string, unknown>).definitionId;
+    delete doc.definitionId;
   }
-  next();
+  (next as (err?: Error) => void)();
 });
 
 const LevelWisePractice =

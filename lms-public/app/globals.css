@@ -543,6 +543,75 @@
   font-style: italic;
 }
 
+/* One row 2 col / 3 col – responsive image grid with border/grid feel */
+.lexical-content .lexical-image-row {
+  display: grid;
+  gap: 0;
+  margin: 1rem 0;
+  min-width: 0;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: hsl(var(--muted) / 0.3);
+}
+
+.lexical-content .lexical-image-row-2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.lexical-content .lexical-image-row-2col>* {
+  border-right: 1px solid hsl(var(--border));
+  padding: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lexical-content .lexical-image-row-2col>*:last-child {
+  border-right: none;
+}
+
+.lexical-content .lexical-image-row-3col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.lexical-content .lexical-image-row-3col>* {
+  border-right: 1px solid hsl(var(--border));
+  padding: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lexical-content .lexical-image-row-3col>*:nth-child(3n) {
+  border-right: none;
+}
+
+.lexical-content .lexical-image-row img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.25rem;
+}
+
+@media (max-width: 768px) {
+
+  .lexical-content .lexical-image-row-2col,
+  .lexical-content .lexical-image-row-3col {
+    grid-template-columns: 1fr;
+  }
+
+  .lexical-content .lexical-image-row-2col>*,
+  .lexical-content .lexical-image-row-3col>* {
+    border-right: none;
+    border-bottom: 1px solid hsl(var(--border));
+    padding: 0.25rem;
+  }
+
+  .lexical-content .lexical-image-row-2col>*:last-child,
+  .lexical-content .lexical-image-row-3col>*:last-child {
+    border-bottom: none;
+  }
+}
+
 .lexical-content hr {
   margin: 1.5rem 0;
   border: 0;

@@ -60,6 +60,7 @@ import MentionsPlugin from '../plugins/MentionsPlugin';
 import TreeViewPlugin from '../plugins/TreeViewPlugin';
 import ContentEditable from '../ui/ContentEditable';
 import ImageResizer from '../ui/ImageResizer';
+import ImagePropertiesModal from '../ui/ImagePropertiesModal';
 import {$isCaptionEditorEmpty, $isImageNode} from './ImageNode';
 
 type ImageStatus =
@@ -252,6 +253,7 @@ export default function ImageComponent({
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
   const [isResizing, setIsResizing] = useState<boolean>(false);
+  const [showImagePropertiesModal, setShowImagePropertiesModal] = useState<boolean>(false);
   const {isCollabActive} = useCollaborationContext();
   const [editor] = useLexicalComposerContext();
   const activeEditorRef = useRef<LexicalEditor | null>(null);
@@ -450,6 +452,20 @@ export default function ImageComponent({
     setIsResizing(true);
   };
 
+  const handleSaveImageProperties = useCallback(
+    (props: { altText: string; width: 'inherit' | number; height: 'inherit' | number }) => {
+      editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if ($isImageNode(node)) {
+          node.setAltText(props.altText);
+          node.setWidthAndHeight(props.width, props.height);
+        }
+      });
+      setShowImagePropertiesModal(false);
+    },
+    [editor, nodeKey],
+  );
+
   const {historyState} = useSharedHistoryContext();
   const {
     settings: {showNestedEditorTreeView},
@@ -457,10 +473,17 @@ export default function ImageComponent({
 
   const draggable = isInNodeSelection && !isResizing;
   const isFocused = (isSelected || isResizing) && isEditable;
+  const onDoubleClickImage = useCallback(
+    () => {
+      if (isEditable) setShowImagePropertiesModal(true);
+    },
+    [isEditable],
+  );
+
   return (
     <Suspense fallback={null}>
       <>
-        <div draggable={draggable}>
+        <div draggable={draggable} onDoubleClick={onDoubleClickImage}>
           {isLoadError ? (
             <BrokenImage />
           ) : (
@@ -524,6 +547,15 @@ export default function ImageComponent({
             onResizeStart={onResizeStart}
             onResizeEnd={onResizeEnd}
             captionsEnabled={!isLoadError && captionsEnabled}
+          />
+        )}
+        {showImagePropertiesModal && (
+          <ImagePropertiesModal
+            initialAltText={altText}
+            initialWidth={width}
+            initialHeight={height}
+            onClose={() => setShowImagePropertiesModal(false)}
+            onSave={handleSaveImageProperties}
           />
         )}
       </>

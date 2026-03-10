@@ -6,15 +6,15 @@
  *
  */
 
-import type {
-  AppState,
-  BinaryFiles,
-  ExcalidrawImperativeAPI,
-  ExcalidrawInitialDataState,
-} from '@excalidraw/excalidraw/types';
-import type {JSX} from 'react';
-
 import './ExcalidrawModal.css';
+
+/** Local types when @excalidraw/excalidraw types are not available */
+type AppState = Record<string, unknown>;
+type BinaryFiles = Record<string, unknown>;
+interface ExcalidrawImperativeAPI {
+  getAppState(): AppState;
+}
+type ExcalidrawInitialDataState = { elements: unknown[] };
 
 import {Excalidraw} from '@excalidraw/excalidraw';
 import {isDOMNode} from 'lexical';
@@ -132,7 +132,7 @@ export default function ExcalidrawModal({
   }, [elements, files, onDelete]);
 
   const save = () => {
-    if (elements?.some((el) => !el.isDeleted)) {
+    if (elements?.some((el) => !(el as { isDeleted?: boolean }).isDeleted)) {
       const appState = excalidrawAPI?.getAppState();
       // We only need a subset of the state
       const partialState: Partial<AppState> = {
@@ -159,34 +159,6 @@ export default function ExcalidrawModal({
     setDiscardModalOpen(true);
   };
 
-  function ShowDiscardDialog(): JSX.Element {
-    return (
-      <Modal
-        title="Discard"
-        onClose={() => {
-          setDiscardModalOpen(false);
-        }}
-        closeOnClickOutside={false}>
-        Are you sure you want to discard the changes?
-        <div className="ExcalidrawModal__discardModal">
-          <Button
-            onClick={() => {
-              setDiscardModalOpen(false);
-              onClose();
-            }}>
-            Discard
-          </Button>{' '}
-          <Button
-            onClick={() => {
-              setDiscardModalOpen(false);
-            }}>
-            Cancel
-          </Button>
-        </div>
-      </Modal>
-    );
-  }
-
   if (isShown === false) {
     return null;
   }
@@ -196,7 +168,7 @@ export default function ExcalidrawModal({
     _: AppState,
     fls: BinaryFiles,
   ) => {
-    setElements(els);
+    setElements(Array.isArray(els) ? [...els] : []);
     setFiles(fls);
   };
 
@@ -207,15 +179,38 @@ export default function ExcalidrawModal({
         ref={excaliDrawModelRef}
         tabIndex={-1}>
         <div className="ExcalidrawModal__row">
-          {discardModalOpen && <ShowDiscardDialog />}
+          {discardModalOpen && (
+            <Modal
+              title="Discard"
+              onClose={() => setDiscardModalOpen(false)}
+              closeOnClickOutside={false}>
+              Are you sure you want to discard the changes?
+              <div className="ExcalidrawModal__discardModal">
+                <Button
+                  onClick={() => {
+                    setDiscardModalOpen(false);
+                    onClose();
+                  }}>
+                  Discard
+                </Button>{' '}
+                <Button
+                  onClick={() => setDiscardModalOpen(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </Modal>
+          )}
           <Excalidraw
-            onChange={onChange}
-            excalidrawAPI={setExcalidrawAPI}
-            initialData={{
-              appState: initialAppState || {isLoading: false},
-              elements: initialElements,
-              files: initialFiles,
-            }}
+            {...({
+              onChange: onChange as unknown as React.ComponentProps<typeof Excalidraw>['onChange'],
+              excalidrawAPI: (api: unknown) =>
+                setExcalidrawAPI(api as ExcalidrawImperativeAPI),
+              initialData: {
+                appState: initialAppState || {isLoading: false},
+                elements: initialElements,
+                files: initialFiles,
+              },
+            } as any)}
           />
           <div className="ExcalidrawModal__actions">
             <button className="action-button" onClick={discard}>

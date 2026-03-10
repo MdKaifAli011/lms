@@ -219,21 +219,23 @@ export default function LevelWiseQuestionsPage() {
   };
 
   const openEdit = (q: Question) => {
+    const options: string[] =
+      q.type === "MCQ" && q.options?.length
+        ? q.options.length >= 4
+          ? q.options.map(String)
+          : [...q.options.map(String), ...Array(4 - q.options.length).fill("")].slice(0, 4)
+        : ["", "", "", ""];
     setForm({
       questionText: q.questionText,
       type: q.type,
-      options:
-        q.type === "MCQ" && q.options?.length
-          ? q.options.length >= 4
-            ? q.options
-            : [...q.options, ...Array(4 - q.options.length).fill("")].slice(0, 4)
-          : ["", "", "", ""],
+      options,
       correctOptionIndex: q.correctOptionIndex ?? 0,
       numericalAnswer: q.numericalAnswer ?? "",
       numericalTolerance: q.numericalTolerance ?? 0,
       numericalUnit: q.numericalUnit ?? "",
       marksCorrect: q.marksCorrect ?? 4,
       marksIncorrect: q.marksIncorrect ?? 1,
+      orderNumber: q.orderNumber ?? 0,
       explanation: q.explanation ?? "",
       explanationImageUrl: q.explanationImageUrl ?? "",
     });

@@ -25,7 +25,6 @@ import {AutocompleteNode} from './AutocompleteNode';
 import {DateTimeNode} from './DateTimeNode/DateTimeNode';
 import {EmojiNode} from './EmojiNode';
 import {EquationNode} from './EquationNode';
-import {ExcalidrawNode} from './ExcalidrawNode';
 import {FigmaNode} from './FigmaNode';
 import {ImageNode} from './ImageNode';
 import {KeywordNode} from './KeywordNode';
@@ -36,6 +35,7 @@ import {PageBreakNode} from './PageBreakNode';
 import {PollNode} from './PollNode';
 import {SpecialTextNode} from './SpecialTextNode';
 import {StickyNode} from './StickyNode';
+import {ImageRowNode} from './ImageRowNode';
 import {TweetNode} from './TweetNode';
 import {YouTubeNode} from './YouTubeNode';
 
@@ -55,10 +55,10 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   OverflowNode,
   PollNode,
   StickyNode,
+  ImageRowNode,
   ImageNode,
   MentionNode,
   EmojiNode,
-  ExcalidrawNode,
   EquationNode,
   AutocompleteNode,
   KeywordNode,

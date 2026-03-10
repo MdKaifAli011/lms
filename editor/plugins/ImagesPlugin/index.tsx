@@ -51,6 +51,11 @@ import {
   ImageNode,
   ImagePayload,
 } from '../../nodes/ImageNode';
+import {
+  $createImageRowNode,
+  ImageRowNode,
+  type ImageRowColumnCount,
+} from '../../nodes/ImageRowNode';
 import Button from '../../ui/Button';
 import {DialogActions, DialogButtonsList} from '../../ui/Dialog';
 import FileInput from '../../ui/FileInput';
@@ -58,8 +63,16 @@ import TextInput from '../../ui/TextInput';
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 
+export type InsertImageRowPayload = Readonly<{
+  columnCount: ImageRowColumnCount;
+  payloads: ReadonlyArray<InsertImagePayload>;
+}>;
+
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> =
   createCommand('INSERT_IMAGE_COMMAND');
+
+export const INSERT_IMAGE_ROW_COMMAND: LexicalCommand<InsertImageRowPayload> =
+  createCommand('INSERT_IMAGE_ROW_COMMAND');
 
 export function InsertImageUriDialogBody({
   onClick,
@@ -149,6 +162,73 @@ export function InsertImageUploadedDialogBody({
   );
 }
 
+export function InsertImageRowDialogBody({
+  columnCount,
+  onClick,
+  onBack,
+}: {
+  columnCount: ImageRowColumnCount;
+  onClick: (payload: InsertImageRowPayload) => void;
+  onBack: () => void;
+}) {
+  const count = columnCount;
+  const [payloads, setPayloads] = useState<Array<{ src: string; altText: string }>>(
+    () => Array.from({ length: count }, () => ({ src: '', altText: '' })),
+  );
+
+  const updateSlot = (index: number, field: 'src' | 'altText', value: string) => {
+    setPayloads((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const allHaveSrc = payloads.every((p) => p.src.trim() !== '');
+  const imagePayloads: InsertImagePayload[] = payloads.map((p) => ({
+    src: p.src.trim(),
+    altText: p.altText.trim() || 'Image',
+  }));
+
+  return (
+    <>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+        Add {count} images in one responsive row.
+      </p>
+      {payloads.map((_, index) => (
+        <div key={index} className="mb-4 space-y-2">
+          <span className="text-xs font-medium text-gray-500">Image {index + 1}</span>
+          <TextInput
+            label=""
+            placeholder={`Image ${index + 1} URL`}
+            onChange={(v) => updateSlot(index, 'src', v)}
+            value={payloads[index].src}
+            data-test-id={`image-row-${index}-url`}
+          />
+          <TextInput
+            label=""
+            placeholder="Alt text (optional)"
+            onChange={(v) => updateSlot(index, 'altText', v)}
+            value={payloads[index].altText}
+            data-test-id={`image-row-${index}-alt`}
+          />
+        </div>
+      ))}
+      <DialogActions>
+        <Button data-test-id="image-row-back-btn" onClick={onBack}>
+          Back
+        </Button>
+        <Button
+          data-test-id="image-row-confirm-btn"
+          disabled={!allHaveSrc}
+          onClick={() => onClick({ columnCount, payloads: imagePayloads })}>
+          Confirm
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
+
 export function InsertImageDialog({
   activeEditor,
   onClose,
@@ -156,7 +236,7 @@ export function InsertImageDialog({
   activeEditor: LexicalEditor;
   onClose: () => void;
 }): JSX.Element {
-  const [mode, setMode] = useState<null | 'url' | 'file'>(null);
+  const [mode, setMode] = useState<null | 'url' | 'file' | 'row2' | 'row3'>(null);
   const hasModifier = useRef(false);
 
   useEffect(() => {
@@ -172,6 +252,11 @@ export function InsertImageDialog({
 
   const onClick = (payload: InsertImagePayload) => {
     activeEditor.dispatchCommand(INSERT_IMAGE_COMMAND, payload);
+    onClose();
+  };
+
+  const onRowClick = (payload: InsertImageRowPayload) => {
+    activeEditor.dispatchCommand(INSERT_IMAGE_ROW_COMMAND, payload);
     onClose();
   };
 
@@ -207,10 +292,34 @@ export function InsertImageDialog({
             onClick={() => setMode('file')}>
             File
           </Button>
+          <Button
+            data-test-id="image-modal-option-row2"
+            onClick={() => setMode('row2')}>
+            One row 2 col
+          </Button>
+          <Button
+            data-test-id="image-modal-option-row3"
+            onClick={() => setMode('row3')}>
+            One row 3 col
+          </Button>
         </DialogButtonsList>
       )}
       {mode === 'url' && <InsertImageUriDialogBody onClick={onClick} />}
       {mode === 'file' && <InsertImageUploadedDialogBody onClick={onClick} />}
+      {mode === 'row2' && (
+        <InsertImageRowDialogBody
+          columnCount={2}
+          onClick={onRowClick}
+          onBack={() => setMode(null)}
+        />
+      )}
+      {mode === 'row3' && (
+        <InsertImageRowDialogBody
+          columnCount={3}
+          onClick={onRowClick}
+          onBack={() => setMode(null)}
+        />
+      )}
     </>
   );
 }
@@ -226,6 +335,9 @@ export default function ImagesPlugin({
     if (!editor.hasNodes([ImageNode])) {
       throw new Error('ImagesPlugin: ImageNode not registered on editor');
     }
+    if (!editor.hasNodes([ImageRowNode])) {
+      throw new Error('ImagesPlugin: ImageRowNode not registered on editor');
+    }
 
     return mergeRegister(
       editor.registerCommand<InsertImagePayload>(
@@ -237,6 +349,24 @@ export default function ImagesPlugin({
             $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd();
           }
 
+          return true;
+        },
+        COMMAND_PRIORITY_EDITOR,
+      ),
+      editor.registerCommand<InsertImageRowPayload>(
+        INSERT_IMAGE_ROW_COMMAND,
+        (payload) => {
+          const { columnCount, payloads } = payload;
+          if (payloads.length !== columnCount) return false;
+          const rowNode = $createImageRowNode(columnCount);
+          const imageNodes = payloads.map((p) => $createImageNode(p));
+          for (const node of imageNodes) {
+            rowNode.append(node);
+          }
+          $insertNodes([rowNode]);
+          if ($isRootOrShadowRoot(rowNode.getParentOrThrow())) {
+            $wrapNodeInElement(rowNode, $createParagraphNode).selectEnd();
+          }
           return true;
         },
         COMMAND_PRIORITY_EDITOR,
