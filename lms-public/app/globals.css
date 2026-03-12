@@ -531,6 +531,12 @@
   border: 1px solid hsl(var(--border));
 }
 
+/* Reserve space for images without width/height to reduce CLS */
+.lexical-content img.lexical-img-reserve {
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
 .lexical-content figure {
   margin: 1rem 0;
 }

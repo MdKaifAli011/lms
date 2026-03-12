@@ -15,8 +15,10 @@ interface SubjectCardGridProps {
 
 export function SubjectCardGrid({ examSlug, subjects }: SubjectCardGridProps) {
   if (subjects.length === 0) return <EmptyState />;
+  const rowCount = Math.ceil(subjects.length / 3);
+  const gridMinHeight = rowCount * 220;
   return (
-    <section className="mb-12">
+    <section className="mb-12" style={{ minHeight: `${Math.max(220, gridMinHeight)}px` }}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {subjects.map((subject) => (
           <SubjectCard key={subject.id} subject={subject} examSlug={examSlug} />
@@ -38,7 +40,7 @@ function SubjectCard({ subject, examSlug }: { subject: HierarchySubject; examSlu
     <div className="group h-full">
       <Card
         className={cn(
-          "relative h-full flex flex-col overflow-hidden border-border/60 dark:border-border/40 bg-card/50 dark:bg-card/40",
+          "relative h-full min-h-[200px] flex flex-col overflow-hidden border-border/60 dark:border-border/40 bg-card/50 dark:bg-card/40",
           "transition-all duration-300 ease-out",
           "hover:bg-card hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20",
           "dark:hover:bg-card/80 dark:hover:border-primary/30"

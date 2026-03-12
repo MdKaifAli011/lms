@@ -282,13 +282,13 @@ export function LevelQuiz({
 
   if (papersLoading) {
     return (
-      <section className="my-8 sm:my-10" aria-label={sectionTitle}>
+      <section className="my-8 sm:my-10 min-h-[280px]" aria-label={sectionTitle}>
         <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
           {sectionTitle}
         </h2>
-        <div className="flex justify-center py-12 rounded-2xl border border-dashed border-border/60 bg-muted/10">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="flex justify-center items-center min-h-[200px] rounded-2xl border border-dashed border-border/60 bg-muted/10">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden="true" />
         </div>
       </section>
     );
@@ -298,20 +298,30 @@ export function LevelQuiz({
     return null;
   }
 
-  // No papers for this level: don't render anything
+  // No papers: keep a stable slot so layout doesn't shift (avoid CLS)
   if (!papersLoading && (totalPapers === 0 || currentPaper === null)) {
-    return null;
-  }
-
-  // Loading questions for current paper
-  if (questionsLoading) {
     return (
-      <section className="my-8 sm:my-10" aria-label={sectionTitle}>
+      <section className="my-8 sm:my-10 min-h-[180px]" aria-label={sectionTitle}>
         <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
           {sectionTitle}
         </h2>
-        <Card className="border border-border bg-card">
+        <div className="flex justify-center items-center min-h-[120px] rounded-2xl border border-dashed border-border/60 bg-muted/10">
+          <p className="text-sm text-muted-foreground">No practice quizzes for this level yet.</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Loading questions for current paper — stable min-height to avoid CLS
+  if (questionsLoading) {
+    return (
+      <section className="my-8 sm:my-10 min-h-[320px]" aria-label={sectionTitle}>
+        <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-primary" />
+          {sectionTitle}
+        </h2>
+        <Card className="border border-border bg-card min-h-[260px]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-base font-semibold text-foreground">
@@ -324,24 +334,24 @@ export function LevelQuiz({
               )}
             </div>
           </CardHeader>
-          <CardContent className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <CardContent className="flex justify-center items-center min-h-[180px]">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden="true" />
           </CardContent>
         </Card>
       </section>
     );
   }
 
-  // Current paper has no questions — try next paper or show message
+  // Current paper has no questions — try next paper or show message (stable height)
   if (currentPaper && questions.length === 0) {
     return (
-      <section className="my-8 sm:my-10" aria-label={sectionTitle}>
+      <section className="my-8 sm:my-10 min-h-[280px]" aria-label={sectionTitle}>
         <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
           {sectionTitle}
         </h2>
-        <Card className="border border-border bg-card">
-          <CardContent className="py-8 text-center">
+        <Card className="border border-border bg-card min-h-[200px]">
+          <CardContent className="py-8 text-center flex flex-col justify-center min-h-[160px]">
             <p className="text-sm text-muted-foreground mb-4">
               This paper has no questions yet.
             </p>

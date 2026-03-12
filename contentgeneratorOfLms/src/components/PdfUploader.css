@@ -1,0 +1,43 @@
+.pdf-uploader {
+  padding: 1rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 2px dashed #0ea5e9;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.pdf-uploader-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pdf-uploader-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #0ea5e9;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pdf-uploader-button:hover:not(:disabled) {
+  background: #0284c7;
+}
+
+.pdf-uploader-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pdf-uploader-hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}

@@ -53,7 +53,8 @@ export function HierarchyShell({
       try {
         const url = new URL(anchor.href);
         const isSameOrigin =
-          typeof window !== "undefined" && url.origin === window.location.origin;
+          typeof window !== "undefined" &&
+          url.origin === window.location.origin;
         const path = url.pathname + url.search;
         if (
           isSameOrigin &&
@@ -70,20 +71,34 @@ export function HierarchyShell({
         // ignore
       }
     },
-    [router]
+    [router],
   );
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header />
-      <ExamCategoriesBar exams={exams} sidebarOpen={sidebarOpen} onToggleSidebar={toggleSidebar} />
+      <ExamCategoriesBar
+        exams={exams}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={toggleSidebar}
+      />
       <div className="h-[72px] sm:h-[84px]" aria-hidden />
 
       <div className="flex flex-1 relative">
-        <HierarchySidebar examSlug={examSlug} subjects={subjects} isOpen={sidebarOpen} onClose={closeSidebar} />
+        <HierarchySidebar
+          examSlug={examSlug}
+          subjects={subjects}
+          isOpen={sidebarOpen}
+          onClose={closeSidebar}
+        />
 
         <div className="flex-1 min-w-0 relative">
-          <main className={cn("w-full bg-background dark:bg-slate-950/50", "pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0")}>
+          <main
+            className={cn(
+              "w-full bg-background dark:bg-slate-950/50",
+              "pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0",
+            )}
+          >
             {isNavigating ? (
               <MainContentSkeleton />
             ) : (

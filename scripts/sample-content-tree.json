@@ -1,0 +1,42 @@
+{
+  "exam": {
+    "name": "NEET",
+    "contentBody": "<p>Overview of the NEET exam. Use this space for exam-level introduction.</p>"
+  },
+  "subjects": [
+    {
+      "name": "Physics",
+      "contentBody": "<p>Introduction to Physics for NEET.</p>",
+      "units": [
+        {
+          "name": "Units and Measurement",
+          "contentBody": "<p>This unit covers SI units, dimensions, and measurement.</p><h2>Learning objectives</h2><ul><li>Understand base and derived units</li><li>Apply dimensional analysis</li></ul>",
+          "chapters": [
+            {
+              "name": "Physical Quantities",
+              "contentBody": "<p>Physical quantities are measurable properties. They can be scalar or vector.</p>",
+              "topics": [
+                {
+                  "name": "Scalars and Vectors",
+                  "contentBody": "<p>Scalars have magnitude only; vectors have magnitude and direction.</p>",
+                  "subtopics": [
+                    {
+                      "name": "Vector Addition",
+                      "contentBody": "<p>Vectors add by parallelogram or triangle law.</p><figure><img src=\"https://example.com/vector-diagram.png\" alt=\"Vector addition\" /><figcaption>Resultant of two vectors</figcaption></figure>",
+                      "definitions": [
+                        {
+                          "name": "Resultant Vector",
+                          "contentBody": "<p>The <strong>resultant vector</strong> is the single vector that has the same effect as two or more vectors combined.</p>"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

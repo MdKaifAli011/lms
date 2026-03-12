@@ -247,10 +247,11 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                         : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                     )}
                     title={!isExpanded ? tool.label : undefined}
+                    aria-label={tool.label}
                     asChild
                   >
-                    <Link href={href} className="flex w-full items-center gap-3 py-2.5 px-2 min-h-10" aria-current={isActive ? "page" : undefined}>
-                      <Icon className="h-5 w-5 shrink-0" />
+                    <Link href={href} className="flex w-full items-center gap-3 py-2.5 px-2 min-h-10" aria-label={tool.label} aria-current={isActive ? "page" : undefined}>
+                      <Icon className="h-5 w-5 shrink-0" aria-hidden />
                       {isExpanded && <span className="text-sm font-normal">{tool.label}</span>}
                     </Link>
                   </Button>
@@ -269,8 +270,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                   )}
                   onClick={(tool as { onClick?: () => void }).onClick}
                   title={!isExpanded ? tool.label : undefined}
+                  aria-label={tool.label}
                 >
-                  <Icon className="h-5 w-5 shrink-0" />
+                  <Icon className="h-5 w-5 shrink-0" aria-hidden />
                   {isExpanded && <span className="text-sm font-normal">{tool.label}</span>}
                 </Button>
               );
@@ -291,8 +293,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                       variant="ghost"
                       className="w-full justify-start gap-3 h-auto py-2.5 px-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary transition-colors duration-200 ease-out"
                       onClick={action.onClick}
+                      aria-label={action.label}
                     >
-                      <Icon className="h-5 w-5 shrink-0" />
+                      <Icon className="h-5 w-5 shrink-0" aria-hidden />
                       <span className="text-sm font-normal">{action.label}</span>
                     </Button>
                   );
@@ -322,8 +325,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
               className="h-8 w-8 shrink-0 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
               onClick={() => {}}
               title="Settings"
+              aria-label="Settings"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-4 w-4" aria-hidden />
             </Button>
           </div>
         ) : (

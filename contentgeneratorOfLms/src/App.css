@@ -1,0 +1,122 @@
+.app {
+  min-height: 100vh;
+  background: #f1f5f9;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.app-header {
+  padding: 1rem 1.5rem;
+  background: #0f172a;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.app-header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.app-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.app-controls-exam,
+.app-controls-subject {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-controls-exam label,
+.app-controls-subject label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.app-controls-exam input,
+.app-controls-subject input {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  min-width: 140px;
+}
+
+.app-main {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 0;
+  min-height: calc(100vh - 180px);
+}
+
+@media (max-width: 900px) {
+  .app-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+}
+
+.app-panel-tree {
+  padding: 1rem;
+  overflow: auto;
+  border-right: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .app-panel-tree {
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    max-height: 40vh;
+  }
+}
+
+.app-panel-content {
+  padding: 1rem;
+  overflow: auto;
+  min-height: 300px;
+}
+
+.app-export {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.app-export:hover {
+  background: #cbd5e1;
+}
+
+.app-status {
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.app-status.error {
+  color: #dc2626;
+}
+
+.app-status.success {
+  color: #16a34a;
+}

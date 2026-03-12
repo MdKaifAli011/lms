@@ -19,11 +19,19 @@ function wrapTables(html: string): string {
   });
 }
 
-/** Enhance images (lazy load + responsive) */
+/** Enhance images (lazy load + responsive + reserve space to reduce CLS) */
 function enhanceImages(html: string): string {
   return html.replace(
-    /<img(.*?)>/gi,
-    `<img loading="lazy" decoding="async" class="max-w-full h-auto rounded-lg my-4"$1>`,
+    /<img(\s[^>]*?)>/gi,
+    (_, rest) => {
+      const hasWidth = /width=["']/i.test(rest);
+      const hasHeight = /height=["']/i.test(rest);
+      const hasAspect = /aspect-ratio|style=["'][^"']*aspect/i.test(rest);
+      const reserveClass = !hasWidth && !hasHeight && !hasAspect
+        ? " lexical-img-reserve"
+        : "";
+      return `<img loading="lazy" decoding="async" class="max-w-full h-auto rounded-lg my-4${reserveClass}"${rest}>`;
+    }
   );
 }
 
@@ -43,6 +51,7 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [processedHtml, setProcessedHtml] = useState("");
+  const hasContent = Boolean(content?.trim());
 
   useEffect(() => {
     if (!content?.trim()) {
@@ -104,6 +113,7 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
         "lexical-content content-reading prose max-w-none",
         className,
       )}
+      style={hasContent && !processedHtml ? { minHeight: "12rem" } : undefined}
       dangerouslySetInnerHTML={{ __html: processedHtml }}
     />
   );

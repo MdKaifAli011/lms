@@ -17,8 +17,9 @@ export function NavigationButtons({ prev, next }: NavigationButtonsProps) {
         <Link
           href={prev.href}
           className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+          aria-label={`Previous: ${prev.label}`}
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} aria-hidden />
           <span className="hidden sm:inline">Previous: {prev.label}</span>
           <span className="sm:hidden">Previous</span>
         </Link>
@@ -29,10 +30,11 @@ export function NavigationButtons({ prev, next }: NavigationButtonsProps) {
         <Link
           href={next.href}
           className="group inline-flex items-center gap-3 rounded-full px-6 py-3 text-sm font-semibold text-white bg-gray-900 hover:bg-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all"
+          aria-label={`Next: ${next.label}`}
         >
           <span className="hidden sm:inline">Next: {next.label}</span>
           <span className="sm:hidden">Next</span>
-          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden />
         </Link>
       ) : (
         <div />
