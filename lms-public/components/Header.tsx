@@ -125,8 +125,10 @@ export function Header() {
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="w-8 h-8 flex items-center justify-center text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-500"
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileMenuOpen}
               >
-                {mobileMenuOpen ? <X /> : <Menu />}
+                {mobileMenuOpen ? <X aria-hidden /> : <Menu aria-hidden />}
               </button>
             </div>
           </div>

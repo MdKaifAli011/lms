@@ -206,7 +206,7 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
   return (
     <aside
       className={cn(
-        "sticky self-start top-[72px] sm:top-[84px] h-[calc(100vh-72px)] sm:h-[calc(100vh-84px)] ",
+        "fixed right-0 top-[72px] sm:top-[84px] h-[calc(100vh-72px)] sm:h-[calc(100vh-84px)] z-30",
         "bg-white dark:bg-gray-900 border-l border-border",
         "transition-all duration-300 ease-in-out flex flex-col shrink-0 shadow-sm",
         isExpanded ? "w-64 shadow-lg" : "w-16"

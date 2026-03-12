@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import parse, { type DOMNode, Element } from "html-react-parser";
 import { cn } from "@/lib/utils";
 
 interface ContentRendererProps {
   content?: string | null;
+  /** When set (e.g. from server), render immediately — no async DOMPurify, no layout shift. */
+  preProcessedHtml?: string | null;
   className?: string;
 }
 
@@ -47,13 +51,46 @@ function addHeadingIds(html: string): string {
   });
 }
 
-export function ContentRenderer({ content, className }: ContentRendererProps) {
+const DEFAULT_IMAGE_WIDTH = 800;
+const DEFAULT_IMAGE_HEIGHT = 600;
+
+function replaceImgWithNextImage(domNode: DOMNode): React.ReactElement | null | undefined {
+  if (!(domNode instanceof Element) || domNode.name !== "img") return undefined;
+  const attrs = domNode.attribs;
+  const src = attrs?.src;
+  if (!src || typeof src !== "string") return undefined;
+
+  const width = attrs["data-width"] ? parseInt(attrs["data-width"], 10) : DEFAULT_IMAGE_WIDTH;
+  const height = attrs["data-height"] ? parseInt(attrs["data-height"], 10) : DEFAULT_IMAGE_HEIGHT;
+  const priority = attrs["data-priority"] === "true";
+  const alt = (attrs.alt ?? "").trim() || "Content image";
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      className="max-w-full h-auto rounded-lg my-4"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : "auto"}
+      sizes="(max-width: 768px) 100vw, 800px"
+      unoptimized={src.startsWith("data:")}
+    />
+  );
+}
+
+export function ContentRenderer({ content, preProcessedHtml, className }: ContentRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [processedHtml, setProcessedHtml] = useState("");
-  const hasContent = Boolean(content?.trim());
+  const [processedHtml, setProcessedHtml] = useState(preProcessedHtml ?? "");
+  const hasContent = Boolean((preProcessedHtml ?? content)?.trim());
 
   useEffect(() => {
+    if (preProcessedHtml != null && preProcessedHtml !== "") {
+      setProcessedHtml(preProcessedHtml);
+      return;
+    }
     if (!content?.trim()) {
       setProcessedHtml("");
       return;
@@ -65,7 +102,7 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
       clean = addHeadingIds(clean);
       setProcessedHtml(clean);
     });
-  }, [content]);
+  }, [content, preProcessedHtml]);
 
   /* 🔥 Improved Link Handling (Event Delegation) */
   useEffect(() => {
@@ -98,7 +135,7 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
     return () => container.removeEventListener("click", handleClick);
   }, [router]);
 
-  if (!content?.trim()) {
+  if (!(preProcessedHtml ?? content)?.trim()) {
     return (
       <p className={cn("text-muted-foreground text-sm", className)}>
         No content available.
@@ -113,8 +150,9 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
         "lexical-content content-reading prose max-w-none",
         className,
       )}
-      style={hasContent && !processedHtml ? { minHeight: "12rem" } : undefined}
-      dangerouslySetInnerHTML={{ __html: processedHtml }}
-    />
+      style={hasContent && !processedHtml && !preProcessedHtml ? { minHeight: "12rem" } : undefined}
+    >
+      {parse(processedHtml, { replace: replaceImgWithNextImage })}
+    </div>
   );
 }

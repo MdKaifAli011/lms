@@ -161,7 +161,7 @@ export function HierarchySidebar({
           "overflow-y-auto border-r bg-background/95 backdrop-blur-sm border-border scrollbar-hide",
           isMobile
             ? "fixed left-0 top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] z-50 w-80 shrink-0"
-            : "sticky self-start top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] w-80 shrink-0"
+            : "fixed left-0 top-[80px] sm:top-[96px] h-[calc(100vh-80px)] sm:h-[calc(100vh-96px)] z-40 w-80 shrink-0"
         )}
       >
         <div className="px-4 py-5 space-y-5">

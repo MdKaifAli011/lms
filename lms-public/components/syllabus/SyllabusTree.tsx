@@ -96,12 +96,12 @@ export function SyllabusTree({ examSlug, examName, subjects }: SyllabusTreeProps
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-end gap-2">
-        <Button variant="ghost" size="sm" onClick={expandAll} className="h-9 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
-          <ChevronsDownUp className="h-4 w-4 mr-1.5" />
+        <Button variant="ghost" size="sm" onClick={expandAll} className="h-9 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" aria-label="Expand all sections">
+          <ChevronsDownUp className="h-4 w-4 mr-1.5" aria-hidden />
           Expand all
         </Button>
-        <Button variant="ghost" size="sm" onClick={collapseAll} className="h-9 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
-          <ChevronsUpDown className="h-3.5 w-3.5 mr-1.5" />
+        <Button variant="ghost" size="sm" onClick={collapseAll} className="h-9 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100" aria-label="Collapse all sections">
+          <ChevronsUpDown className="h-3.5 w-3.5 mr-1.5" aria-hidden />
           Collapse all
         </Button>
       </div>
@@ -213,8 +213,9 @@ function UnitRow({
             onClick={() => onToggle(id)}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
             aria-expanded={isExpanded}
+            aria-label={isExpanded ? "Collapse unit" : "Expand unit"}
           >
-            {isExpanded ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+            {isExpanded ? <Minus className="h-3.5 w-3.5" aria-hidden /> : <Plus className="h-3.5 w-3.5" aria-hidden />}
           </button>
         )}
       </div>
@@ -272,8 +273,9 @@ function ChapterRow({
             onClick={() => onToggle(id)}
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
             aria-expanded={isExpanded}
+            aria-label={isExpanded ? "Collapse chapter" : "Expand chapter"}
           >
-            {isExpanded ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+            {isExpanded ? <Minus className="h-3 w-3" aria-hidden /> : <Plus className="h-3 w-3" aria-hidden />}
           </button>
         )}
       </div>
@@ -334,8 +336,9 @@ function TopicRow({
             onClick={() => onToggle(id)}
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
             aria-expanded={isExpanded}
+            aria-label={isExpanded ? "Collapse topic" : "Expand topic"}
           >
-            {isExpanded ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+            {isExpanded ? <Minus className="h-3 w-3" aria-hidden /> : <Plus className="h-3 w-3" aria-hidden />}
           </button>
         )}
       </div>
@@ -399,8 +402,9 @@ function SubtopicRow({
             onClick={() => onToggle(id)}
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-100 transition-colors"
             aria-expanded={isExpanded}
+            aria-label={isExpanded ? "Collapse subtopic" : "Expand subtopic"}
           >
-            {isExpanded ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+            {isExpanded ? <Minus className="h-3 w-3" aria-hidden /> : <Plus className="h-3 w-3" aria-hidden />}
           </button>
         )}
       </div>

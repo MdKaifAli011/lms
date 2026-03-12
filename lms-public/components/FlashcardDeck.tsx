@@ -75,6 +75,7 @@ export function FlashcardDeck({ title, cards = DEFAULT_CARDS, className }: Flash
               "w-full min-h-[180px] sm:min-h-[200px] rounded-xl border-2 border-border bg-muted/30 hover:bg-muted/50 transition-all duration-300",
               "flex flex-col items-center justify-center p-6 text-left"
             )}
+            aria-label={isFlipped ? "Flip card to show front" : "Flip card to show back"}
           >
             <div className={cn("w-full flex flex-col items-center justify-center", isFlipped && "[transform:rotateY(180deg)]")}>
               {!isFlipped ? (

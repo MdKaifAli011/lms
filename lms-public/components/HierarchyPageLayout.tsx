@@ -50,10 +50,12 @@ export function HierarchyPageLayout({
   const isMobile = useIsMobile();
   const navigationLoading = useNavigationLoading();
   const isNavigating = Boolean(navigationLoading?.isNavigating);
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
-
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  /** Sync open state when switching between mobile/desktop (e.g. resize); deferred to avoid synchronous setState in effect. */
   useEffect(() => {
-    setSidebarOpen(!isMobile);
+    const open = !isMobile;
+    const t = setTimeout(() => setSidebarOpen(open), 0);
+    return () => clearTimeout(t);
   }, [isMobile]);
 
   const toggleSidebar = () => setSidebarOpen((o) => !o);
@@ -106,7 +108,12 @@ export function HierarchyPageLayout({
           onClose={closeSidebar}
         />
 
-        <div className="flex-1 min-w-0 relative">
+        <div
+          className={cn(
+            "flex-1 min-w-0 relative transition-[margin] duration-300 ease-out",
+            sidebarOpen && "md:ml-80"
+          )}
+        >
           <main
             className={cn(
               "w-full bg-background dark:bg-slate-950/50",
