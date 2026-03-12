@@ -440,3 +440,29 @@ export function MinimalRouteLoading({ className }: { className?: string }) {
     </RouteLoadingShell>
   );
 }
+
+/**
+ * Below-the-fold skeleton for exam page: syllabus link, subject grid placeholder, quiz placeholder, nav.
+ * Used inside Suspense for progressive loading.
+ */
+export function BelowFoldSkeleton() {
+  return (
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-wrap items-center gap-3">
+        <Skeleton className="h-10 w-40 rounded-lg" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-[200px] rounded-xl" />
+        ))}
+      </div>
+      <div className="min-h-[280px] rounded-2xl border border-dashed border-border/60 flex items-center justify-center">
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <Skeleton className="h-10 w-32 rounded-full" />
+        <Skeleton className="h-10 w-28 rounded-full" />
+      </div>
+    </div>
+  );
+}

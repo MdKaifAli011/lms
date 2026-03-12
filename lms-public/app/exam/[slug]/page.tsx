@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,9 @@ import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { SubjectCardGrid } from "@/components/SubjectCardGrid";
 import { RecordVisit } from "@/components/RecordVisit";
-import { LevelQuiz } from "@/components/LevelQuiz";
+import { DynamicLevelQuiz } from "@/components/DynamicLevelQuiz";
+import { LazyBelowFold } from "@/components/LazyBelowFold";
+import { BelowFoldSkeleton } from "@/components/RouteLoadingSkeletons";
 import { BookOpen } from "lucide-react";
 
 interface PageProps {
@@ -36,6 +39,35 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 }
 
+/** Below-the-fold: grid, quiz, nav. Fetches sidebar + nav so they stream after above-the-fold. */
+async function ExamBelowFold({
+  slug,
+  examId,
+}: {
+  slug: string;
+  examId: string;
+}) {
+  const [sidebarData, nav] = await Promise.all([
+    getSidebarTree(examId),
+    getUniversalNav({ examSlug: slug }),
+  ]);
+  const hierarchy = (sidebarData.subjects ?? []) as HierarchySubject[];
+
+  return (
+    <>
+      <div className="mt-6 sm:mt-8 md:mt-10">
+        <SubjectCardGrid examSlug={slug} subjects={hierarchy} />
+      </div>
+      <LazyBelowFold fallback={<div className="my-8 sm:my-10 min-h-[280px]" aria-hidden />}>
+        <DynamicLevelQuiz level={1} examId={examId} examSlug={slug} />
+      </LazyBelowFold>
+      <div className="mt-8 sm:mt-10 md:mt-12">
+        <NavigationButtons prev={nav.prev} next={nav.next} />
+      </div>
+    </>
+  );
+}
+
 export default async function ExamSlugPage({ params }: PageProps) {
   const { slug } = await params;
   const exam = await getExamBySlugOrId(slug);
@@ -44,12 +76,6 @@ export default async function ExamSlugPage({ params }: PageProps) {
   const examId = String((exam as { id: string }).id);
   const examName = toTitleCase(String((exam as { name?: string }).name ?? slug));
   const contentBody = (exam as { contentBody?: string }).contentBody ?? "";
-
-  const [sidebarData, nav] = await Promise.all([
-    getSidebarTree(examId),
-    getUniversalNav({ examSlug: slug }),
-  ]);
-  const hierarchy = (sidebarData.subjects ?? []) as HierarchySubject[];
 
   const breadcrumbs = [{ label: examName, href: `/exam/${slug}` }];
 
@@ -76,13 +102,9 @@ export default async function ExamSlugPage({ params }: PageProps) {
           View full syllabus
         </Link>
       </div>
-      <div className="mt-6 sm:mt-8 md:mt-10">
-        <SubjectCardGrid examSlug={slug} subjects={hierarchy} />
-      </div>
-      <LevelQuiz level={1} examId={examId} examSlug={slug} />
-      <div className="mt-8 sm:mt-10 md:mt-12">
-        <NavigationButtons prev={nav.prev} next={nav.next} />
-      </div>
+      <Suspense fallback={<BelowFoldSkeleton />}>
+        <ExamBelowFold slug={slug} examId={examId} />
+      </Suspense>
     </>
   );
 }

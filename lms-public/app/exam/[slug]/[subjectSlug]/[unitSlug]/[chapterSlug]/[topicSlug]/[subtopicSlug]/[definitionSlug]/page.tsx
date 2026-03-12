@@ -20,7 +20,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { RecordVisit } from "@/components/RecordVisit";
-import { LevelQuiz } from "@/components/LevelQuiz";
+import { DynamicLevelQuiz } from "@/components/DynamicLevelQuiz";
+import { LazyBelowFold } from "@/components/LazyBelowFold";
 
 interface PageProps {
   params: Promise<{
@@ -153,12 +154,14 @@ export default async function DefinitionPage({ params }: PageProps) {
   const definitionBySlug = definitions.find((d) => d.slug === definitionSlug);
   if (!definitionBySlug) notFound();
 
-  const definition = await getDefinitionById(definitionBySlug.id);
+  const [definition, nav] = await Promise.all([
+    getDefinitionById(definitionBySlug.id),
+    getUniversalNav({ examSlug, subjectSlug, unitSlug, chapterSlug, topicSlug, subtopicSlug, definitionSlug }),
+  ]);
+
   if (!definition || typeof definition !== "object") notFound();
   const definitionName = toTitleCase(String((definition as { name?: string }).name ?? definitionSlug));
   const contentBody = (definition as { contentBody?: string }).contentBody ?? "";
-
-  const nav = await getUniversalNav({ examSlug, subjectSlug, unitSlug, chapterSlug, topicSlug, subtopicSlug, definitionSlug });
 
   const breadcrumbs = [
     { label: examName, href: `/exam/${examSlug}` },
@@ -184,17 +187,19 @@ export default async function DefinitionPage({ params }: PageProps) {
           <ContentRenderer content={contentBody} />
         </div>
       ) : null}
-      <LevelQuiz
-        level={7}
-        examId={examId}
-        examSlug={examSlug}
-        subjectId={subjectBySlug.id}
-        unitId={unitBySlug.id}
-        chapterId={chapterBySlug.id}
-        topicId={topicBySlug.id}
-        subtopicId={subtopicBySlug.id}
-        definitionId={definitionBySlug.id}
-      />
+      <LazyBelowFold fallback={<div className="my-8 sm:my-10 min-h-[280px]" aria-hidden />}>
+        <DynamicLevelQuiz
+          level={7}
+          examId={examId}
+          examSlug={examSlug}
+          subjectId={subjectBySlug.id}
+          unitId={unitBySlug.id}
+          chapterId={chapterBySlug.id}
+          topicId={topicBySlug.id}
+          subtopicId={subtopicBySlug.id}
+          definitionId={definitionBySlug.id}
+        />
+      </LazyBelowFold>
       <div className="mt-8 sm:mt-10 md:mt-12">
         <NavigationButtons prev={nav.prev} next={nav.next} />
       </div>

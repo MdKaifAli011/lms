@@ -1,6 +1,7 @@
 /**
  * API client for your admin API (docs/API.md).
  * All requests go to NEXT_PUBLIC_API_URL (e.g. http://localhost:3000).
+ * On the server, GET requests use Next.js fetch cache (revalidate 60s) to reduce load and work with Cloudflare.
  */
 
 const getBase = () => {
@@ -10,15 +11,24 @@ const getBase = () => {
   return "http://localhost:3000";
 };
 
+const DEFAULT_REVALIDATE = 60;
+
 async function fetchApi<T>(
   path: string,
-  options?: RequestInit
+  options?: RequestInit & { revalidate?: number }
 ): Promise<T> {
   const base = getBase();
   const url = path.startsWith("http") ? path : `${base}${path}`;
+  const { revalidate, ...init } = options ?? {};
+  const isGet = !init.method || init.method === "GET";
+  const serverCache =
+    typeof window === "undefined" && isGet && revalidate !== 0
+      ? { next: { revalidate: revalidate ?? DEFAULT_REVALIDATE } as const }
+      : {};
   const res = await fetch(url, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    ...init,
+    ...serverCache,
+    headers: { "Content-Type": "application/json", ...init.headers },
   });
   const contentType = res.headers.get("content-type") ?? "";
   const isJson = contentType.includes("application/json");
