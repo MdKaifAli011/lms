@@ -93,11 +93,9 @@ levelWisePracticeSchema.index({ level: 1 });
 levelWisePracticeSchema.index({ level: 1, orderNumber: 1 });
 levelWisePracticeSchema.index({ examId: 1, level: 1, orderNumber: 1 });
 
-/** Never store null for hierarchy fields above level; remove keys so DB does not persist them */
-/** Never store null for hierarchy fields above level; remove keys so DB does not persist them */
-levelWisePracticeSchema.pre("save", function (next) {
+/** Never store null for hierarchy fields above level; remove keys so DB does not persist them. Mongoose 9+ does not pass next(). */
+levelWisePracticeSchema.pre("save", async function () {
   const level = this.level as number;
-  // Double cast required: Mongoose Document type is not assignable to Record<string, unknown>
   const doc = this as unknown as Record<string, unknown>;
   if (level < 2) {
     delete doc.subjectId;
@@ -127,7 +125,6 @@ levelWisePracticeSchema.pre("save", function (next) {
   } else if (level < 7) {
     delete doc.definitionId;
   }
-  (next as (err?: Error) => void)();
 });
 
 const LevelWisePractice =

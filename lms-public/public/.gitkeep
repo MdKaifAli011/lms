@@ -1,0 +1,2 @@
+# Static assets: add favicon.ico here (and other files like robots.txt, images)
+# Files in public/ are served from the site root, e.g. public/favicon.ico → /favicon.ico

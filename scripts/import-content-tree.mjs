@@ -179,10 +179,11 @@ async function main() {
   }
   const data = JSON.parse(raw);
   if (!data.exam) throw new Error("JSON must have an 'exam' object with at least 'name'");
+  const subjects = data.subjects ?? data.exam?.subjects ?? [];
   console.log("Importing content tree to", API_BASE);
   const exam = await processExam(data.exam);
   console.log("Exam:", exam.name, "(" + exam.id + ")");
-  await processSubjects(exam, data.subjects || []);
+  await processSubjects(exam, subjects);
   console.log("Done.");
 }
 

@@ -44,6 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -53,7 +54,8 @@ import {
   Search,
   Loader2,
   ListChecks,
-  ChevronRight,
+  FileQuestion,
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 import { toTitleCase } from "@/lib/titleCase";
@@ -121,6 +123,12 @@ export default function LevelWisePracticePage() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [pageSize, setPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isReorderingEnabled, setIsReorderingEnabled] = useState(false);
+  const [draggedPaper, setDraggedPaper] = useState<LevelWisePractice | null>(null);
+  const [dragOverPaperId, setDragOverPaperId] = useState<string | null>(null);
+  const [reorderSaving, setReorderSaving] = useState(false);
 
   // Hierarchy filter: Exam → Subject → Unit → Chapter → Topic → Subtopic → Definition
   const [filter, setFilter] = useState({
@@ -494,67 +502,6 @@ export default function LevelWisePracticePage() {
     });
   }, []);
 
-  const clearFilterFromLevel = useCallback((level: 1 | 2 | 3 | 4 | 5 | 6 | 7) => {
-    setFilter((prev) => {
-      const next = { ...prev };
-      if (level < 2) {
-        next.subjectId = "";
-        next.subjectName = "";
-        next.unitId = "";
-        next.unitName = "";
-        next.chapterId = "";
-        next.chapterName = "";
-        next.topicId = "";
-        next.topicName = "";
-        next.subtopicId = "";
-        next.subtopicName = "";
-        next.definitionId = "";
-        next.definitionName = "";
-      }
-      if (level < 3) {
-        next.unitId = "";
-        next.unitName = "";
-        next.chapterId = "";
-        next.chapterName = "";
-        next.topicId = "";
-        next.topicName = "";
-        next.subtopicId = "";
-        next.subtopicName = "";
-        next.definitionId = "";
-        next.definitionName = "";
-      }
-      if (level < 4) {
-        next.chapterId = "";
-        next.chapterName = "";
-        next.topicId = "";
-        next.topicName = "";
-        next.subtopicId = "";
-        next.subtopicName = "";
-        next.definitionId = "";
-        next.definitionName = "";
-      }
-      if (level < 5) {
-        next.topicId = "";
-        next.topicName = "";
-        next.subtopicId = "";
-        next.subtopicName = "";
-        next.definitionId = "";
-        next.definitionName = "";
-      }
-      if (level < 6) {
-        next.subtopicId = "";
-        next.subtopicName = "";
-        next.definitionId = "";
-        next.definitionName = "";
-      }
-      if (level < 7) {
-        next.definitionId = "";
-        next.definitionName = "";
-      }
-      return next;
-    });
-  }, []);
-
   const clearAllFilters = useCallback(() => {
     setFilter({
       examId: "",
@@ -625,6 +572,18 @@ export default function LevelWisePracticePage() {
       return matchesSearch && matchesLevel;
     });
   }, [papers, searchTerm, levelFilter]);
+
+  const PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
+  const totalPages = Math.max(1, Math.ceil(filteredPapers.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const pagedPapers = useMemo(
+    () => filteredPapers.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [filteredPapers, safePage, pageSize]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, levelFilter, pageSize, filter.examId, filter.subjectId, filter.unitId, filter.chapterId, filter.topicId, filter.subtopicId, filter.definitionId]);
 
   const stats = useMemo(
     () => ({
@@ -826,7 +785,8 @@ export default function LevelWisePracticePage() {
     setOverrideTotalMarks(false);
   }, []);
 
-  function scopeLabel(paper: LevelWisePractice): string {
+  /** Scope path for grouping: e.g. "neet", "neet/biology", "neet/biology/unit1" */
+  function scopeKey(paper: LevelWisePractice): string {
     const level = Math.min(Math.max(paper.level, 1), 7);
     const names = [
       paper.examName,
@@ -838,23 +798,154 @@ export default function LevelWisePracticePage() {
       paper.definitionName,
     ];
     const parts = names.slice(0, level).map((n) =>
-      n != null && String(n).trim() ? toTitleCase(String(n).trim()) : "-"
+      n != null && String(n).trim() ? String(n).trim().toLowerCase().replace(/\s+/g, "-") : "-"
     );
-    const out = parts.join(" › ");
-    return out || "-";
+    return parts.join("/") || "-";
   }
 
-  const pathSegments = useMemo(() => {
-    const segs: { level: 1 | 2 | 3 | 4 | 5 | 6 | 7; name: string }[] = [];
-    if (filter.examName) segs.push({ level: 1, name: filter.examName });
-    if (filter.subjectName) segs.push({ level: 2, name: filter.subjectName });
-    if (filter.unitName) segs.push({ level: 3, name: filter.unitName });
-    if (filter.chapterName) segs.push({ level: 4, name: filter.chapterName });
-    if (filter.topicName) segs.push({ level: 5, name: filter.topicName });
-    if (filter.subtopicName) segs.push({ level: 6, name: filter.subtopicName });
-    if (filter.definitionName) segs.push({ level: 7, name: filter.definitionName });
-    return segs;
-  }, [filter]);
+  /** Scope as section header label: e.g. "Neet", "Neet / Biology", "Neet / Biology / Unit 1" */
+  function scopeHeaderLabel(paper: LevelWisePractice): string {
+    const level = Math.min(Math.max(paper.level, 1), 7);
+    const names = [
+      paper.examName,
+      paper.subjectName,
+      paper.unitName,
+      paper.chapterName,
+      paper.topicName,
+      paper.subtopicName,
+      paper.definitionName,
+    ];
+    const parts = names.slice(0, level).map((n) =>
+      n != null && String(n).trim() ? toTitleCase(String(n).trim()) : "—"
+    );
+    return parts.join(" / ") || "—";
+  }
+
+  /** Scope as array of segments for breadcrumb pills: e.g. ["Neet", "Physics", "Unit 1", "Chapter1", ...] */
+  function scopeSegments(paper: LevelWisePractice): string[] {
+    const level = Math.min(Math.max(paper.level, 1), 7);
+    const names = [
+      paper.examName,
+      paper.subjectName,
+      paper.unitName,
+      paper.chapterName,
+      paper.topicName,
+      paper.subtopicName,
+      paper.definitionName,
+    ];
+    return names.slice(0, level).map((n) =>
+      n != null && String(n).trim() ? toTitleCase(String(n).trim()) : "—"
+    );
+  }
+
+  /** Group papers by scope path; sort groups so parent paths come before children; papers within each group by orderNumber (per-scope order) */
+  const papersByScope = useMemo(() => {
+    const map = new Map<string, LevelWisePractice[]>();
+    for (const paper of pagedPapers) {
+      const key = scopeKey(paper);
+      const list = map.get(key) ?? [];
+      list.push(paper);
+      map.set(key, list);
+    }
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, list]) => [key, [...list].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))] as const);
+  }, [pagedPapers]);
+
+  const enableReordering = useCallback(() => setIsReorderingEnabled(true), []);
+  const disableReordering = useCallback(() => {
+    setIsReorderingEnabled(false);
+    setDraggedPaper(null);
+    setDragOverPaperId(null);
+  }, []);
+
+  /** Save current order to API (call when user clicks "Save order"). Groups papers by scope and sends orderNumber 1,2,3 per scope. */
+  const saveOrder = useCallback(async () => {
+    setReorderSaving(true);
+    try {
+      const byScope = new Map<string, LevelWisePractice[]>();
+      for (const p of papers) {
+        const key = scopeKey(p);
+        const list = byScope.get(key) ?? [];
+        list.push(p);
+        byScope.set(key, list);
+      }
+      const items: { id: string; orderNumber: number }[] = [];
+      for (const list of byScope.values()) {
+        const sorted = [...list].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
+        sorted.forEach((p, idx) => items.push({ id: p.id, orderNumber: idx + 1 }));
+      }
+      if (items.length === 0) {
+        toast.success("Order saved");
+        return;
+      }
+      const res = await fetch("/api/level-wise-practice/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as { error?: string }).error || "Failed to save order");
+      }
+      toast.success("Order saved");
+      disableReordering();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save order");
+    } finally {
+      setReorderSaving(false);
+    }
+  }, [papers, disableReordering]);
+
+  const handlePaperDragStart = useCallback((e: React.DragEvent, paper: LevelWisePractice) => {
+    if (!isReorderingEnabled) return;
+    setDraggedPaper(paper);
+    e.dataTransfer.effectAllowed = "move";
+  }, [isReorderingEnabled]);
+
+  const handlePaperDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    if (!isReorderingEnabled) return;
+    e.dataTransfer.dropEffect = "move";
+  }, [isReorderingEnabled]);
+
+  const handlePaperDragEnter = useCallback((paper: LevelWisePractice) => {
+    if (!isReorderingEnabled) return;
+    if (!draggedPaper || draggedPaper.id === paper.id) return;
+    if (scopeKey(draggedPaper) !== scopeKey(paper)) return;
+    setDragOverPaperId(paper.id);
+  }, [isReorderingEnabled, draggedPaper]);
+
+  const handlePaperDragLeave = useCallback(() => {
+    setDragOverPaperId(null);
+  }, []);
+
+  const handlePaperDrop = useCallback(
+    (e: React.DragEvent, targetPaper: LevelWisePractice, scopeKeyVal: string, groupPapers: LevelWisePractice[]) => {
+      e.preventDefault();
+      if (!isReorderingEnabled) return;
+      if (!draggedPaper || draggedPaper.id === targetPaper.id) return;
+      if (scopeKey(draggedPaper) !== scopeKeyVal) return;
+
+      const fromIndex = groupPapers.findIndex((p) => p.id === draggedPaper.id);
+      const toIndex = groupPapers.findIndex((p) => p.id === targetPaper.id);
+      if (fromIndex === -1 || toIndex === -1) return;
+
+      const reordered = [...groupPapers];
+      const [moved] = reordered.splice(fromIndex, 1);
+      reordered.splice(toIndex, 0, moved);
+      const withNewOrder = reordered.map((p, idx) => ({ ...p, orderNumber: idx + 1 }));
+
+      setPapers((prev) => {
+        const byId = new Map(prev.map((p) => [p.id, p]));
+        withNewOrder.forEach((p) => byId.set(p.id, { ...byId.get(p.id)!, ...p }));
+        return Array.from(byId.values());
+      });
+      setDraggedPaper(null);
+      setDragOverPaperId(null);
+    },
+    [isReorderingEnabled, draggedPaper]
+  );
 
   return (
     <div className="flex min-h-0 flex-1 min-w-0 flex-col">
@@ -867,8 +958,9 @@ export default function LevelWisePracticePage() {
         </div>
       )}
       {loading && (
-        <div className="flex flex-1 items-center justify-center p-8 text-muted-foreground">
-          Loading level-wise practice…
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-12 text-muted-foreground">
+          <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
+          <p className="text-sm font-medium">Loading level-wise practice…</p>
         </div>
       )}
       {!loading && (
@@ -1246,47 +1338,14 @@ export default function LevelWisePracticePage() {
               </Card>
             </div>
 
-            <Card className="min-w-0 shrink-0 shadow-sm">
+            <Card className="min-w-0 shrink-0 border-border/60 shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex flex-col gap-4">
-                  <div>
-                    <CardTitle>Level Wise Practice Papers</CardTitle>
+                  <div className="flex flex-col gap-1">
+                    <CardTitle className="text-lg">Level Wise Practice Papers</CardTitle>
                     <CardDescription>
-                      Filter by exam → subject → unit → chapter → topic → subtopic → definition. Table shows papers for the selected path.
+                      Filter by exam → subject → unit → chapter → topic → subtopic → definition. Each scope is shown in its own card below with a table.
                     </CardDescription>
-                  </div>
-
-                  {/* Breadcrumb path (image-style: pills + arrow + count) */}
-                  <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border/60 bg-muted/20 px-3 py-2">
-                    <button
-                      type="button"
-                      onClick={clearAllFilters}
-                      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                        pathSegments.length === 0
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/70 text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
-                      All
-                    </button>
-                    {pathSegments.map((seg, i) => (
-                      <React.Fragment key={seg.level}>
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                        <button
-                          type="button"
-                          onClick={() => seg.level < 7 && clearFilterFromLevel((seg.level + 1) as 2 | 3 | 4 | 5 | 6 | 7)}
-                          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                            i === 0 ? "bg-primary text-primary-foreground" : "bg-muted/70 text-foreground hover:bg-muted"
-                          }`}
-                        >
-                          {toTitleCase(seg.name)}
-                        </button>
-                      </React.Fragment>
-                    ))}
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                      {papers.length} {papers.length === 1 ? "paper" : "papers"}
-                    </span>
                   </div>
 
                   {/* Cascading filter row */}
@@ -1476,73 +1535,201 @@ export default function LevelWisePracticePage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {filteredPapers.length > 0 && (
+                      isReorderingEnabled ? (
+                        <>
+                          <Button type="button" size="sm" className="h-9" onClick={saveOrder} disabled={reorderSaving}>
+                            {reorderSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save order"}
+                          </Button>
+                          <Button type="button" variant="outline" size="sm" className="h-9" onClick={disableReordering} disabled={reorderSaving}>
+                            Done
+                          </Button>
+                        </>
+                      ) : (
+                        <Button type="button" variant="outline" size="sm" className="h-9" onClick={enableReordering}>
+                          <GripVertical className="mr-2 h-4 w-4" />
+                          Enable Reordering
+                        </Button>
+                      )
+                    )}
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-14">ORDER</TableHead>
-                      <TableHead>TITLE</TableHead>
-                      <TableHead className="w-24">LEVEL</TableHead>
-                      <TableHead className="max-w-[200px]">SCOPE</TableHead>
-                      <TableHead className="w-20 text-right">QUESTIONS</TableHead>
-                      <TableHead className="w-20 text-right">DURATION</TableHead>
-                      <TableHead className="w-20 text-right">MARKS</TableHead>
-                      <TableHead className="w-24">DIFFICULTY</TableHead>
-                      <TableHead className="w-20">STATUS</TableHead>
-                      <TableHead className="w-32 text-right">ACTIONS</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredPapers.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
-                          No papers in this scope. Use filters or Add Practice.
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredPapers.map((paper) => (
-                        <TableRow key={paper.id}>
-                          <TableCell className="font-mono text-muted-foreground">{paper.orderNumber != null ? paper.orderNumber : "-"}</TableCell>
-                          <TableCell>
-                            <Link
-                              href={`/practice-management/level-wise/${paper.id}/questions`}
-                              className="font-medium text-primary hover:underline"
-                            >
-                              {toTitleCase(paper.title)}
-                            </Link>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">{paper.levelName != null && paper.levelName !== "" ? paper.levelName : (paper.level != null ? `Level ${paper.level}` : "-")}</TableCell>
-                          <TableCell className="text-muted-foreground truncate max-w-[200px]" title={scopeLabel(paper)}>
-                            {scopeLabel(paper)}
-                          </TableCell>
-                          <TableCell className="text-right">{paper.totalQuestions != null ? paper.totalQuestions : "-"}</TableCell>
-                          <TableCell className="text-right">{paper.durationMinutes != null ? `${paper.durationMinutes} m` : "-"}</TableCell>
-                          <TableCell className="text-right">{paper.totalMarks != null ? paper.totalMarks : "-"}</TableCell>
-                          <TableCell>{paper.difficulty != null && paper.difficulty !== "" ? paper.difficulty : "-"}</TableCell>
-                          <TableCell>{paper.status != null && paper.status !== "" ? paper.status : "-"}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                <Link href={`/practice-management/level-wise/${paper.id}/questions`} title="Questions">
-                                  <ListChecks className="h-4 w-4" />
-                                </Link>
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(paper)} title="Edit">
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(paper)} title="Delete">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+              <Separator />
+              <CardContent className="pt-4">
+                {filteredPapers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border/60 bg-muted/20 py-16 px-6 text-center">
+                    <div className="rounded-full bg-muted p-4">
+                      <FileQuestion className="h-10 w-10 text-muted-foreground" aria-hidden />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">No practice papers found</p>
+                      <p className="max-w-sm text-sm text-muted-foreground">
+                        Adjust filters above or add a new practice paper to get started.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      <Button variant="outline" size="sm" onClick={clearAllFilters}>
+                        Clear filters
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          resetForm();
+                          setIsAddOpen(true);
+                        }}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Practice
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {papersByScope.map(([scopeKeyVal, groupPapers]) => (
+                      <Card key={scopeKeyVal} className="border-border/50 shadow-none bg-muted/5">
+                        <CardHeader className="pb-3 pt-4">
+                          <nav aria-label={`Scope: ${scopeHeaderLabel(groupPapers[0])}`} className="flex flex-wrap items-center gap-2">
+                            {scopeSegments(groupPapers[0]).map((seg, i) => (
+                              <React.Fragment key={i}>
+                                {i > 0 && <span className="text-muted-foreground px-0.5" aria-hidden>/</span>}
+                                {i === 0 ? (
+                                  <Badge className="rounded-full px-2.5 py-0.5 text-xs font-medium">
+                                    {seg}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="secondary" className="rounded-full px-2.5 py-0.5 text-xs font-medium">
+                                    {seg}
+                                  </Badge>
+                                )}
+                              </React.Fragment>
+                            ))}
+                            <span className="text-muted-foreground px-0.5" aria-hidden>/</span>
+                            <Badge variant="outline" className="rounded-full px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                              {groupPapers.length} {groupPapers.length === 1 ? "paper" : "papers"}
+                            </Badge>
+                          </nav>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="w-full overflow-x-auto">
+                            <Table className="min-w-[800px]">
+                              <TableHeader>
+                                <TableRow className="border-b border-border/80 hover:bg-transparent">
+                                  <TableHead className="w-14 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Order</TableHead>
+                                  <TableHead className="min-w-[180px] py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Title</TableHead>
+                                  <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Level</TableHead>
+                                  <TableHead className="w-20 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Questions</TableHead>
+                                  <TableHead className="w-20 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Duration</TableHead>
+                                  <TableHead className="w-20 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Marks</TableHead>
+                                  <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Difficulty</TableHead>
+                                  <TableHead className="w-20 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                                  <TableHead className="w-32 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {groupPapers.map((paper, orderIndex) => (
+                                  <TableRow
+                                    key={paper.id}
+                                    className={`transition-colors hover:bg-muted/40 ${isReorderingEnabled ? "cursor-move" : ""} ${dragOverPaperId === paper.id ? "border-2 border-primary/30 bg-primary/5" : ""}`}
+                                    draggable={isReorderingEnabled}
+                                    onDragStart={(e) => handlePaperDragStart(e, paper)}
+                                    onDragOver={handlePaperDragOver}
+                                    onDragEnter={() => handlePaperDragEnter(paper)}
+                                    onDragLeave={handlePaperDragLeave}
+                                    onDrop={(e) => handlePaperDrop(e, paper, scopeKeyVal, groupPapers)}
+                                  >
+                                    <TableCell className="py-2">
+                                      <div className="flex items-center justify-center gap-1">
+                                        {isReorderingEnabled && (
+                                          <GripVertical className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                                        )}
+                                        <span className="min-w-6 text-center font-mono text-sm font-medium text-foreground">{orderIndex + 1}</span>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="py-2">
+                                      <Link
+                                        href={`/practice-management/level-wise/${paper.id}/questions`}
+                                        className="font-medium text-primary hover:underline"
+                                      >
+                                        {toTitleCase(paper.title)}
+                                      </Link>
+                                    </TableCell>
+                                    <TableCell className="py-2 text-sm text-muted-foreground">{paper.levelName != null && paper.levelName !== "" ? paper.levelName : (paper.level != null ? `Level ${paper.level}` : "—")}</TableCell>
+                                    <TableCell className="py-2 text-right text-sm">{paper.totalQuestions != null ? paper.totalQuestions : "—"}</TableCell>
+                                    <TableCell className="py-2 text-right text-sm">{paper.durationMinutes != null ? `${paper.durationMinutes} m` : "—"}</TableCell>
+                                    <TableCell className="py-2 text-right text-sm">{paper.totalMarks != null ? paper.totalMarks : "—"}</TableCell>
+                                    <TableCell className="py-2 text-sm">{paper.difficulty != null && paper.difficulty !== "" ? paper.difficulty : "—"}</TableCell>
+                                    <TableCell className="py-2 text-sm">{paper.status != null && paper.status !== "" ? paper.status : "—"}</TableCell>
+                                    <TableCell className="py-2 text-right">
+                                      <div className="flex items-center justify-end gap-0.5">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" asChild>
+                                          <Link href={`/practice-management/level-wise/${paper.id}/questions`} title="Questions">
+                                            <ListChecks className="h-4 w-4" />
+                                          </Link>
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => openEdit(paper)} title="Edit">
+                                          <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(paper)} title="Delete">
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Pagination */}
+                {filteredPapers.length > 0 && (
+                  <div className="mt-6 flex flex-col gap-3 border-t border-border/60 pt-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <span>Rows per page</span>
+                      <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setCurrentPage(1); }}>
+                        <SelectTrigger className="h-9 w-[100px] rounded-lg">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PAGE_SIZE_OPTIONS.map((n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <span>
+                        {(safePage - 1) * pageSize + 1}-{Math.min(safePage * pageSize, filteredPapers.length)} of {filteredPapers.length}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>Page {safePage} of {totalPages}</span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={safePage <= 1}
+                      >
+                        Prev
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9"
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={safePage >= totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
