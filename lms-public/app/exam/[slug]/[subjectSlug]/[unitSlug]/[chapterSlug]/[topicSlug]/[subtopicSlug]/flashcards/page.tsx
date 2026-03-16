@@ -20,6 +20,7 @@ import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { Button } from "@/components/ui/button";
+import { generateFlashcardDeckMetadata } from "@/lib/metadata";
 
 interface PageProps {
   params: Promise<{
@@ -70,7 +71,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const subtopicData = await getSubtopicById(subtopic.id);
   if (!subtopicData || typeof subtopicData !== "object") return { title: "Not Found | LmsDoors" };
   const subtopicName = toTitleCase(String((subtopicData as { name?: string }).name ?? p.subtopicSlug));
-  return { title: `Flashcards – ${subtopicName} | LmsDoors` };
+  const fallbackTitle = `Flashcards – ${subtopicName}`;
+  const { deck } = await getLevelWiseFlashcardDeckAndCards({
+    examId,
+    level: 6,
+    subjectId: subject.id,
+    unitId: unit.id,
+    chapterId: chapter.id,
+    topicId: topic.id,
+    subtopicId: subtopic.id,
+  });
+  return generateFlashcardDeckMetadata(deck, fallbackTitle);
 }
 
 export default async function SubtopicFlashcardsPage({ params }: PageProps) {

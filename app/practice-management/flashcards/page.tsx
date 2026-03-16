@@ -47,7 +47,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Plus, Pencil, Trash2, Loader2, BookOpen } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, BookOpen, Search, FilterX, ChevronLeft, ChevronRight, Check, Globe, GlobeLock, Power } from "lucide-react";
 import { toast } from "sonner";
 import { toTitleCase } from "@/lib/titleCase";
 
@@ -60,6 +60,8 @@ const CONTENT_LEVELS = [
   { value: 6, label: "Level 6 - Subtopic" },
   { value: 7, label: "Level 7 - Definition" },
 ];
+
+const PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
 
 interface Deck {
   id: string;
@@ -84,6 +86,13 @@ interface Deck {
   description?: string;
   orderNumber: number;
   status: string;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    noIndex?: boolean;
+    noFollow?: boolean;
+  };
 }
 
 interface Exam {
@@ -118,7 +127,23 @@ export default function PracticeManagementFlashcardsPage() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<{ examId: string }>({ examId: "" });
+  const [filter, setFilter] = useState({
+    level: "",
+    examId: "",
+    subjectId: "",
+    unitId: "",
+    chapterId: "",
+    topicId: "",
+    subtopicId: "",
+    definitionId: "",
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [metaStatusFilter, setMetaStatusFilter] = useState<"all" | "filled" | "not-filled">("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const [totalDecks, setTotalDecks] = useState(0);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [togglingStatusId, setTogglingStatusId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
@@ -141,6 +166,13 @@ export default function PracticeManagementFlashcardsPage() {
   const [deleteTargetDeck, setDeleteTargetDeck] = useState<Deck | null>(null);
   const [deleteSaving, setDeleteSaving] = useState(false);
 
+  const [filterSubjects, setFilterSubjects] = useState<HierarchyOption[]>([]);
+  const [filterUnits, setFilterUnits] = useState<HierarchyOption[]>([]);
+  const [filterChapters, setFilterChapters] = useState<HierarchyOption[]>([]);
+  const [filterTopics, setFilterTopics] = useState<HierarchyOption[]>([]);
+  const [filterSubtopics, setFilterSubtopics] = useState<HierarchyOption[]>([]);
+  const [filterDefinitions, setFilterDefinitions] = useState<HierarchyOption[]>([]);
+
   const [formSubjects, setFormSubjects] = useState<HierarchyOption[]>([]);
   const [formUnits, setFormUnits] = useState<HierarchyOption[]>([]);
   const [formChapters, setFormChapters] = useState<HierarchyOption[]>([]);
@@ -150,9 +182,23 @@ export default function PracticeManagementFlashcardsPage() {
 
   const decksQuery = useMemo(() => {
     const p = new URLSearchParams();
+    if (filter.level) p.set("level", filter.level);
     if (filter.examId) p.set("examId", filter.examId);
+    if (filter.subjectId) p.set("subjectId", filter.subjectId);
+    if (filter.unitId) p.set("unitId", filter.unitId);
+    if (filter.chapterId) p.set("chapterId", filter.chapterId);
+    if (filter.topicId) p.set("topicId", filter.topicId);
+    if (filter.subtopicId) p.set("subtopicId", filter.subtopicId);
+    if (filter.definitionId) p.set("definitionId", filter.definitionId);
+    p.set("page", String(currentPage));
+    p.set("limit", String(pageSize));
     return p.toString();
-  }, [filter.examId]);
+  }, [filter.level, filter.examId, filter.subjectId, filter.unitId, filter.chapterId, filter.topicId, filter.subtopicId, filter.definitionId, currentPage, pageSize]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter.level, filter.examId, filter.subjectId, filter.unitId, filter.chapterId, filter.topicId, filter.subtopicId, filter.definitionId]);
 
   useEffect(() => {
     fetch("/api/exams?contextapi=1")
@@ -161,22 +207,110 @@ export default function PracticeManagementFlashcardsPage() {
       .catch(() => setExams([]));
   }, []);
 
+  // Load filter dropdown options (cascading: exam → subject → unit → chapter → topic → subtopic → definition)
+  useEffect(() => {
+    if (!filter.examId) {
+      setFilterSubjects([]);
+      return;
+    }
+    fetch(`/api/subjects?examId=${filter.examId}&contextapi=1`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setFilterSubjects(
+          Array.isArray(data) ? data.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name ?? "" })) : []
+        )
+      )
+      .catch(() => setFilterSubjects([]));
+  }, [filter.examId]);
+  useEffect(() => {
+    if (!filter.subjectId) {
+      setFilterUnits([]);
+      return;
+    }
+    fetch(`/api/units?subjectId=${filter.subjectId}&contextapi=1`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setFilterUnits(
+          Array.isArray(data) ? data.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name ?? "" })) : []
+        )
+      )
+      .catch(() => setFilterUnits([]));
+  }, [filter.subjectId]);
+  useEffect(() => {
+    if (!filter.unitId) {
+      setFilterChapters([]);
+      return;
+    }
+    fetch(`/api/chapters?unitId=${filter.unitId}&contextapi=1`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setFilterChapters(
+          Array.isArray(data) ? data.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name ?? "" })) : []
+        )
+      )
+      .catch(() => setFilterChapters([]));
+  }, [filter.unitId]);
+  useEffect(() => {
+    if (!filter.chapterId) {
+      setFilterTopics([]);
+      return;
+    }
+    fetch(`/api/topics?chapterId=${filter.chapterId}&contextapi=1`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setFilterTopics(
+          Array.isArray(data) ? data.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name ?? "" })) : []
+        )
+      )
+      .catch(() => setFilterTopics([]));
+  }, [filter.chapterId]);
+  useEffect(() => {
+    if (!filter.topicId) {
+      setFilterSubtopics([]);
+      return;
+    }
+    fetch(`/api/subtopics?topicId=${filter.topicId}&contextapi=1`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setFilterSubtopics(
+          Array.isArray(data) ? data.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name ?? "" })) : []
+        )
+      )
+      .catch(() => setFilterSubtopics([]));
+  }, [filter.topicId]);
+  useEffect(() => {
+    if (!filter.subtopicId) {
+      setFilterDefinitions([]);
+      return;
+    }
+    fetch(`/api/definitions?subtopicId=${filter.subtopicId}&contextapi=1`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setFilterDefinitions(
+          Array.isArray(data) ? data.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name ?? "" })) : []
+        )
+      )
+      .catch(() => setFilterDefinitions([]));
+  }, [filter.subtopicId]);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     const url = `/api/level-wise-flashcards${decksQuery ? `?${decksQuery}` : ""}`;
     fetch(url)
-      .then((res) => (!cancelled && res.ok ? res.json() : { decks: [] }))
+      .then((res) => (!cancelled && res.ok ? res.json() : { decks: [], total: 0 }))
       .then((data) => {
         if (!cancelled) {
           const list = Array.isArray(data.decks) ? data.decks : [];
           setDecks(list);
+          setTotalDecks(typeof data.total === "number" ? data.total : 0);
           setError(null);
         }
       })
       .catch(() => {
         if (!cancelled) setError("Failed to fetch decks");
         if (!cancelled) setDecks([]);
+        if (!cancelled) setTotalDecks(0);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -473,10 +607,114 @@ export default function PracticeManagementFlashcardsPage() {
     }
   }, [deleteTargetDeck]);
 
-  const sortedDecks = useMemo(
-    () => [...decks].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0)),
-    [decks]
+  const handleToggleStatus = useCallback(async (deckId: string) => {
+    const deck = decks.find((d) => d.id === deckId);
+    if (!deck) return;
+    const nextStatus = deck.status === "Active" ? "Inactive" : "Active";
+    setTogglingStatusId(deckId);
+    try {
+      const res = await fetch(`/api/level-wise-flashcards/${deckId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (!res.ok) throw new Error("Failed to update status");
+      const updated = await res.json();
+      setDecks((prev) => prev.map((d) => (d.id === updated.id ? { ...d, status: updated.status } : d)));
+      toast.success(`Status set to ${nextStatus}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update status");
+    } finally {
+      setTogglingStatusId(null);
+    }
+  }, [decks]);
+
+  const handlePublish = useCallback(async (deckId: string, noIndex: boolean, noFollow: boolean) => {
+    const deck = decks.find((d) => d.id === deckId);
+    if (!deck) return;
+    setPublishingId(deckId);
+    try {
+      const res = await fetch(`/api/level-wise-flashcards/${deckId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          seo: {
+            ...deck.seo,
+            noIndex,
+            noFollow,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to update publish state");
+      const updated = await res.json();
+      setDecks((prev) =>
+        prev.map((d) => (d.id === updated.id ? { ...d, seo: updated.seo ?? d.seo } : d))
+      );
+      toast.success(noIndex && noFollow ? "Unpublished" : "Published");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update");
+    } finally {
+      setPublishingId(null);
+    }
+  }, [decks]);
+
+  const hasActiveFilters = useMemo(
+    () =>
+      !!(
+        filter.level ||
+        filter.examId ||
+        filter.subjectId ||
+        filter.unitId ||
+        filter.chapterId ||
+        filter.topicId ||
+        filter.subtopicId ||
+        filter.definitionId ||
+        searchQuery.trim() ||
+        metaStatusFilter !== "all"
+      ),
+    [filter, searchQuery, metaStatusFilter]
   );
+
+  const clearFilters = useCallback(() => {
+    setFilter({
+      level: "",
+      examId: "",
+      subjectId: "",
+      unitId: "",
+      chapterId: "",
+      topicId: "",
+      subtopicId: "",
+      definitionId: "",
+    });
+    setSearchQuery("");
+    setMetaStatusFilter("all");
+  }, []);
+
+  const sortedDecks = useMemo(() => {
+    let list = [...decks].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(
+        (deck) =>
+          (deck.title && deck.title.toLowerCase().includes(q)) ||
+          scopeLabel(deck).toLowerCase().includes(q)
+      );
+    }
+    if (metaStatusFilter !== "all") {
+      list = list.filter((deck) => {
+        const t = deck.seo?.metaTitle?.trim();
+        const d = deck.seo?.metaDescription?.trim();
+        const k = deck.seo?.metaKeywords?.trim();
+        const metaFilled = !!(t && d && k);
+        return metaStatusFilter === "filled" ? metaFilled : !metaFilled;
+      });
+    }
+    return list;
+  }, [decks, searchQuery, metaStatusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(totalDecks / pageSize));
+  const startItem = totalDecks === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalDecks);
 
   return (
     <div className="flex min-h-0 flex-1 min-w-0 flex-col">
@@ -807,27 +1045,263 @@ export default function PracticeManagementFlashcardsPage() {
                   <div className="flex flex-col gap-1">
                     <CardTitle className="text-lg">Level-Wise Flashcard Decks</CardTitle>
                     <CardDescription>
-                      Manage flashcard decks by exam and hierarchy. Open a deck to add or edit cards.
+                      Manage flashcard decks by exam and hierarchy. Filter by level and scope, or search by title/scope.
                     </CardDescription>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Label className="text-sm text-muted-foreground shrink-0">Filter by exam:</Label>
-                    <Select
-                      value={filter.examId || "__all__"}
-                      onValueChange={(v) => setFilter({ examId: v === "__all__" ? "" : v })}
-                    >
-                      <SelectTrigger className="w-[200px] h-9">
-                        <SelectValue placeholder="All exams" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__all__">All exams</SelectItem>
-                        {exams.map((e) => (
-                          <SelectItem key={e.id} value={e.id}>
-                            {toTitleCase(e.name)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  {/* Filters: Level, Exam → Subject → Unit → Chapter → Topic → Subtopic → Definition */}
+                  <div className="flex flex-wrap items-end gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Level</Label>
+                      <Select
+                        value={filter.level || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({ ...prev, level: v === "__all__" ? "" : v }))
+                        }
+                      >
+                        <SelectTrigger className="h-9 w-[140px]">
+                          <SelectValue placeholder="All levels" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All levels</SelectItem>
+                          {CONTENT_LEVELS.map((l) => (
+                            <SelectItem key={l.value} value={String(l.value)}>
+                              {l.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Exam</Label>
+                      <Select
+                        value={filter.examId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({
+                            ...prev,
+                            examId: v === "__all__" ? "" : v,
+                            subjectId: "",
+                            unitId: "",
+                            chapterId: "",
+                            topicId: "",
+                            subtopicId: "",
+                            definitionId: "",
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="h-9 w-[160px]">
+                          <SelectValue placeholder="All exams" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All exams</SelectItem>
+                          {exams.map((e) => (
+                            <SelectItem key={e.id} value={e.id}>
+                              {toTitleCase(e.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Subject</Label>
+                      <Select
+                        value={filter.subjectId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({
+                            ...prev,
+                            subjectId: v === "__all__" ? "" : v,
+                            unitId: "",
+                            chapterId: "",
+                            topicId: "",
+                            subtopicId: "",
+                            definitionId: "",
+                          }))
+                        }
+                        disabled={!filter.examId}
+                      >
+                        <SelectTrigger className="h-9 w-[140px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All</SelectItem>
+                          {filterSubjects.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {toTitleCase(s.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Unit</Label>
+                      <Select
+                        value={filter.unitId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({
+                            ...prev,
+                            unitId: v === "__all__" ? "" : v,
+                            chapterId: "",
+                            topicId: "",
+                            subtopicId: "",
+                            definitionId: "",
+                          }))
+                        }
+                        disabled={!filter.subjectId}
+                      >
+                        <SelectTrigger className="h-9 w-[120px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All</SelectItem>
+                          {filterUnits.map((u) => (
+                            <SelectItem key={u.id} value={u.id}>
+                              {toTitleCase(u.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Chapter</Label>
+                      <Select
+                        value={filter.chapterId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({
+                            ...prev,
+                            chapterId: v === "__all__" ? "" : v,
+                            topicId: "",
+                            subtopicId: "",
+                            definitionId: "",
+                          }))
+                        }
+                        disabled={!filter.unitId}
+                      >
+                        <SelectTrigger className="h-9 w-[120px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All</SelectItem>
+                          {filterChapters.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {toTitleCase(c.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Topic</Label>
+                      <Select
+                        value={filter.topicId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({
+                            ...prev,
+                            topicId: v === "__all__" ? "" : v,
+                            subtopicId: "",
+                            definitionId: "",
+                          }))
+                        }
+                        disabled={!filter.chapterId}
+                      >
+                        <SelectTrigger className="h-9 w-[120px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All</SelectItem>
+                          {filterTopics.map((t) => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {toTitleCase(t.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Subtopic</Label>
+                      <Select
+                        value={filter.subtopicId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({
+                            ...prev,
+                            subtopicId: v === "__all__" ? "" : v,
+                            definitionId: "",
+                          }))
+                        }
+                        disabled={!filter.topicId}
+                      >
+                        <SelectTrigger className="h-9 w-[120px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All</SelectItem>
+                          {filterSubtopics.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {toTitleCase(s.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Definition</Label>
+                      <Select
+                        value={filter.definitionId || "__all__"}
+                        onValueChange={(v) =>
+                          setFilter((prev) => ({ ...prev, definitionId: v === "__all__" ? "" : v }))
+                        }
+                        disabled={!filter.subtopicId}
+                      >
+                        <SelectTrigger className="h-9 w-[120px]">
+                          <SelectValue placeholder="All" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">All</SelectItem>
+                          {filterDefinitions.map((d) => (
+                            <SelectItem key={d.id} value={d.id}>
+                              {toTitleCase(d.name)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Meta</Label>
+                      <Select
+                        value={metaStatusFilter}
+                        onValueChange={(v: "all" | "filled" | "not-filled") => setMetaStatusFilter(v)}
+                      >
+                        <SelectTrigger className="h-9 w-[130px]">
+                          <SelectValue placeholder="Meta" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          <SelectItem value="filled">Meta Filled</SelectItem>
+                          <SelectItem value="not-filled">Meta Not Filled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="ml-auto flex items-center gap-2">
+                      <Label className="text-xs text-muted-foreground whitespace-nowrap">Search (title or scope)</Label>
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="Search by title or scope…"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="h-9 w-[220px] pl-8"
+                        />
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 gap-1.5"
+                        onClick={clearFilters}
+                        disabled={!hasActiveFilters}
+                        title="Clear all filters and search"
+                      >
+                        <FilterX className="h-4 w-4" />
+                        Clear filter
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
@@ -837,7 +1311,7 @@ export default function PracticeManagementFlashcardsPage() {
                   <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border/60 bg-muted/20 py-16 px-6 text-center">
                     <p className="font-medium text-foreground">No flashcard decks found</p>
                     <p className="max-w-sm text-sm text-muted-foreground">
-                      Add a deck or adjust the exam filter.
+                      Add a deck or adjust the level/scope filters and search.
                     </p>
                     <Button
                       size="sm"
@@ -852,7 +1326,7 @@ export default function PracticeManagementFlashcardsPage() {
                   </div>
                 ) : (
                   <div className="w-full overflow-x-auto">
-                    <Table className="min-w-[700px]">
+                    <Table className="min-w-[820px]">
                       <TableHeader>
                         <TableRow className="border-b border-border/80 hover:bg-transparent">
                           <TableHead className="w-14 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Order</TableHead>
@@ -860,7 +1334,8 @@ export default function PracticeManagementFlashcardsPage() {
                           <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Level</TableHead>
                           <TableHead className="min-w-[200px] py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Scope</TableHead>
                           <TableHead className="w-20 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
-                          <TableHead className="w-32 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
+                          <TableHead className="w-16 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Meta</TableHead>
+                          <TableHead className="w-36 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -888,8 +1363,58 @@ export default function PracticeManagementFlashcardsPage() {
                                 {deck.status}
                               </Badge>
                             </TableCell>
+                            <TableCell className="py-2 text-muted-foreground">
+                              {(() => {
+                                const t = deck.seo?.metaTitle?.trim();
+                                const d = deck.seo?.metaDescription?.trim();
+                                const k = deck.seo?.metaKeywords?.trim();
+                                const metaFilled = !!(t && d && k);
+                                return metaFilled ? (
+                                  <Check className="h-4 w-4 shrink-0 text-green-500" aria-label="Meta filled" />
+                                ) : (
+                                  "—"
+                                );
+                              })()}
+                            </TableCell>
                             <TableCell className="py-2 text-right">
                               <div className="flex items-center justify-end gap-0.5">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                  title={
+                                    deck.seo?.noIndex || deck.seo?.noFollow
+                                      ? "Publish (allow index & follow)"
+                                      : "Unpublish (no index, no follow)"
+                                  }
+                                  disabled={publishingId === deck.id}
+                                  onClick={() => {
+                                    const isPublished = !deck.seo?.noIndex && !deck.seo?.noFollow;
+                                    handlePublish(deck.id, isPublished, isPublished);
+                                  }}
+                                >
+                                  {publishingId === deck.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : deck.seo?.noIndex || deck.seo?.noFollow ? (
+                                    <GlobeLock className="h-4 w-4" />
+                                  ) : (
+                                    <Globe className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                  title={deck.status === "Active" ? "Set Inactive" : "Set Active"}
+                                  disabled={togglingStatusId === deck.id}
+                                  onClick={() => handleToggleStatus(deck.id)}
+                                >
+                                  {togglingStatusId === deck.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Power className="h-4 w-4" />
+                                  )}
+                                </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" asChild>
                                   <Link href={`/practice-management/flashcards/${deck.id}/cards`} title="Cards">
                                     <BookOpen className="h-4 w-4" />
@@ -909,6 +1434,63 @@ export default function PracticeManagementFlashcardsPage() {
                     </Table>
                   </div>
                 )}
+                {/* Pagination */}
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs text-muted-foreground whitespace-nowrap">Show</Label>
+                      <Select
+                        value={String(pageSize)}
+                        onValueChange={(v) => {
+                          setPageSize(Number(v));
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <SelectTrigger className="h-9 w-[90px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PAGE_SIZE_OPTIONS.map((n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <span className="text-xs text-muted-foreground">per page</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {totalDecks === 0
+                        ? "0 decks"
+                        : `Showing ${startItem}–${endItem} of ${totalDecks}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 gap-1"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage <= 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <span className="min-w-[100px] px-2 text-center text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 gap-1"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage >= totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 

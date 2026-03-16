@@ -20,6 +20,7 @@ import { ContentEditorCard } from "@/components/self-study/content-editor-card"
 import { ContentSeoLayout } from "@/components/self-study/content-seo-layout"
 import { LastModifiedCreatedBar } from "@/components/self-study/last-modified-bar"
 import { LevelWiseDirectDetailsPage } from "@/components/self-study/level-wise-direct-details-page"
+import { LevelWiseDirectDetailsPageFlashcard } from "@/components/self-study/level-wise-direct-details-page-flashcard"
 import { SeoSettingsForm } from "@/components/self-study/seo-settings-form"
 import { DEFAULT_SEO, type SeoData } from "@/components/self-study/types"
 
@@ -296,6 +297,12 @@ export default function ExamSlugPage({
           <>
             <ContentEditorCard />
             <LevelWiseDirectDetailsPage
+              level={1}
+              examId={exam.id}
+              examSlug={exam.slug}
+              examName={exam.name}
+            />
+            <LevelWiseDirectDetailsPageFlashcard
               level={1}
               examId={exam.id}
               examSlug={exam.slug}

@@ -147,3 +147,66 @@ export function normalizeApiSeo(apiSeo: unknown): EntitySeo | null {
     noFollow: (s.noFollow as boolean) ?? null,
   };
 }
+
+/** Deck shape for flashcard metadata (from getLevelWiseFlashcardDeckAndCards) */
+export interface FlashcardDeckForMeta {
+  title?: string | null;
+  examName?: string | null;
+  subjectName?: string | null;
+  unitName?: string | null;
+  chapterName?: string | null;
+  topicName?: string | null;
+  subtopicName?: string | null;
+  definitionName?: string | null;
+  seo?: unknown;
+}
+
+/**
+ * Build Next.js Metadata for public flashcard deck pages.
+ * Uses deck.seo when set in practice management; otherwise fallback from deck title and context.
+ */
+export function generateFlashcardDeckMetadata(
+  deck: FlashcardDeckForMeta | null,
+  fallbackPageTitle: string
+): Metadata {
+  const seo = deck?.seo ? normalizeApiSeo(deck.seo) : null;
+  const title = (deck?.title ?? "").trim() || fallbackPageTitle;
+
+  let metaTitle = (seo?.metaTitle ?? "").trim();
+  if (!metaTitle) {
+    metaTitle = `${title} | ${SITE_NAME}`;
+    if (metaTitle.length > MAX_TITLE_LENGTH) {
+      metaTitle = metaTitle.slice(0, MAX_TITLE_LENGTH - 3) + "...";
+    }
+  }
+
+  let metaDescription = (seo?.metaDescription ?? "").trim();
+  if (!metaDescription) {
+    metaDescription = `Practice with ${title} flashcards on ${SITE_NAME}. Study and revise key terms and definitions.`;
+    if (metaDescription.length > MAX_DESCRIPTION_LENGTH) {
+      metaDescription = metaDescription.slice(0, MAX_DESCRIPTION_LENGTH - 3) + "...";
+    }
+  }
+
+  const rawKeywords = seo?.metaKeywords ?? seo?.keywords ?? "";
+  const keywords = (typeof rawKeywords === "string" ? rawKeywords : "").trim()
+    || [title, deck?.examName, deck?.subjectName, deck?.unitName].filter(Boolean).join(", ");
+
+  const noIndex = seo?.noIndex === true;
+  const noFollow = seo?.noFollow === true;
+
+  const ogImage = (deck?.seo && typeof deck.seo === "object" && (deck.seo as Record<string, unknown>).ogImageUrl) as string | undefined;
+
+  return {
+    title: metaTitle,
+    description: metaDescription,
+    keywords: keywords || undefined,
+    robots: { index: !noIndex, follow: !noFollow },
+    openGraph: {
+      title: metaTitle,
+      description: metaDescription,
+      siteName: SITE_NAME,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+  };
+}

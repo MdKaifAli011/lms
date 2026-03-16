@@ -104,6 +104,7 @@ export async function GET(request: NextRequest) {
       orderNumber: doc.orderNumber,
       status: doc.status,
       locked: doc.locked || false,
+      seo: (doc.seo as Record<string, unknown>) ?? undefined,
       createdAt: doc.createdAt
         ? new Date(doc.createdAt as Date).toLocaleString("en-US", {
             year: "numeric",

@@ -10,6 +10,7 @@ import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
 import { Button } from "@/components/ui/button";
+import { generateFlashcardDeckMetadata } from "@/lib/metadata";
 
 interface PageProps {
   params: Promise<{ slug: string; subjectSlug: string }>;
@@ -26,8 +27,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
   const subject = subjects.find((s) => s.slug === subjectSlug);
   if (!subject) return { title: "Not Found | LmsDoors" };
-  const name = toTitleCase(subject.name);
-  return { title: `Flashcards – ${name} | LmsDoors` };
+  const subjectName = toTitleCase(subject.name);
+  const fallbackTitle = `Flashcards – ${subjectName}`;
+  const { deck } = await getLevelWiseFlashcardDeckAndCards({
+    examId,
+    level: 2,
+    subjectId: subject.id,
+  });
+  return generateFlashcardDeckMetadata(deck, fallbackTitle);
 }
 
 export default async function SubjectFlashcardsPage({ params }: PageProps) {

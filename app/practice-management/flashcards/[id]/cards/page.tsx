@@ -33,6 +33,10 @@ import { Plus, Pencil, Trash2, Loader2, ArrowLeft, GripVertical } from "lucide-r
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { toTitleCase } from "@/lib/titleCase";
+import { SeoSettingsForm } from "@/components/self-study/seo-settings-form";
+import { ContentSeoLayout } from "@/components/self-study/content-seo-layout";
+import { LastModifiedCreatedBar } from "@/components/self-study/last-modified-bar";
+import { DEFAULT_SEO, type SeoData } from "@/components/self-study/types";
 
 const TRUNCATE_LEN = 80;
 
@@ -45,7 +49,36 @@ interface Deck {
   id: string;
   title: string;
   slug?: string;
+  level?: number;
   levelName?: string;
+  examName?: string | null;
+  subjectName?: string | null;
+  unitName?: string | null;
+  chapterName?: string | null;
+  topicName?: string | null;
+  subtopicName?: string | null;
+  definitionName?: string | null;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  seo?: SeoData | Record<string, unknown>;
+}
+
+function scopeLabel(deck: Deck): string {
+  const level = Math.min(Math.max(deck.level ?? 1, 1), 7);
+  const names = [
+    deck.examName,
+    deck.subjectName,
+    deck.unitName,
+    deck.chapterName,
+    deck.topicName,
+    deck.subtopicName,
+    deck.definitionName,
+  ];
+  const parts = names.slice(0, level).map((n) =>
+    n != null && String(n).trim() ? toTitleCase(String(n).trim()) : "—"
+  );
+  return parts.join(" / ") || "—";
 }
 
 interface Flashcard {
@@ -76,6 +109,10 @@ export default function FlashcardsCardsPage() {
   const [savingOrder, setSavingOrder] = useState(false);
   const [draggedCard, setDraggedCard] = useState<Flashcard | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [seo, setSeo] = useState<SeoData>(DEFAULT_SEO);
+  const [savingSeo, setSavingSeo] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [publishSaving, setPublishSaving] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -101,8 +138,21 @@ export default function FlashcardsCardsPage() {
         }
         const deckData = await deckRes.json();
         setDeck(deckData);
-        const cardsData = await cardsRes.ok ? cardsRes.json() : [];
-        setCards(Array.isArray(cardsData) ? cardsData : []);
+        if (deckData?.seo && typeof deckData.seo === "object") {
+          setSeo({ ...DEFAULT_SEO, ...deckData.seo } as SeoData);
+        } else {
+          setSeo(DEFAULT_SEO);
+        }
+        const cardsPayload = await cardsRes.json().catch(() => []);
+        const cardsList = Array.isArray(cardsPayload)
+          ? cardsPayload
+          : Array.isArray((cardsPayload as { cards?: unknown })?.cards)
+            ? (cardsPayload as { cards: Flashcard[] }).cards
+            : [];
+        if (!cardsRes.ok && cardsList.length === 0) {
+          toast.error("Could not load cards. Try refreshing.");
+        }
+        setCards(cardsList);
         setError(null);
       } catch {
         if (!cancelled) setError("Failed to load data");
@@ -262,6 +312,80 @@ export default function FlashcardsCardsPage() {
     }
   }, [id, sortedCards]);
 
+  const saveSeo = useCallback(async () => {
+    setSavingSeo(true);
+    setSaveStatus("saving");
+    try {
+      const res = await fetch(`/api/level-wise-flashcards/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          seo: {
+            metaTitle: seo.metaTitle,
+            metaDescription: seo.metaDescription,
+            metaKeywords: seo.metaKeywords,
+            ogTitle: seo.ogTitle,
+            ogDescription: seo.ogDescription,
+            ogImageUrl: seo.ogImageUrl,
+            canonicalUrl: seo.canonicalUrl,
+            noIndex: seo.noIndex,
+            noFollow: seo.noFollow,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save SEO");
+      const updated = await res.json();
+      setDeck((prev) =>
+        prev
+          ? {
+              ...prev,
+              seo: updated.seo ?? prev.seo,
+              updatedAt: (updated as { updatedAt?: string }).updatedAt ?? prev.updatedAt,
+            }
+          : null
+      );
+      setSaveStatus("saved");
+      toast.success("SEO settings saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save SEO");
+      setSaveStatus("idle");
+    } finally {
+      setSavingSeo(false);
+    }
+  }, [id, seo]);
+
+  const handlePublishChange = useCallback(
+    async (noIndex: boolean, noFollow: boolean) => {
+      setPublishSaving(true);
+      try {
+        const res = await fetch(`/api/level-wise-flashcards/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            seo: {
+              ...seo,
+              noIndex,
+              noFollow,
+            },
+          }),
+        });
+        if (!res.ok) throw new Error("Failed to update publish state");
+        const updated = await res.json();
+        setSeo((prev) => ({ ...prev, noIndex, noFollow }));
+        setDeck((prev) =>
+          prev ? { ...prev, seo: updated.seo ?? prev.seo } : null
+        );
+        toast.success(noIndex && noFollow ? "Unpublished" : "Published");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to update");
+      } finally {
+        setPublishSaving(false);
+      }
+    },
+    [id, seo]
+  );
+
   if (loading) {
     return (
       <div className="flex flex-1 flex-col gap-4 p-4">
@@ -395,20 +519,59 @@ export default function FlashcardsCardsPage() {
         </Button>
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4 overflow-auto min-h-0">
-        <Card>
-          <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-base">{toTitleCase(deck.title)}</CardTitle>
-            <CardDescription className="text-sm">
-              {deck.levelName && `${deck.levelName} · `}
-              <span className="font-medium text-foreground">
-                {cards.length} card{cards.length !== 1 ? "s" : ""}
-              </span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 px-4 pb-4 pt-0">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-sm font-semibold">Cards</h3>
+      <LastModifiedCreatedBar
+        lastModified={deck.updatedAt}
+        createdAt={deck.createdAt}
+        onSave={saveSeo}
+        saveStatus={saveStatus}
+        saveButtonLabel="Save SEO settings"
+        noIndex={seo.noIndex}
+        noFollow={seo.noFollow}
+        onPublishChange={handlePublishChange}
+        publishSaving={publishSaving}
+      />
+
+      <ContentSeoLayout
+        content={
+          <div className="space-y-6 p-4">
+            {/* Deck details */}
+            <Card>
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-base">{toTitleCase(deck.title)}</CardTitle>
+                <CardDescription className="text-sm">
+                  {deck.levelName && `${deck.levelName} · `}
+                  <span className="font-medium text-foreground">
+                    {cards.length} card{cards.length !== 1 ? "s" : ""}
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="px-4 pb-4 pt-0 space-y-3">
+                <div className="grid gap-2 text-sm">
+                  <div className="flex gap-2">
+                    <span className="font-medium text-muted-foreground shrink-0">Scope:</span>
+                    <span className="text-foreground">{scopeLabel(deck)}</span>
+                  </div>
+                  {deck.description != null && String(deck.description).trim() !== "" && (
+                    <div className="flex gap-2">
+                      <span className="font-medium text-muted-foreground shrink-0">Description:</span>
+                      <p className="text-foreground">{deck.description}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Cards */}
+            <Card>
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-base">Cards</CardTitle>
+                <CardDescription className="text-sm">
+                  Add, edit, reorder flashcard front and back content.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 pb-4 pt-0">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold">Card list</h3>
               <div className="flex items-center gap-2">
                 {cards.length > 0 && (
                   <>
@@ -557,9 +720,22 @@ export default function FlashcardsCardsPage() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-      </div>
+              </CardContent>
+            </Card>
+          </div>
+        }
+        seoSidebar={
+          <>
+            <SeoSettingsForm seo={seo} setSeo={setSeo} idPrefix="flashcard-deck-seo" />
+            <div className="mt-4 flex justify-end">
+              <Button onClick={saveSeo} disabled={savingSeo}>
+                {savingSeo && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save SEO settings
+              </Button>
+            </div>
+          </>
+        }
+      />
     </div>
   );
 }

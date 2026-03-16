@@ -24,13 +24,17 @@ export async function GET(
       return NextResponse.json({ error: "Flashcard deck not found" }, { status: 404 });
     }
 
-    const cards = await LevelWiseFlashcardCard.find({ deckId: deck._id })
+    const deckId = deck._id instanceof mongoose.Types.ObjectId
+      ? deck._id
+      : new mongoose.Types.ObjectId(String(deck._id));
+
+    const cards = await LevelWiseFlashcardCard.find({ deckId })
       .sort({ orderNumber: 1 })
       .lean();
 
     const list = cards.map((c) => ({
       id: (c._id as mongoose.Types.ObjectId).toString(),
-      deckId: (deck._id as mongoose.Types.ObjectId).toString(),
+      deckId: deckId.toString(),
       front: c.front,
       back: c.back,
       orderNumber: c.orderNumber,

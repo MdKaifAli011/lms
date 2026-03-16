@@ -196,6 +196,18 @@ export interface LevelWiseFlashcardDeck {
   orderNumber: number;
   status: string;
   locked?: boolean;
+  /** SEO for public flashcard deck page */
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    metaKeywords?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImageUrl?: string | null;
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+  };
 }
 
 export interface LevelWiseFlashcardCardItem {

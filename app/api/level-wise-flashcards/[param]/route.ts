@@ -48,6 +48,7 @@ function mapDocToResponse(doc: Record<string, unknown>) {
     orderNumber: doc.orderNumber,
     status: doc.status,
     locked: doc.locked || false,
+    seo: (doc.seo as Record<string, unknown>) ?? undefined,
     createdAt: doc.createdAt
       ? new Date(doc.createdAt as Date).toLocaleString("en-US", {
           year: "numeric",
@@ -152,6 +153,9 @@ export async function PUT(
     if (body.description !== undefined) updateData.description = body.description.trim();
     if (body.status !== undefined) updateData.status = body.status;
     if (body.locked !== undefined) updateData.locked = body.locked === true;
+    if (body.seo !== undefined && typeof body.seo === "object") {
+      updateData.seo = { ...(body.seo as Record<string, unknown>) };
+    }
 
     const unsetData: Record<string, string> = {};
     if (body.level !== undefined) {

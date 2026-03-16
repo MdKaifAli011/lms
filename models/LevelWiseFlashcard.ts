@@ -32,6 +32,18 @@ export interface ILevelWiseFlashcard {
   orderNumber: number;
   status: "Active" | "Inactive";
   locked?: boolean;
+  /** SEO for the public flashcard deck page */
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImageUrl?: string;
+    canonicalUrl?: string;
+    noIndex?: boolean;
+    noFollow?: boolean;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -58,6 +70,10 @@ const levelWiseFlashcardSchema = new Schema<ILevelWiseFlashcard>(
     orderNumber: { type: Number, default: 1 },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
     locked: { type: Boolean, default: false },
+    seo: {
+      type: Schema.Types.Mixed,
+      default: undefined,
+    },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -135,7 +141,10 @@ type FormData = {
   explanationImageUrl: string;
 };
 
-function buildQueryParamsFromScope(level: ContentLevel, scope: ResolvedScope): string {
+function buildQueryParamsFromScope(
+  level: ContentLevel,
+  scope: ResolvedScope,
+): string {
   const params = new URLSearchParams();
   params.set("level", String(level));
   if (scope.examId) params.set("examId", scope.examId);
@@ -194,13 +203,30 @@ function scopeLabel(level: ContentLevel, scope: ResolvedScope): string {
 /** Full scope line for display: "Exam: NEET, Subject: Physics, Unit: Unit 1" up to current level. */
 function scopeLine(level: ContentLevel, scope: ResolvedScope): string {
   const parts: string[] = [];
-  if (level >= 1 && (scope.examName || scope.examId)) parts.push(`Exam: ${scope.examName ? toTitleCase(scope.examName) : "—"}`);
-  if (level >= 2 && (scope.subjectName || scope.subjectId)) parts.push(`Subject: ${scope.subjectName ? toTitleCase(scope.subjectName) : "—"}`);
-  if (level >= 3 && (scope.unitName || scope.unitId)) parts.push(`Unit: ${scope.unitName ? toTitleCase(scope.unitName) : "—"}`);
-  if (level >= 4 && (scope.chapterName || scope.chapterId)) parts.push(`Chapter: ${scope.chapterName ? toTitleCase(scope.chapterName) : "—"}`);
-  if (level >= 5 && (scope.topicName || scope.topicId)) parts.push(`Topic: ${scope.topicName ? toTitleCase(scope.topicName) : "—"}`);
-  if (level >= 6 && (scope.subtopicName || scope.subtopicId)) parts.push(`Subtopic: ${scope.subtopicName ? toTitleCase(scope.subtopicName) : "—"}`);
-  if (level >= 7 && (scope.definitionName || scope.definitionId)) parts.push(`Definition: ${scope.definitionName ? toTitleCase(scope.definitionName) : "—"}`);
+  if (level >= 1 && (scope.examName || scope.examId))
+    parts.push(`Exam: ${scope.examName ? toTitleCase(scope.examName) : "—"}`);
+  if (level >= 2 && (scope.subjectName || scope.subjectId))
+    parts.push(
+      `Subject: ${scope.subjectName ? toTitleCase(scope.subjectName) : "—"}`,
+    );
+  if (level >= 3 && (scope.unitName || scope.unitId))
+    parts.push(`Unit: ${scope.unitName ? toTitleCase(scope.unitName) : "—"}`);
+  if (level >= 4 && (scope.chapterName || scope.chapterId))
+    parts.push(
+      `Chapter: ${scope.chapterName ? toTitleCase(scope.chapterName) : "—"}`,
+    );
+  if (level >= 5 && (scope.topicName || scope.topicId))
+    parts.push(
+      `Topic: ${scope.topicName ? toTitleCase(scope.topicName) : "—"}`,
+    );
+  if (level >= 6 && (scope.subtopicName || scope.subtopicId))
+    parts.push(
+      `Subtopic: ${scope.subtopicName ? toTitleCase(scope.subtopicName) : "—"}`,
+    );
+  if (level >= 7 && (scope.definitionName || scope.definitionId))
+    parts.push(
+      `Definition: ${scope.definitionName ? toTitleCase(scope.definitionName) : "—"}`,
+    );
   return parts.length ? parts.join(", ") : "—";
 }
 
@@ -227,28 +253,42 @@ const emptyQuestionForm = (): FormData => ({
   explanationImageUrl: "",
 });
 
-export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProps) {
+export function LevelWiseDirectDetailsPage(
+  props: LevelWiseDirectDetailsPageProps,
+) {
   const { level, examId: propsExamId } = props;
-  const [resolvedScope, setResolvedScope] = React.useState<ResolvedScope>(() => initialScope(props));
+  const [resolvedScope, setResolvedScope] = React.useState<ResolvedScope>(() =>
+    initialScope(props),
+  );
   const [papers, setPapers] = React.useState<PracticePaper[]>([]);
-  const [selectedPaperId, setSelectedPaperId] = React.useState<string | null>(null);
+  const [selectedPaperId, setSelectedPaperId] = React.useState<string | null>(
+    null,
+  );
   const [questions, setQuestions] = React.useState<Question[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [questionsLoading, setQuestionsLoading] = React.useState(false);
   const [exams, setExams] = React.useState<ExamOption[]>([]);
 
   /** Collapsible: which papers are expanded (questions loaded on first expand). */
-  const [expandedPapers, setExpandedPapers] = React.useState<Set<string>>(new Set());
+  const [expandedPapers, setExpandedPapers] = React.useState<Set<string>>(
+    new Set(),
+  );
   /** Collapsible: which questions are expanded (per question id). */
-  const [expandedQuestions, setExpandedQuestions] = React.useState<Set<string>>(new Set());
+  const [expandedQuestions, setExpandedQuestions] = React.useState<Set<string>>(
+    new Set(),
+  );
   /** Questions by paper id (lazy-loaded when paper is expanded). */
-  const [paperQuestionsCache, setPaperQuestionsCache] = React.useState<Record<string, Question[]>>({});
-  const [loadingPaperId, setLoadingPaperId] = React.useState<string | null>(null);
+  const [paperQuestionsCache, setPaperQuestionsCache] = React.useState<
+    Record<string, Question[]>
+  >({});
+  const [loadingPaperId, setLoadingPaperId] = React.useState<string | null>(
+    null,
+  );
 
   const [createOpen, setCreateOpen] = React.useState(false);
   const [createSaving, setCreateSaving] = React.useState(false);
   const [paperForm, setPaperForm] = React.useState(() =>
-    emptyPaperForm(level, propsExamId)
+    emptyPaperForm(level, propsExamId),
   );
 
   const [showInlineForm, setShowInlineForm] = React.useState(false);
@@ -263,13 +303,33 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   const [showPerPage, setShowPerPage] = React.useState(10);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [deleteTargetSingle, setDeleteTargetSingle] = React.useState<string | null>(null);
+  const [deleteTargetSingle, setDeleteTargetSingle] = React.useState<
+    string | null
+  >(null);
   const [deleteTargetBulk, setDeleteTargetBulk] = React.useState<string[]>([]);
-  const [deleteTargetPaperId, setDeleteTargetPaperId] = React.useState<string | null>(null);
+  const [deleteTargetPaperId, setDeleteTargetPaperId] = React.useState<
+    string | null
+  >(null);
 
   React.useEffect(() => {
     setResolvedScope(initialScope(props));
-  }, [props.level, props.examId, props.subjectId, props.unitId, props.chapterId, props.topicId, props.subtopicId, props.definitionId, props.examName, props.subjectName, props.unitName, props.chapterName, props.topicName, props.subtopicName, props.definitionName]);
+  }, [
+    props.level,
+    props.examId,
+    props.subjectId,
+    props.unitId,
+    props.chapterId,
+    props.topicId,
+    props.subtopicId,
+    props.definitionId,
+    props.examName,
+    props.subjectName,
+    props.unitName,
+    props.chapterName,
+    props.topicName,
+    props.subtopicName,
+    props.definitionName,
+  ]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -355,11 +415,22 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       }
     }
     resolve();
-    return () => { cancelled = true; };
-  }, [props.examId, props.subjectId, props.unitId, props.chapterId, props.topicId, props.subtopicId, props.definitionId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    props.examId,
+    props.subjectId,
+    props.unitId,
+    props.chapterId,
+    props.topicId,
+    props.subtopicId,
+    props.definitionId,
+  ]);
 
   React.useEffect(() => {
-    if (!resolvedScope.examId || resolvedScope.examName || exams.length === 0) return;
+    if (!resolvedScope.examId || resolvedScope.examName || exams.length === 0)
+      return;
     const exam = exams.find((e) => e.id === resolvedScope.examId);
     if (exam?.name) setResolvedScope((s) => ({ ...s, examName: exam.name }));
   }, [resolvedScope.examId, resolvedScope.examName, exams]);
@@ -367,7 +438,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   const levelName = LEVEL_NAMES[level] ?? "Content";
   const selectedPaper = React.useMemo(
     () => papers.find((p) => p.id === selectedPaperId) ?? null,
-    [papers, selectedPaperId]
+    [papers, selectedPaperId],
   );
 
   const fetchQuestions = React.useCallback((practiceId: string) => {
@@ -380,27 +451,35 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   }, []);
 
   /** Fetch questions for a paper and store in cache; used when paper is expanded. */
-  const ensurePaperQuestions = React.useCallback((paperId: string) => {
-    if (paperQuestionsCache[paperId] !== undefined) return;
-    setLoadingPaperId(paperId);
-    fetch(`/api/level-wise-practice/${paperId}/questions`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        const list = Array.isArray(data) ? data : [];
-        setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: list }));
-      })
-      .catch(() => setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: [] })))
-      .finally(() => setLoadingPaperId(null));
-  }, [paperQuestionsCache]);
+  const ensurePaperQuestions = React.useCallback(
+    (paperId: string) => {
+      if (paperQuestionsCache[paperId] !== undefined) return;
+      setLoadingPaperId(paperId);
+      fetch(`/api/level-wise-practice/${paperId}/questions`)
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => {
+          const list = Array.isArray(data) ? data : [];
+          setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: list }));
+        })
+        .catch(() =>
+          setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: [] })),
+        )
+        .finally(() => setLoadingPaperId(null));
+    },
+    [paperQuestionsCache],
+  );
 
-  const togglePaperExpanded = React.useCallback((paperId: string, open: boolean) => {
-    setExpandedPapers((prev) => {
-      const next = new Set(prev);
-      if (open) next.add(paperId);
-      else next.delete(paperId);
-      return next;
-    });
-  }, []);
+  const togglePaperExpanded = React.useCallback(
+    (paperId: string, open: boolean) => {
+      setExpandedPapers((prev) => {
+        const next = new Set(prev);
+        if (open) next.add(paperId);
+        else next.delete(paperId);
+        return next;
+      });
+    },
+    [],
+  );
 
   const toggleQuestionExpanded = React.useCallback((questionId: string) => {
     setExpandedQuestions((prev) => {
@@ -412,9 +491,12 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   }, []);
 
   /** Update cached questions for a paper (after add/edit/delete). */
-  const setCachedQuestions = React.useCallback((paperId: string, list: Question[]) => {
-    setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: list }));
-  }, []);
+  const setCachedQuestions = React.useCallback(
+    (paperId: string, list: Question[]) => {
+      setPaperQuestionsCache((prev) => ({ ...prev, [paperId]: list }));
+    },
+    [],
+  );
 
   const syncPaper = React.useCallback(
     async (practiceId: string, count: number) => {
@@ -434,11 +516,11 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         prev.map((p) =>
           p.id === practiceId
             ? { ...p, totalQuestions: count, durationMinutes, totalMarks }
-            : p
-        )
+            : p,
+        ),
       );
     },
-    []
+    [],
   );
 
   React.useEffect(() => {
@@ -457,8 +539,13 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
           const list = Array.isArray(data.papers) ? data.papers : [];
           setPapers(list);
           if (list.length > 0) {
-            const sorted = list.sort((a: PracticePaper, b: PracticePaper) => a.orderNumber - b.orderNumber);
-            const currentInList = sorted.some((p: PracticePaper) => p.id === selectedPaperId);
+            const sorted = list.sort(
+              (a: PracticePaper, b: PracticePaper) =>
+                a.orderNumber - b.orderNumber,
+            );
+            const currentInList = sorted.some(
+              (p: PracticePaper) => p.id === selectedPaperId,
+            );
             if (!currentInList) setSelectedPaperId(sorted[0].id);
           } else {
             setSelectedPaperId(null);
@@ -489,8 +576,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   React.useEffect(() => {
     if (selectedPaperId)
       setQuestions(paperQuestionsCache[selectedPaperId] ?? []);
-    else
-      setQuestions([]);
+    else setQuestions([]);
   }, [selectedPaperId, paperQuestionsCache]);
 
   React.useEffect(() => {
@@ -502,9 +588,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
 
   React.useEffect(() => {
     if (createOpen)
-      setPaperForm(
-        emptyPaperForm(level, resolvedScope.examId ?? undefined)
-      );
+      setPaperForm(emptyPaperForm(level, resolvedScope.examId ?? undefined));
   }, [createOpen, level, resolvedScope.examId]);
 
   const createPaper = async () => {
@@ -525,23 +609,29 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     const title = toTitleCase(rawTitle);
     setCreateSaving(true);
     try {
-    const body: Record<string, unknown> = {
-      examId: resolvedScope.examId ?? paperForm.examId,
-      level: levelNum,
-      title,
-      description: paperForm.description.trim(),
-      totalQuestions: 0,
-      durationMinutes: 0,
-      totalMarks: 0,
-      difficulty: paperForm.difficulty,
-      status: paperForm.status,
-    };
-    if (levelNum >= 2 && resolvedScope.subjectId) body.subjectId = resolvedScope.subjectId;
-    if (levelNum >= 3 && resolvedScope.unitId) body.unitId = resolvedScope.unitId;
-    if (levelNum >= 4 && resolvedScope.chapterId) body.chapterId = resolvedScope.chapterId;
-    if (levelNum >= 5 && resolvedScope.topicId) body.topicId = resolvedScope.topicId;
-    if (levelNum >= 6 && resolvedScope.subtopicId) body.subtopicId = resolvedScope.subtopicId;
-    if (levelNum >= 7 && resolvedScope.definitionId) body.definitionId = resolvedScope.definitionId;
+      const body: Record<string, unknown> = {
+        examId: resolvedScope.examId ?? paperForm.examId,
+        level: levelNum,
+        title,
+        description: paperForm.description.trim(),
+        totalQuestions: 0,
+        durationMinutes: 0,
+        totalMarks: 0,
+        difficulty: paperForm.difficulty,
+        status: paperForm.status,
+      };
+      if (levelNum >= 2 && resolvedScope.subjectId)
+        body.subjectId = resolvedScope.subjectId;
+      if (levelNum >= 3 && resolvedScope.unitId)
+        body.unitId = resolvedScope.unitId;
+      if (levelNum >= 4 && resolvedScope.chapterId)
+        body.chapterId = resolvedScope.chapterId;
+      if (levelNum >= 5 && resolvedScope.topicId)
+        body.topicId = resolvedScope.topicId;
+      if (levelNum >= 6 && resolvedScope.subtopicId)
+        body.subtopicId = resolvedScope.subtopicId;
+      if (levelNum >= 7 && resolvedScope.definitionId)
+        body.definitionId = resolvedScope.definitionId;
 
       const res = await fetch("/api/level-wise-practice", {
         method: "POST",
@@ -554,9 +644,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       }
       const created = await res.json();
       setPapers((prev) =>
-        [...prev, { ...created, orderNumber: created.orderNumber ?? prev.length }].sort(
-          (a, b) => a.orderNumber - b.orderNumber
-        )
+        [
+          ...prev,
+          { ...created, orderNumber: created.orderNumber ?? prev.length },
+        ].sort((a, b) => a.orderNumber - b.orderNumber),
       );
       setSelectedPaperId(created.id);
       setPaperQuestionsCache((prev) => ({ ...prev, [created.id]: [] }));
@@ -574,8 +665,12 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
 
   function buildPayload(f: FormData) {
     const questionText = f.questionText.trim();
-    const opts = f.type === "MCQ" ? f.options.map((o) => o.trim()).filter(Boolean) : [];
-    const correctIndex = f.type === "MCQ" ? Math.min(f.correctOptionIndex, Math.max(0, opts.length - 1)) : 0;
+    const opts =
+      f.type === "MCQ" ? f.options.map((o) => o.trim()).filter(Boolean) : [];
+    const correctIndex =
+      f.type === "MCQ"
+        ? Math.min(f.correctOptionIndex, Math.max(0, opts.length - 1))
+        : 0;
     return {
       questionText,
       type: f.type,
@@ -600,12 +695,18 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     setForm(emptyQuestionForm());
     setEditingId(null);
     setShowInlineForm(true);
-    setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    setTimeout(
+      () => formRef.current?.scrollIntoView({ behavior: "smooth" }),
+      50,
+    );
   };
 
   const openAddMore = () => {
     setFormSlots((prev) => [...prev, emptyQuestionForm()]);
-    setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    setTimeout(
+      () => formRef.current?.scrollIntoView({ behavior: "smooth" }),
+      50,
+    );
   };
 
   const updateFormSlot = (slotIndex: number, update: Partial<FormData>) => {
@@ -633,7 +734,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         q.type === "MCQ" && q.options?.length
           ? q.options.length >= 4
             ? q.options
-            : [...q.options, ...Array(4 - q.options.length).fill("")].slice(0, 4)
+            : [...q.options, ...Array(4 - q.options.length).fill("")].slice(
+                0,
+                4,
+              )
           : ["", "", "", ""],
       correctOptionIndex: q.correctOptionIndex ?? 0,
       numericalAnswer: q.numericalAnswer ?? "",
@@ -672,7 +776,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     setForm({
       ...form,
       options: next,
-      correctOptionIndex: Math.min(form.correctOptionIndex, Math.max(0, next.length - 1)),
+      correctOptionIndex: Math.min(
+        form.correctOptionIndex,
+        Math.max(0, next.length - 1),
+      ),
     });
   };
 
@@ -690,7 +797,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         return;
       }
       form.options = opts;
-      form.correctOptionIndex = Math.min(form.correctOptionIndex, opts.length - 1);
+      form.correctOptionIndex = Math.min(
+        form.correctOptionIndex,
+        opts.length - 1,
+      );
     }
 
     setSaving(true);
@@ -704,16 +814,16 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
-          }
+          },
         );
         if (!res.ok) throw new Error("Failed to update");
         const updated = await res.json();
-        const newList = (paperQuestionsCache[selectedPaperId!] ?? []).map((q) =>
-          q.id === editingId ? { ...q, ...updated } : q
+        const newList = (paperQuestionsCache[selectedPaperId!] ?? []).map(
+          (q) => (q.id === editingId ? { ...q, ...updated } : q),
         );
         setCachedQuestions(selectedPaperId!, newList);
         setQuestions((prev) =>
-          prev.map((q) => (q.id === editingId ? { ...q, ...updated } : q))
+          prev.map((q) => (q.id === editingId ? { ...q, ...updated } : q)),
         );
         toast.success("Question updated");
         closeForm();
@@ -724,12 +834,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
-          }
+          },
         );
         if (!res.ok) throw new Error("Failed to create");
         const created = await res.json();
         const currentList = paperQuestionsCache[selectedPaperId!] ?? [];
-        const newList = [...currentList, created].sort((a, b) => a.orderNumber - b.orderNumber);
+        const newList = [...currentList, created].sort(
+          (a, b) => a.orderNumber - b.orderNumber,
+        );
         setCachedQuestions(selectedPaperId!, newList);
         setQuestions(newList);
         toast.success("Question added");
@@ -767,11 +879,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       let newList = [...initialList];
       for (const { slot } of toSave) {
         const payload = buildPayload(slot);
-        const res = await fetch(`/api/level-wise-practice/${selectedPaperId}/questions`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        const res = await fetch(
+          `/api/level-wise-practice/${selectedPaperId}/questions`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          },
+        );
         if (!res.ok) throw new Error("Failed to create");
         const created = await res.json();
         newList = [...newList, created];
@@ -782,7 +897,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       setFormSlots([]);
       setShowInlineForm(false);
       await syncPaper(selectedPaperId, newList.length);
-      toast.success(`${toSave.length} question${toSave.length !== 1 ? "s" : ""} added`);
+      toast.success(
+        `${toSave.length} question${toSave.length !== 1 ? "s" : ""} added`,
+      );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to save");
     } finally {
@@ -810,15 +927,20 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
     setSavingSlot(slotIndex);
     try {
       const payload = buildPayload(slotForm);
-      const res = await fetch(`/api/level-wise-practice/${selectedPaperId}/questions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `/api/level-wise-practice/${selectedPaperId}/questions`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
       if (!res.ok) throw new Error("Failed to create");
       const created = await res.json();
       const currentList = paperQuestionsCache[selectedPaperId] ?? [];
-      const newList = [...currentList, created].sort((a, b) => a.orderNumber - b.orderNumber);
+      const newList = [...currentList, created].sort(
+        (a, b) => a.orderNumber - b.orderNumber,
+      );
       setCachedQuestions(selectedPaperId, newList);
       setQuestions(newList);
       setFormSlots((prev) => {
@@ -866,8 +988,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         ids.map((id) =>
           fetch(`/api/level-wise-practice/${paperId}/questions/${id}`, {
             method: "DELETE",
-          })
-        )
+          }),
+        ),
       );
       const currentList = paperQuestionsCache[paperId] ?? [];
       const newList = currentList.filter((q) => !ids.includes(q.id));
@@ -879,7 +1001,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
         return next;
       });
       toast.success(
-        ids.length === 1 ? "Question deleted" : `${ids.length} questions deleted`
+        ids.length === 1
+          ? "Question deleted"
+          : `${ids.length} questions deleted`,
       );
       await syncPaper(paperId, newList.length);
     } catch (e) {
@@ -895,7 +1019,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
   const toggleSelectAll = (paperId: string) => {
     const list = paperQuestionsCache[paperId] ?? [];
     const sorted = [...list].sort((a, b) => a.orderNumber - b.orderNumber);
-    const allSelected = sorted.length > 0 && sorted.every((q) => selectedIds.has(q.id));
+    const allSelected =
+      sorted.length > 0 && sorted.every((q) => selectedIds.has(q.id));
     if (allSelected) {
       setSelectedIds((prev) => {
         const next = new Set(prev);
@@ -943,7 +1068,12 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
               </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Button onClick={() => setCreateOpen(true)} variant="outline" size="sm" className="gap-1.5">
+              <Button
+                onClick={() => setCreateOpen(true)}
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+              >
                 <Plus className="h-4 w-4" />
                 New paper
               </Button>
@@ -962,7 +1092,11 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
               <p className="text-sm text-muted-foreground">
                 No practice paper for this {levelName.toLowerCase()} yet.
               </p>
-              <Button onClick={() => setCreateOpen(true)} variant="outline" size="sm">
+              <Button
+                onClick={() => setCreateOpen(true)}
+                variant="outline"
+                size="sm"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create first practice paper
               </Button>
@@ -971,16 +1105,27 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
             <div className="space-y-4">
               {/* Create-question panel (shown when adding to a paper) */}
               {formSlots.length > 0 && selectedPaperId && (
-                <div ref={formRef} className="space-y-3 rounded-lg border-2 border-primary/20 bg-muted/10 p-4">
+                <div
+                  ref={formRef}
+                  className="space-y-3 rounded-lg border-2 border-primary/20 bg-muted/10 p-4"
+                >
                   {formSlots.map((slotForm, slotIndex) => (
-                    <Card key={`slot-${slotIndex}`} className="border border-border">
+                    <Card
+                      key={`slot-${slotIndex}`}
+                      className="border border-border"
+                    >
                       <CardHeader className="flex flex-row items-center justify-between gap-4 pb-1.5 pt-3 px-4">
                         <CardTitle className="text-base">
-                          New Question {formSlots.length > 1 ? `(${slotIndex + 1} of ${formSlots.length})` : ""}
+                          New Question{" "}
+                          {formSlots.length > 1
+                            ? `(${slotIndex + 1} of ${formSlots.length})`
+                            : ""}
                         </CardTitle>
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2">
-                            <Label className="text-xs text-muted-foreground shrink-0">Type</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0">
+                              Type
+                            </Label>
                             <Select
                               value={slotForm.type}
                               onValueChange={(v: "MCQ" | "NVQ") =>
@@ -997,7 +1142,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                             </Select>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <Label className="text-xs text-muted-foreground shrink-0">Marks (✓)</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0">
+                              Marks (✓)
+                            </Label>
                             <Input
                               type="number"
                               min={0}
@@ -1005,13 +1152,16 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                               value={slotForm.marksCorrect}
                               onChange={(e) =>
                                 updateFormSlot(slotIndex, {
-                                  marksCorrect: parseInt(e.target.value, 10) || 0,
+                                  marksCorrect:
+                                    parseInt(e.target.value, 10) || 0,
                                 })
                               }
                             />
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <Label className="text-xs text-muted-foreground shrink-0">Marks (✗)</Label>
+                            <Label className="text-xs text-muted-foreground shrink-0">
+                              Marks (✗)
+                            </Label>
                             <Input
                               type="number"
                               min={0}
@@ -1019,7 +1169,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                               value={slotForm.marksIncorrect}
                               onChange={(e) =>
                                 updateFormSlot(slotIndex, {
-                                  marksIncorrect: parseInt(e.target.value, 10) || 0,
+                                  marksIncorrect:
+                                    parseInt(e.target.value, 10) || 0,
                                 })
                               }
                             />
@@ -1032,7 +1183,11 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                           <textarea
                             className={textareaClass}
                             value={slotForm.questionText}
-                            onChange={(e) => updateFormSlot(slotIndex, { questionText: e.target.value })}
+                            onChange={(e) =>
+                              updateFormSlot(slotIndex, {
+                                questionText: e.target.value,
+                              })
+                            }
                             placeholder="Enter the question..."
                           />
                         </div>
@@ -1041,7 +1196,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                             <Label>Options</Label>
                             <div className="grid grid-cols-2 gap-2">
                               {slotForm.options.map((opt, i) => (
-                                <div key={i} className="flex items-center gap-2">
+                                <div
+                                  key={i}
+                                  className="flex items-center gap-2"
+                                >
                                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
                                     {OPTION_LETTERS[i] ?? i + 1}
                                   </span>
@@ -1051,7 +1209,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                     onChange={(e) => {
                                       const next = [...slotForm.options];
                                       next[i] = e.target.value;
-                                      updateFormSlot(slotIndex, { options: next });
+                                      updateFormSlot(slotIndex, {
+                                        options: next,
+                                      });
                                     }}
                                     placeholder={`Option ${OPTION_LETTERS[i] ?? i + 1}`}
                                   />
@@ -1062,12 +1222,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                     className="shrink-0"
                                     onClick={() => {
                                       if (slotForm.options.length <= 2) return;
-                                      const next = slotForm.options.filter((_, j) => j !== i);
+                                      const next = slotForm.options.filter(
+                                        (_, j) => j !== i,
+                                      );
                                       updateFormSlot(slotIndex, {
                                         options: next,
                                         correctOptionIndex: Math.min(
                                           slotForm.correctOptionIndex,
-                                          Math.max(0, next.length - 1)
+                                          Math.max(0, next.length - 1),
                                         ),
                                       });
                                     }}
@@ -1096,8 +1258,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                 value={String(
                                   Math.min(
                                     slotForm.correctOptionIndex,
-                                    slotForm.options.length - 1
-                                  )
+                                    slotForm.options.length - 1,
+                                  ),
                                 )}
                                 onValueChange={(v) =>
                                   updateFormSlot(slotIndex, {
@@ -1126,7 +1288,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                               <Input
                                 value={slotForm.numericalAnswer}
                                 onChange={(e) =>
-                                  updateFormSlot(slotIndex, { numericalAnswer: e.target.value })
+                                  updateFormSlot(slotIndex, {
+                                    numericalAnswer: e.target.value,
+                                  })
                                 }
                                 placeholder="e.g. 42 or 3.14"
                               />
@@ -1139,7 +1303,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                 value={slotForm.numericalTolerance}
                                 onChange={(e) =>
                                   updateFormSlot(slotIndex, {
-                                    numericalTolerance: parseFloat(e.target.value) || 0,
+                                    numericalTolerance:
+                                      parseFloat(e.target.value) || 0,
                                   })
                                 }
                               />
@@ -1149,7 +1314,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                               <Input
                                 value={slotForm.numericalUnit}
                                 onChange={(e) =>
-                                  updateFormSlot(slotIndex, { numericalUnit: e.target.value })
+                                  updateFormSlot(slotIndex, {
+                                    numericalUnit: e.target.value,
+                                  })
                                 }
                                 placeholder="e.g. m/s"
                               />
@@ -1162,22 +1329,31 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                             className={textareaClass}
                             value={slotForm.explanation}
                             onChange={(e) =>
-                              updateFormSlot(slotIndex, { explanation: e.target.value })
+                              updateFormSlot(slotIndex, {
+                                explanation: e.target.value,
+                              })
                             }
                             placeholder="Why this answer is correct..."
                           />
-                          <Label className="text-xs text-muted-foreground">Explanation image URL (optional)</Label>
+                          <Label className="text-xs text-muted-foreground">
+                            Explanation image URL (optional)
+                          </Label>
                           <Input
                             className={inputClass}
                             value={slotForm.explanationImageUrl ?? ""}
                             onChange={(e) =>
-                              updateFormSlot(slotIndex, { explanationImageUrl: e.target.value })
+                              updateFormSlot(slotIndex, {
+                                explanationImageUrl: e.target.value,
+                              })
                             }
                             placeholder="https://..."
                           />
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="outline" onClick={() => removeFormSlot(slotIndex)}>
+                          <Button
+                            variant="outline"
+                            onClick={() => removeFormSlot(slotIndex)}
+                          >
                             Remove
                           </Button>
                           <Button
@@ -1199,8 +1375,11 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                       Add more question
                     </Button>
                     <Button onClick={saveAllSlots} disabled={saving} size="sm">
-                      {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
-                      Save all ({formSlots.filter((s) => s.questionText.trim()).length})
+                      {saving && (
+                        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                      )}
+                      Save all (
+                      {formSlots.filter((s) => s.questionText.trim()).length})
                     </Button>
                     <Button
                       variant="ghost"
@@ -1224,7 +1403,7 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                     const isPaperOpen = expandedPapers.has(paper.id);
                     const paperQuestions = paperQuestionsCache[paper.id] ?? [];
                     const sortedPaperQuestions = [...paperQuestions].sort(
-                      (a, b) => a.orderNumber - b.orderNumber
+                      (a, b) => a.orderNumber - b.orderNumber,
                     );
                     return (
                       <Collapsible
@@ -1258,7 +1437,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                       : "—"}
                                   {" · "}
                                   {paper.durationMinutes ?? 0} min
-                                  {paper.totalMarks != null ? ` · ${paper.totalMarks} marks` : ""}
+                                  {paper.totalMarks != null
+                                    ? ` · ${paper.totalMarks} marks`
+                                    : ""}
                                 </p>
                               </div>
                             </button>
@@ -1268,14 +1449,17 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                               {loadingPaperId === paper.id ? (
                                 <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
                                   <Loader2 className="h-5 w-5 animate-spin" />
-                                  <span className="text-sm">Loading questions…</span>
+                                  <span className="text-sm">
+                                    Loading questions…
+                                  </span>
                                 </div>
                               ) : (
                                 <>
                                   <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/60 bg-background px-3 py-2.5">
                                     <div className="flex items-center gap-3">
                                       <h4 className="text-sm font-semibold">
-                                        Questions ({sortedPaperQuestions.length})
+                                        Questions ({sortedPaperQuestions.length}
+                                        )
                                       </h4>
                                       {sortedPaperQuestions.length > 0 && (
                                         <>
@@ -1283,10 +1467,15 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                             <input
                                               type="checkbox"
                                               checked={
-                                                sortedPaperQuestions.length > 0 &&
-                                                sortedPaperQuestions.every((q) => selectedIds.has(q.id))
+                                                sortedPaperQuestions.length >
+                                                  0 &&
+                                                sortedPaperQuestions.every(
+                                                  (q) => selectedIds.has(q.id),
+                                                )
                                               }
-                                              onChange={() => toggleSelectAll(paper.id)}
+                                              onChange={() =>
+                                                toggleSelectAll(paper.id)
+                                              }
                                               className="h-4 w-4 rounded border-input"
                                             />
                                             Select all
@@ -1298,7 +1487,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                             onClick={() => {
                                               setExpandedQuestions((prev) => {
                                                 const next = new Set(prev);
-                                                sortedPaperQuestions.forEach((q) => next.add(q.id));
+                                                sortedPaperQuestions.forEach(
+                                                  (q) => next.add(q.id),
+                                                );
                                                 return next;
                                               });
                                             }}
@@ -1314,7 +1505,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                             onClick={() => {
                                               setExpandedQuestions((prev) => {
                                                 const next = new Set(prev);
-                                                sortedPaperQuestions.forEach((q) => next.delete(q.id));
+                                                sortedPaperQuestions.forEach(
+                                                  (q) => next.delete(q.id),
+                                                );
                                                 return next;
                                               });
                                             }}
@@ -1325,16 +1518,21 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                           </Button>
                                         </>
                                       )}
-                                      {selectedIds.size > 0 && sortedPaperQuestions.some((q) => selectedIds.has(q.id)) && (
-                                        <Button
-                                          variant="destructive"
-                                          size="sm"
-                                          onClick={() => openDeleteBulk(paper.id)}
-                                        >
-                                          <Trash2 className="mr-1.5 h-4 w-4" />
-                                          Delete selected ({selectedIds.size})
-                                        </Button>
-                                      )}
+                                      {selectedIds.size > 0 &&
+                                        sortedPaperQuestions.some((q) =>
+                                          selectedIds.has(q.id),
+                                        ) && (
+                                          <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() =>
+                                              openDeleteBulk(paper.id)
+                                            }
+                                          >
+                                            <Trash2 className="mr-1.5 h-4 w-4" />
+                                            Delete selected ({selectedIds.size})
+                                          </Button>
+                                        )}
                                     </div>
                                     <Button
                                       onClick={() => openAdd(paper.id)}
@@ -1348,12 +1546,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
 
                                   {sortedPaperQuestions.length === 0 ? (
                                     <div className="rounded-lg border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-                                      No questions yet. Click &quot;Add question&quot; to create one.
+                                      No questions yet. Click &quot;Add
+                                      question&quot; to create one.
                                     </div>
                                   ) : (
                                     <div className="space-y-2">
                                       {sortedPaperQuestions.map((q) => {
-                                        const isQuestionOpen = expandedQuestions.has(q.id);
+                                        const isQuestionOpen =
+                                          expandedQuestions.has(q.id);
                                         return (
                                           <Collapsible
                                             key={q.id}
@@ -1382,7 +1582,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                                     {q.orderNumber}
                                                   </span>
                                                   <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-                                                    {truncate(q.questionText, 80)}
+                                                    {truncate(
+                                                      q.questionText,
+                                                      80,
+                                                    )}
                                                   </p>
                                                   <span className="shrink-0 text-xs text-muted-foreground">
                                                     {q.type}
@@ -1395,9 +1598,15 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                                     <div className="flex shrink-0 items-start gap-2 pt-0.5">
                                                       <input
                                                         type="checkbox"
-                                                        checked={selectedIds.has(q.id)}
-                                                        onChange={() => toggleSelectOne(q.id)}
-                                                        onClick={(e) => e.stopPropagation()}
+                                                        checked={selectedIds.has(
+                                                          q.id,
+                                                        )}
+                                                        onChange={() =>
+                                                          toggleSelectOne(q.id)
+                                                        }
+                                                        onClick={(e) =>
+                                                          e.stopPropagation()
+                                                        }
                                                         className="mt-1 h-4 w-4 rounded border-input"
                                                       />
                                                     </div>
@@ -1408,10 +1617,14 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                                         </p>
                                                         <div className="flex shrink-0 items-center gap-2">
                                                           <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-950/50 dark:text-green-400">
-                                                            +{q.marksCorrect ?? 4}
+                                                            +
+                                                            {q.marksCorrect ??
+                                                              4}
                                                           </span>
                                                           <span className="inline-flex items-center rounded-md bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-950/50 dark:text-red-400">
-                                                            −{q.marksIncorrect ?? 1}
+                                                            −
+                                                            {q.marksIncorrect ??
+                                                              1}
                                                           </span>
                                                           <Button
                                                             variant="ghost"
@@ -1419,7 +1632,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                                             className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
                                                             onClick={(e) => {
                                                               e.stopPropagation();
-                                                              openEdit(paper.id, q);
+                                                              openEdit(
+                                                                paper.id,
+                                                                q,
+                                                              );
                                                             }}
                                                             title="Edit"
                                                           >
@@ -1431,7 +1647,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                                             className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                             onClick={(e) => {
                                                               e.stopPropagation();
-                                                              openDeleteSingle(paper.id, q.id);
+                                                              openDeleteSingle(
+                                                                paper.id,
+                                                                q.id,
+                                                              );
                                                             }}
                                                             title="Delete"
                                                           >
@@ -1440,62 +1659,98 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                                                         </div>
                                                       </div>
 
-                                                      {q.type === "MCQ" && q.options?.length > 0 && (
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                          {q.options.map((opt, i) => {
-                                                            const isCorrect = i === (q.correctOptionIndex ?? 0);
-                                                            return (
-                                                              <div
-                                                                key={i}
-                                                                className={`flex items-center gap-2 rounded-md border p-2 ${
-                                                                  isCorrect
-                                                                    ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40"
-                                                                    : "border-border bg-muted/30"
-                                                                }`}
-                                                              >
-                                                                <span
-                                                                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
-                                                                    isCorrect
-                                                                      ? "bg-green-500 text-white"
-                                                                      : "bg-muted text-muted-foreground"
-                                                                  }`}
-                                                                >
-                                                                  {OPTION_LETTERS[i] ?? i + 1}
-                                                                </span>
-                                                                <span className="min-w-0 flex-1 text-sm">{opt}</span>
-                                                                {isCorrect && <Check className="h-4 w-4 shrink-0 text-green-600" />}
-                                                              </div>
-                                                            );
-                                                          })}
-                                                        </div>
-                                                      )}
+                                                      {q.type === "MCQ" &&
+                                                        q.options?.length >
+                                                          0 && (
+                                                          <div className="grid grid-cols-2 gap-2">
+                                                            {q.options.map(
+                                                              (opt, i) => {
+                                                                const isCorrect =
+                                                                  i ===
+                                                                  (q.correctOptionIndex ??
+                                                                    0);
+                                                                return (
+                                                                  <div
+                                                                    key={i}
+                                                                    className={`flex items-center gap-2 rounded-md border p-2 ${
+                                                                      isCorrect
+                                                                        ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/40"
+                                                                        : "border-border bg-muted/30"
+                                                                    }`}
+                                                                  >
+                                                                    <span
+                                                                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
+                                                                        isCorrect
+                                                                          ? "bg-green-500 text-white"
+                                                                          : "bg-muted text-muted-foreground"
+                                                                      }`}
+                                                                    >
+                                                                      {OPTION_LETTERS[
+                                                                        i
+                                                                      ] ??
+                                                                        i + 1}
+                                                                    </span>
+                                                                    <span className="min-w-0 flex-1 text-sm">
+                                                                      {opt}
+                                                                    </span>
+                                                                    {isCorrect && (
+                                                                      <Check className="h-4 w-4 shrink-0 text-green-600" />
+                                                                    )}
+                                                                  </div>
+                                                                );
+                                                              },
+                                                            )}
+                                                          </div>
+                                                        )}
 
                                                       {q.type === "NVQ" && (
                                                         <div className="flex items-center gap-2 text-sm">
-                                                          <span className="text-muted-foreground">Answer:</span>
-                                                          <span className="font-medium">{q.numericalAnswer || "—"}</span>
+                                                          <span className="text-muted-foreground">
+                                                            Answer:
+                                                          </span>
+                                                          <span className="font-medium">
+                                                            {q.numericalAnswer ||
+                                                              "—"}
+                                                          </span>
                                                           {q.numericalUnit && (
-                                                            <span className="text-muted-foreground">{q.numericalUnit}</span>
+                                                            <span className="text-muted-foreground">
+                                                              {q.numericalUnit}
+                                                            </span>
                                                           )}
                                                         </div>
                                                       )}
 
-                                                      {((q.explanation ?? "").trim() || (q.explanationImageUrl ?? "").trim()) ? (
+                                                      {(
+                                                        q.explanation ?? ""
+                                                      ).trim() ||
+                                                      (
+                                                        q.explanationImageUrl ??
+                                                        ""
+                                                      ).trim() ? (
                                                         <div className="rounded-lg border border-border bg-muted/20 p-4">
                                                           <p className="text-xs font-medium uppercase tracking-tighter text-muted-foreground">
                                                             Explanation
                                                           </p>
-                                                          {(q.explanationImageUrl ?? "").trim() ? (
+                                                          {(
+                                                            q.explanationImageUrl ??
+                                                            ""
+                                                          ).trim() ? (
                                                             <div className="mt-2">
                                                               <img
-                                                                src={q.explanationImageUrl}
+                                                                src={
+                                                                  q.explanationImageUrl
+                                                                }
                                                                 alt="Explanation"
                                                                 className="max-h-48 rounded-md border border-border object-contain"
                                                               />
                                                             </div>
                                                           ) : null}
-                                                          {(q.explanation ?? "").trim() ? (
-                                                            <p className="mt-2 text-sm text-foreground">{q.explanation}</p>
+                                                          {(
+                                                            q.explanation ?? ""
+                                                          ).trim() ? (
+                                                            <p className="mt-2 text-sm text-foreground">
+                                                              {q.explanation}
+                                                            </p>
                                                           ) : null}
                                                         </div>
                                                       ) : null}
@@ -1529,7 +1784,8 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
           <DialogHeader>
             <DialogTitle>Create practice paper</DialogTitle>
             <DialogDescription>
-              Level and scope are pre-filled from the current page. Enter title and options below.
+              Level and scope are pre-filled from the current page. Enter title
+              and options below.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-1 flex-col gap-4 overflow-y-auto py-4">
@@ -1539,7 +1795,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                 <Label>Title *</Label>
                 <Input
                   value={paperForm.title}
-                  onChange={(e) => setPaperForm((f) => ({ ...f, title: e.target.value }))}
+                  onChange={(e) =>
+                    setPaperForm((f) => ({ ...f, title: e.target.value }))
+                  }
                   placeholder="Enter practice title"
                 />
               </div>
@@ -1547,7 +1805,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                 <Label>Description</Label>
                 <Input
                   value={paperForm.description}
-                  onChange={(e) => setPaperForm((f) => ({ ...f, description: e.target.value }))}
+                  onChange={(e) =>
+                    setPaperForm((f) => ({ ...f, description: e.target.value }))
+                  }
                   placeholder="Enter description"
                 />
               </div>
@@ -1556,7 +1816,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                   <Label>Difficulty</Label>
                   <Select
                     value={paperForm.difficulty}
-                    onValueChange={(v) => setPaperForm((f) => ({ ...f, difficulty: v }))}
+                    onValueChange={(v) =>
+                      setPaperForm((f) => ({ ...f, difficulty: v }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -1574,7 +1836,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                   <Label>Status</Label>
                   <Select
                     value={paperForm.status}
-                    onValueChange={(v) => setPaperForm((f) => ({ ...f, status: v }))}
+                    onValueChange={(v) =>
+                      setPaperForm((f) => ({ ...f, status: v }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -1593,7 +1857,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
               Cancel
             </Button>
             <Button onClick={createPaper} disabled={createSaving}>
-              {createSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {createSaving && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Create
             </Button>
           </DialogFooter>
@@ -1604,13 +1870,22 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       <Dialog
         open={deleteDialogOpen}
         onOpenChange={(open) =>
-          !open && (setDeleteDialogOpen(false), setDeleteTargetSingle(null), setDeleteTargetBulk([]), setDeleteTargetPaperId(null))
+          !open &&
+          (setDeleteDialogOpen(false),
+          setDeleteTargetSingle(null),
+          setDeleteTargetBulk([]),
+          setDeleteTargetPaperId(null))
         }
       >
-        <DialogContent className="sm:max-w-md" onPointerDownOutside={(e) => e.preventDefault()}>
+        <DialogContent
+          className="sm:max-w-md"
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>
-              {deleteTargetSingle ? "Delete question?" : `Delete ${deleteTargetBulk.length} questions?`}
+              {deleteTargetSingle
+                ? "Delete question?"
+                : `Delete ${deleteTargetBulk.length} questions?`}
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
@@ -1637,16 +1912,23 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
       </Dialog>
 
       {/* Edit question dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={(open) => !open && closeForm()}>
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={(open) => !open && closeForm()}
+      >
         <DialogContent className="max-w-4xl w-[90vw]">
           <DialogHeader className="flex flex-row items-center justify-between gap-4 pr-8">
             <DialogTitle>Edit Question</DialogTitle>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <Label className="shrink-0 text-xs text-muted-foreground">Type</Label>
+                <Label className="shrink-0 text-xs text-muted-foreground">
+                  Type
+                </Label>
                 <Select
                   value={form.type}
-                  onValueChange={(v: "MCQ" | "NVQ") => setForm({ ...form, type: v })}
+                  onValueChange={(v: "MCQ" | "NVQ") =>
+                    setForm({ ...form, type: v })
+                  }
                 >
                   <SelectTrigger className="h-9 w-24">
                     <SelectValue />
@@ -1658,26 +1940,36 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                 </Select>
               </div>
               <div className="flex items-center gap-1.5">
-                <Label className="shrink-0 text-xs text-muted-foreground">Marks (✓)</Label>
+                <Label className="shrink-0 text-xs text-muted-foreground">
+                  Marks (✓)
+                </Label>
                 <Input
                   type="number"
                   min={0}
                   className="h-9 w-16"
                   value={form.marksCorrect}
                   onChange={(e) =>
-                    setForm({ ...form, marksCorrect: parseInt(e.target.value, 10) || 0 })
+                    setForm({
+                      ...form,
+                      marksCorrect: parseInt(e.target.value, 10) || 0,
+                    })
                   }
                 />
               </div>
               <div className="flex items-center gap-1.5">
-                <Label className="shrink-0 text-xs text-muted-foreground">Marks (✗)</Label>
+                <Label className="shrink-0 text-xs text-muted-foreground">
+                  Marks (✗)
+                </Label>
                 <Input
                   type="number"
                   min={0}
                   className="h-9 w-16"
                   value={form.marksIncorrect}
                   onChange={(e) =>
-                    setForm({ ...form, marksIncorrect: parseInt(e.target.value, 10) || 0 })
+                    setForm({
+                      ...form,
+                      marksIncorrect: parseInt(e.target.value, 10) || 0,
+                    })
                   }
                 />
               </div>
@@ -1689,7 +1981,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
               <textarea
                 className={textareaClass}
                 value={form.questionText}
-                onChange={(e) => setForm({ ...form, questionText: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, questionText: e.target.value })
+                }
                 placeholder="Enter the question..."
               />
             </div>
@@ -1721,14 +2015,26 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                     </div>
                   ))}
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={addOption}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addOption}
+                >
                   Add option
                 </Button>
                 <div className="space-y-1">
                   <Label>Correct option</Label>
                   <Select
-                    value={String(Math.min(form.correctOptionIndex, form.options.length - 1))}
-                    onValueChange={(v) => setForm({ ...form, correctOptionIndex: parseInt(v, 10) })}
+                    value={String(
+                      Math.min(
+                        form.correctOptionIndex,
+                        form.options.length - 1,
+                      ),
+                    )}
+                    onValueChange={(v) =>
+                      setForm({ ...form, correctOptionIndex: parseInt(v, 10) })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -1750,7 +2056,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                   <Label>Numerical answer</Label>
                   <Input
                     value={form.numericalAnswer}
-                    onChange={(e) => setForm({ ...form, numericalAnswer: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, numericalAnswer: e.target.value })
+                    }
                     placeholder="e.g. 42 or 3.14"
                   />
                 </div>
@@ -1761,7 +2069,10 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                     step="any"
                     value={form.numericalTolerance}
                     onChange={(e) =>
-                      setForm({ ...form, numericalTolerance: parseFloat(e.target.value) || 0 })
+                      setForm({
+                        ...form,
+                        numericalTolerance: parseFloat(e.target.value) || 0,
+                      })
                     }
                   />
                 </div>
@@ -1769,7 +2080,9 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
                   <Label>Unit (optional)</Label>
                   <Input
                     value={form.numericalUnit}
-                    onChange={(e) => setForm({ ...form, numericalUnit: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, numericalUnit: e.target.value })
+                    }
                     placeholder="e.g. m/s"
                   />
                 </div>
@@ -1780,14 +2093,20 @@ export function LevelWiseDirectDetailsPage(props: LevelWiseDirectDetailsPageProp
               <textarea
                 className={textareaClass}
                 value={form.explanation}
-                onChange={(e) => setForm({ ...form, explanation: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, explanation: e.target.value })
+                }
                 placeholder="Why this answer is correct..."
               />
-              <Label className="text-xs text-muted-foreground">Explanation image URL (optional)</Label>
+              <Label className="text-xs text-muted-foreground">
+                Explanation image URL (optional)
+              </Label>
               <Input
                 className={inputClass}
                 value={form.explanationImageUrl ?? ""}
-                onChange={(e) => setForm({ ...form, explanationImageUrl: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, explanationImageUrl: e.target.value })
+                }
                 placeholder="https://..."
               />
             </div>
