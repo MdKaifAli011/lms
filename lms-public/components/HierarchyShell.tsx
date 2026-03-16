@@ -83,25 +83,23 @@ export function HierarchyShell({
         sidebarOpen={sidebarOpen}
         onToggleSidebar={toggleSidebar}
       />
-      <div className="h-[72px] sm:h-[84px]" aria-hidden />
+      {/* Spacer: matches Header (h-12/h-14) + ExamCategoriesBar (h-8/h-9) = 80px/92px — avoids sidebar overlapping header, no CLS */}
+      <div className="h-[80px] sm:h-[92px]" aria-hidden />
 
-      <div className="flex flex-1 relative">
+      {/* Body: sticky left sidebar | main | sticky right sidebar. Right sidebar sticky so full menu visible with main area; when page scrolls to footer, both sidebars move (no overlap). */}
+      <div className="flex min-h-[calc(100vh-80px)] sm:min-h-[calc(100vh-92px)]">
         <HierarchySidebar
           examSlug={examSlug}
           subjects={subjects}
           isOpen={sidebarOpen}
           onClose={closeSidebar}
+          sticky
         />
 
-        <div
-          className={cn(
-            "flex-1 min-w-0 relative transition-[margin] duration-300 ease-out",
-            sidebarOpen && "md:ml-80"
-          )}
-        >
+        <div className="flex-1 min-w-0 flex flex-col pr-16">
           <main
             className={cn(
-              "w-full bg-background dark:bg-slate-950/50",
+              "w-full min-h-0 flex-1 bg-background dark:bg-slate-950/50",
               "pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] sm:pb-0",
             )}
           >
@@ -127,10 +125,13 @@ export function HierarchyShell({
             name: "Alex Johnson",
             role: "NEET Aspirant",
           }}
+          sticky
         />
       </div>
 
-      <FooterComponent />
+      <div className="shrink-0">
+        <FooterComponent />
+      </div>
     </div>
   );
 }

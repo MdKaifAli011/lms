@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { getExams } from "@/lib/api";
 
 interface ExamCategoriesBarProps {
   exams?: Array<{ id: string; name?: string; slug?: string; status?: string }>;
@@ -11,37 +12,68 @@ interface ExamCategoriesBarProps {
   onToggleSidebar?: () => void;
 }
 
-const DEFAULT_EXAMS = [
-  { name: "NEET", slug: "neet" },
-  { name: "JEE", slug: "jee" },
-  { name: "SAT", slug: "sat" },
-];
-
 const ESTIMATED_ITEM_WIDTH = 72;
 
 export function ExamCategoriesBar({
-  exams,
+  exams: examsProp,
   sidebarOpen = true,
   onToggleSidebar,
 }: ExamCategoriesBarProps) {
   const pathname = usePathname();
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const [fetchedExams, setFetchedExams] = useState<
+    Array<{ id: string; name?: string; slug?: string; status?: string }>
+  >([]);
+  const [loading, setLoading] = useState(!examsProp?.length);
 
   useEffect(() => {
     const t = setTimeout(() => setIsClient(true), 0);
     return () => clearTimeout(t);
   }, []);
 
-  const displayExams = exams?.length
-    ? exams.map((e) => ({
-        title: (e.name ?? "").toUpperCase(),
-        slug: e.slug || e.id,
+  useEffect(() => {
+    if (examsProp?.length) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    getExams(true)
+      .then((list) => {
+        if (cancelled) return;
+        const items = Array.isArray(list)
+          ? (list as Array<{ id?: string; name?: string; slug?: string; status?: string }>).map(
+              (e) => ({
+                id: typeof e.id === "string" ? e.id : String(e.id ?? ""),
+                name: e.name,
+                slug: e.slug,
+                status: e.status,
+              })
+            )
+          : [];
+        setFetchedExams(items);
+      })
+      .catch(() => {
+        if (!cancelled) setFetchedExams([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [examsProp?.length]);
+
+  const exams = examsProp?.length ? examsProp : fetchedExams;
+  const displayExams =
+    exams
+      .filter((e) => (e.slug || e.id) && (e.status === "Active" || !e.status))
+      .map((e) => ({
+        title: (e.name ?? "").trim().toUpperCase() || (e.slug ?? e.id),
+        slug: (e.slug || e.id).toString(),
       }))
-    : DEFAULT_EXAMS.map((e) => ({
-        title: (e.name ?? "").toUpperCase(),
-        slug: e.slug ?? "",
-      }));
+      .filter((e) => e.title) ?? [];
 
   const scroll = (direction: "left" | "right") => {
     const container = document.getElementById("exam-categories-scroll");
@@ -122,29 +154,35 @@ export function ExamCategoriesBar({
             id="exam-categories-scroll"
             className="flex items-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto scrollbar-hide flex-1 scroll-smooth min-h-0"
           >
-            {displayExams.map((exam) => {
-              const isActive =
-                pathname === `/exam/${exam.slug}` ||
-                (pathname ?? "").startsWith(`/exam/${exam.slug}/`);
-              return (
-                <Link
-                  key={exam.slug}
-                  href={`/exam/${exam.slug}`}
-                  className={`relative whitespace-nowrap text-xs sm:text-sm font-semibold tracking-wide uppercase transition-colors shrink-0 ${
-                    isActive
-                      ? "text-blue-500"
-                      : "text-white hover:text-blue-500"
-                  }`}
-                >
-                  <span className="py-1 sm:py-1.5 inline-block">
-                    {exam.title}
-                  </span>
-                  {isActive && (
-                    <span className="absolute left-0 bottom-0 h-[1.5px] sm:h-[2px] w-full bg-blue-500" />
-                  )}
-                </Link>
-              );
-            })}
+            {loading ? (
+              <span className="text-xs sm:text-sm text-gray-500 shrink-0 py-1 sm:py-1.5">
+                Loading…
+              </span>
+            ) : displayExams.length > 0 ? (
+              displayExams.map((exam) => {
+                const isActive =
+                  pathname === `/exam/${exam.slug}` ||
+                  (pathname ?? "").startsWith(`/exam/${exam.slug}/`);
+                return (
+                  <Link
+                    key={exam.slug}
+                    href={`/exam/${exam.slug}`}
+                    className={`relative whitespace-nowrap text-xs sm:text-sm font-semibold tracking-wide uppercase transition-colors shrink-0 ${
+                      isActive
+                        ? "text-blue-500"
+                        : "text-white hover:text-blue-500"
+                    }`}
+                  >
+                    <span className="py-1 sm:py-1.5 inline-block">
+                      {exam.title}
+                    </span>
+                    {isActive && (
+                      <span className="absolute left-0 bottom-0 h-[1.5px] sm:h-[2px] w-full bg-blue-500" />
+                    )}
+                  </Link>
+                );
+              })
+            ) : null}
           </div>
 
           <div className="md:hidden flex items-center shrink-0">

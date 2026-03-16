@@ -34,13 +34,16 @@ function RouteLoadingShell({ children }: { children: React.ReactNode }) {
             <Skeleton className="h-4 w-4 rounded bg-slate-700 shrink-0" />
             <div className="flex gap-3 flex-1">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} className="h-3 w-12 sm:w-14 rounded bg-slate-700/80" />
+                <Skeleton
+                  key={i}
+                  className="h-3 w-12 sm:w-14 rounded bg-slate-700/80"
+                />
               ))}
             </div>
           </div>
         </div>
       </div>
-      <div className="h-[80px]" aria-hidden />
+      <div className="h-[80px] sm:h-[92px]" aria-hidden />
       {children}
     </div>
   );
@@ -60,7 +63,12 @@ export function PageLoadingSkeleton({
 }) {
   return (
     <RouteLoadingShell>
-      <div className={cn("w-full max-w-7xl mx-auto px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-10 sm:py-12 md:py-16", className)}>
+      <div
+        className={cn(
+          "w-full max-w-7xl mx-auto px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-10 sm:py-12 md:py-16",
+          className,
+        )}
+      >
         {showSectionTitle && (
           <div className="mb-8 sm:mb-10 md:mb-12 text-center">
             <Skeleton className="h-3 w-24 mx-auto mb-3 rounded-full" />
@@ -101,7 +109,11 @@ function CardSkeleton() {
 /**
  * Skeleton for hierarchy pages: exam/[slug], subject, unit, chapter, topic, subtopic, definition.
  */
-export function HierarchyLoadingSkeleton({ className }: { className?: string }) {
+export function HierarchyLoadingSkeleton({
+  className,
+}: {
+  className?: string;
+}) {
   return (
     <RouteLoadingShell>
       <div className="flex flex-1 relative">
@@ -128,7 +140,14 @@ export function HierarchyLoadingSkeleton({ className }: { className?: string }) 
             <Skeleton className="h-4 w-full max-w-xl mb-6 rounded" />
             <div className="space-y-3 mt-6 sm:mt-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Skeleton key={i} className={cn("h-4 rounded", i === 3 && "w-5/6", i === 5 && "w-4/5")} />
+                <Skeleton
+                  key={i}
+                  className={cn(
+                    "h-4 rounded",
+                    i === 3 && "w-5/6",
+                    i === 5 && "w-4/5",
+                  )}
+                />
               ))}
             </div>
             <div className="mt-8 sm:mt-10 flex items-center justify-between">
@@ -162,7 +181,14 @@ export function MainContentSkeleton({ className }: { className?: string }) {
         <Skeleton className="h-4 w-full max-w-xl mb-6 rounded" />
         <div className="space-y-3 mt-6 sm:mt-8">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className={cn("h-4 rounded", i === 3 && "w-5/6", i === 5 && "w-4/5")} />
+            <Skeleton
+              key={i}
+              className={cn(
+                "h-4 rounded",
+                i === 3 && "w-5/6",
+                i === 5 && "w-4/5",
+              )}
+            />
           ))}
         </div>
         <div className="mt-8 sm:mt-10 flex items-center justify-between">
@@ -289,7 +315,14 @@ export function SyllabusPageSkeleton({ className }: { className?: string }) {
             <div key={i} className="space-y-1">
               <div className="flex items-center gap-2">
                 <Skeleton className="h-4 w-4 rounded shrink-0" />
-                <Skeleton className={cn("h-5 rounded", i === 0 && "w-28", i === 1 && "w-24", i === 2 && "w-32")} />
+                <Skeleton
+                  className={cn(
+                    "h-5 rounded",
+                    i === 0 && "w-28",
+                    i === 1 && "w-24",
+                    i === 2 && "w-32",
+                  )}
+                />
                 <Skeleton className="h-3 w-20 rounded shrink-0 ml-auto" />
               </div>
               {i < 2 && (
@@ -324,7 +357,7 @@ export function MockTestsHubSkeleton({ className }: { className?: string }) {
     <div
       className={cn(
         "max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-10 sm:py-12 md:py-14",
-        className
+        className,
       )}
     >
       <div className="route-loading-bar-inline" aria-hidden />
@@ -347,7 +380,10 @@ export function MockTestsHubSkeleton({ className }: { className?: string }) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-border bg-card p-5 sm:p-6 space-y-4">
+          <div
+            key={i}
+            className="rounded-xl border border-border bg-card p-5 sm:p-6 space-y-4"
+          >
             <div className="flex justify-between">
               <Skeleton className="h-5 w-16 rounded" />
               <Skeleton className="h-3 w-20 rounded" />
@@ -382,7 +418,7 @@ export function MockTestsSetupSkeleton({ className }: { className?: string }) {
     <div
       className={cn(
         "max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 py-6 sm:py-8",
-        className
+        className,
       )}
     >
       <div className="route-loading-bar-inline" aria-hidden />
@@ -433,8 +469,16 @@ export function MockTestsSetupSkeleton({ className }: { className?: string }) {
 export function MinimalRouteLoading({ className }: { className?: string }) {
   return (
     <RouteLoadingShell>
-      <div className={cn("flex flex-col items-center justify-center min-h-[50vh] gap-4", className)}>
-        <div className="h-10 w-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin" aria-hidden />
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center min-h-[50vh] gap-4",
+          className,
+        )}
+      >
+        <div
+          className="h-10 w-10 rounded-full border-2 border-primary/20 border-t-primary animate-spin"
+          aria-hidden
+        />
         <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     </RouteLoadingShell>
@@ -464,5 +508,153 @@ export function BelowFoldSkeleton() {
         <Skeleton className="h-10 w-28 rounded-full" />
       </div>
     </div>
+  );
+}
+
+/**
+ * Practice hub (/practice): matches layout for stable CLS and fast FCP.
+ * Hero: analytics card (2/3) + weekly growth (1/3), then tabs. Content: recommended grid, mock rows, previous year.
+ */
+export function PracticePageSkeleton() {
+  return (
+    <RouteLoadingShell>
+      <div className="relative z-10 max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 pt-8 sm:pt-10 md:pt-12 pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+          <div className="lg:col-span-2 rounded-2xl border border-border bg-card/80 p-5 sm:p-6 md:p-8">
+            <div className="flex flex-wrap justify-between items-start gap-4 mb-5 sm:mb-6">
+              <div className="space-y-1">
+                <Skeleton className="h-7 w-48 sm:w-56 rounded-lg" />
+                <Skeleton className="h-4 w-64 rounded" />
+              </div>
+              <Skeleton className="h-6 w-14 rounded-full" />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-16 sm:h-20 rounded-xl" />
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-card/80 p-5 sm:p-6 md:p-8">
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton className="h-5 w-28 rounded" />
+              <Skeleton className="h-6 w-14 rounded" />
+            </div>
+            <div className="flex items-end gap-1.5 sm:gap-2 h-24 sm:h-28 mb-4">
+              {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <Skeleton key={i} className="flex-1 rounded-t min-w-0" />
+              ))}
+            </div>
+            <Skeleton className="h-9 w-full rounded-xl" />
+          </div>
+        </div>
+        <section className="rounded-2xl border border-border bg-white/80 dark:bg-card/60 py-3 px-4 mb-6">
+          <div className="flex items-center gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-10 w-24 sm:w-28 rounded-full" />
+            ))}
+          </div>
+        </section>
+      </div>
+      <div className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 space-y-14 sm:space-y-16 pb-16 sm:pb-20 md:pb-24">
+        <section className="pt-8 min-h-[320px]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-1 rounded-full shrink-0" />
+              <Skeleton className="h-8 w-64 sm:w-72 rounded-lg" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-full min-h-[240px] rounded-2xl border border-border bg-card/60 p-4 sm:p-5 md:p-6 space-y-3">
+                <div className="flex justify-between items-start">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                  <Skeleton className="h-5 w-20 rounded-lg" />
+                </div>
+                <Skeleton className="h-5 w-full max-w-[85%] rounded-lg" />
+                <Skeleton className="h-4 w-full rounded" />
+                <Skeleton className="h-4 w-[80%] max-w-full rounded" />
+                <div className="flex gap-3 pt-2">
+                  <Skeleton className="h-4 w-12 rounded" />
+                  <Skeleton className="h-4 w-14 rounded" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-xl mt-4" />
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="min-h-[220px]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-1 rounded-full shrink-0" />
+              <Skeleton className="h-8 w-56 rounded-lg" />
+            </div>
+            <Skeleton className="h-4 w-40 rounded" />
+          </div>
+          <div className="space-y-3 sm:space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 sm:h-28 rounded-2xl border border-border bg-card/60 p-4 sm:p-5 md:p-6 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Skeleton className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl shrink-0" />
+                  <div className="space-y-1 min-w-0">
+                    <Skeleton className="h-5 w-48 sm:w-56 rounded" />
+                    <Skeleton className="h-4 w-36 rounded" />
+                  </div>
+                </div>
+                <Skeleton className="h-10 w-24 rounded-xl shrink-0" />
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="min-h-[180px]">
+          <div className="flex items-center gap-3 mb-6">
+            <Skeleton className="h-8 w-1 rounded-full shrink-0" />
+            <Skeleton className="h-8 w-52 rounded-lg" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-28 rounded-2xl" />
+            ))}
+          </div>
+        </section>
+      </div>
+    </RouteLoadingShell>
+  );
+}
+
+/**
+ * Practice sub-routes (level-wise, full-length, previous-year): shell with back link, tabs, title, then content grid.
+ * Use in practice/level-wise/loading.tsx, practice/full-length/loading.tsx, practice/previous-year-paper/loading.tsx.
+ */
+export function PracticeShellSkeleton() {
+  return (
+    <RouteLoadingShell>
+      <div className="relative z-10 max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 pt-10 sm:pt-12 md:pt-14 pb-10 sm:pb-12 md:pb-14">
+        <div className="mb-6 sm:mb-8">
+          <Skeleton className="h-4 w-32 mb-3 rounded" />
+          <div className="rounded-2xl border border-border bg-white/80 dark:bg-card/60 py-3 px-4 mb-6">
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-10 w-24 sm:w-28 rounded-full" />
+              ))}
+            </div>
+          </div>
+          <Skeleton className="h-9 sm:h-10 w-3/4 max-w-md rounded-lg mb-2" />
+          <Skeleton className="h-4 w-48 rounded" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-full min-h-[240px] rounded-2xl border border-border bg-card/60 p-4 sm:p-5 md:p-6 space-y-3">
+              <div className="flex justify-between items-start">
+                <Skeleton className="h-12 w-12 rounded-xl" />
+                <Skeleton className="h-5 w-20 rounded-lg" />
+              </div>
+              <Skeleton className="h-5 w-full max-w-[85%] rounded-lg" />
+              <Skeleton className="h-4 w-full rounded" />
+              <Skeleton className="h-10 w-full rounded-xl mt-4" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </RouteLoadingShell>
   );
 }

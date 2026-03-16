@@ -53,8 +53,10 @@ import {
   Search,
   Loader2,
   ListChecks,
+  FileText,
 } from "lucide-react"
 import { toast } from "sonner"
+import { RichTextEditor } from "@/components/rich-text-editor"
 
 interface FullLengthMock {
   id: string
@@ -71,6 +73,8 @@ interface FullLengthMock {
   orderNumber: number
   status: string
   locked: boolean
+  /** Exam regulations HTML from DB, shown on public instructions page */
+  regulations?: string
 }
 
 interface Exam {
@@ -90,10 +94,43 @@ export default function FullLengthMockPage() {
   // Dialog state
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
   const [editingPaper, setEditingPaper] = useState<FullLengthMock | null>(null)
   const [addSaving, setAddSaving] = useState(false)
   const [editSaving, setEditSaving] = useState(false)
-  
+  const [deleteSaving, setDeleteSaving] = useState(false)
+  const [regulationsPaper, setRegulationsPaper] = useState<FullLengthMock | null>(null)
+  const [regulations, setRegulations] = useState("")
+  const [regulationsLoading, setRegulationsLoading] = useState(false)
+  const [regulationsSaving, setRegulationsSaving] = useState(false)
+
+  const openRegulations = (paper: FullLengthMock) => {
+    setRegulationsPaper(paper)
+    setRegulations("")
+    setRegulationsLoading(true)
+  }
+
+  const closeRegulations = () => {
+    setRegulationsPaper(null)
+    setRegulations("")
+  }
+
+  // Fetch regulations from API when dialog opens
+  useEffect(() => {
+    if (!regulationsPaper) return
+    let cancelled = false
+    fetch(`/api/full-length-mock/${encodeURIComponent(regulationsPaper.id)}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (!cancelled && data && typeof data.regulations === "string") setRegulations(data.regulations)
+        else if (!cancelled) setRegulations("")
+      })
+      .catch(() => { if (!cancelled) setRegulations("") })
+      .finally(() => { if (!cancelled) setRegulationsLoading(false) })
+    return () => { cancelled = true }
+  }, [regulationsPaper])
+
   // Form state
   const currentYear = new Date().getFullYear()
   const [formData, setFormData] = useState({
@@ -214,15 +251,25 @@ export default function FullLengthMockPage() {
   }
 
   // Handle delete
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this mock test?")) return
+  const openDelete = (id: string) => {
+    setDeleteTargetId(id)
+    setIsDeleteOpen(true)
+  }
+
+  const handleDelete = async () => {
+    if (!deleteTargetId) return
+    setDeleteSaving(true)
     try {
-      const res = await fetch(`/api/full-length-mock/${id}`, { method: "DELETE" })
+      const res = await fetch(`/api/full-length-mock/${deleteTargetId}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Failed to delete")
-      setPapers((prev) => prev.filter((p) => p.id !== id))
+      setPapers((prev) => prev.filter((p) => p.id !== deleteTargetId))
+      setIsDeleteOpen(false)
+      setDeleteTargetId(null)
       toast.success("Mock test deleted successfully")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete")
+    } finally {
+      setDeleteSaving(false)
     }
   }
 
@@ -276,22 +323,18 @@ export default function FullLengthMockPage() {
       )}
       {!loading && (
         <>
-          <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border/60 bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+          <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border/60 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex items-center gap-2 min-w-0">
+              <SidebarTrigger className="-ml-1 rounded-lg" aria-label="Toggle sidebar" />
+              <Separator orientation="vertical" className="mr-2 h-5 data-[orientation=vertical]:h-4" />
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                    <BreadcrumbLink asChild><Link href="/dashboard">Dashboard</Link></BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/self-study">Self Study</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                    <BreadcrumbLink href="/practice-management">Practice Management</BreadcrumbLink>
+                    <BreadcrumbLink asChild><Link href="/practice-management">Practice Management</Link></BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
@@ -300,13 +343,14 @@ export default function FullLengthMockPage() {
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
-            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={resetForm}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Mock
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center gap-2">
+              <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={resetForm}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Mock
+                  </Button>
+                </DialogTrigger>
             <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add Full Length Mock Test</DialogTitle>
@@ -438,8 +482,76 @@ export default function FullLengthMockPage() {
                 </Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog>
+              </Dialog>
+            </div>
           </header>
+
+          {/* Exam Regulations dialog – single editor, stored in DB */}
+          <Dialog open={!!regulationsPaper} onOpenChange={(open) => !open && closeRegulations()}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  Exam Regulations
+                  {regulationsPaper && (
+                    <span className="block text-sm font-normal text-muted-foreground mt-1">
+                      {regulationsPaper.title}
+                    </span>
+                  )}
+                </DialogTitle>
+                <DialogDescription>
+                  Edit the rules shown to candidates before they start this mock test. Stored in the database per paper. Use the toolbar for bold, colors, lists, and more.
+                </DialogDescription>
+              </DialogHeader>
+              {regulationsPaper && (
+                <>
+                  <div className="py-4">
+                    {regulationsLoading ? (
+                      <div className="flex items-center justify-center py-12 text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin mr-2" />
+                        Loading regulations…
+                      </div>
+                    ) : (
+                      <RichTextEditor
+                        value={regulations}
+                        onChange={setRegulations}
+                        placeholder="Enter exam regulations (rules, instructions, timing, etc.)…"
+                        minHeight="200px"
+                      />
+                    )}
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={closeRegulations}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        if (!regulationsPaper) return
+                        setRegulationsSaving(true)
+                        try {
+                          const res = await fetch(`/api/full-length-mock/${regulationsPaper.id}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ regulations }),
+                          })
+                          if (!res.ok) throw new Error("Failed to save")
+                          toast.success(`Regulations saved for "${regulationsPaper.title}"`)
+                          closeRegulations()
+                        } catch (e) {
+                          toast.error(e instanceof Error ? e.message : "Failed to save")
+                        } finally {
+                          setRegulationsSaving(false)
+                        }
+                      }}
+                      disabled={regulationsSaving || regulationsLoading}
+                    >
+                      {regulationsSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Save
+                    </Button>
+                  </DialogFooter>
+                </>
+              )}
+            </DialogContent>
+          </Dialog>
 
           <div className="min-h-0 min-w-0 flex-1 space-y-4 overflow-auto p-4 pt-4">
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
@@ -537,9 +649,14 @@ export default function FullLengthMockPage() {
                 ) : (
                   filteredPapers.map((paper) => (
                     <TableRow key={paper.id}>
-                      <TableCell>{paper.orderNumber}</TableCell>
+                      <TableCell className="font-mono text-muted-foreground">{paper.orderNumber}</TableCell>
                       <TableCell className="font-mono text-xs text-muted-foreground">{paper.mockId || "—"}</TableCell>
-                      <TableCell className="font-medium">{paper.title}</TableCell>
+                      <TableCell>
+                        <span className="font-medium">{paper.title}</span>
+                        {paper.description ? (
+                          <p className="text-xs text-muted-foreground truncate max-w-[200px] mt-0.5" title={paper.description}>{paper.description}</p>
+                        ) : null}
+                      </TableCell>
                       <TableCell>{paper.examName}</TableCell>
                       <TableCell>{paper.durationMinutes} min</TableCell>
                       <TableCell>{paper.totalQuestions}</TableCell>
@@ -558,16 +675,19 @@ export default function FullLengthMockPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(paper)}>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => openEdit(paper)} title="Edit mock">
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" asChild title="Manage subjects, sections & questions">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" asChild title="Add & manage questions (MCQ, NVQ)">
                             <Link href={`/practice-management/full-length/${paper.id}/questions`}>
                               <ListChecks className="h-4 w-4" />
                             </Link>
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(paper.id)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => openRegulations(paper)} title="Exam regulations for this paper">
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => openDelete(paper.id)} title="Delete mock">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -699,6 +819,25 @@ export default function FullLengthMockPage() {
             <Button onClick={handleEdit} disabled={editSaving}>
               {editSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <Dialog open={isDeleteOpen} onOpenChange={(open) => !open && (setIsDeleteOpen(false), setDeleteTargetId(null))}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete mock test?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete the mock test and all its questions. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => { setIsDeleteOpen(false); setDeleteTargetId(null); }}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={deleteSaving}>
+              {deleteSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

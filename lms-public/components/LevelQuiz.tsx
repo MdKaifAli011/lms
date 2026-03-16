@@ -49,6 +49,8 @@ export interface LevelQuizProps {
   subtopicId?: string;
   definitionId?: string;
   title?: string;
+  /** When set, use this paper directly (e.g. from /practice/[slug]) instead of fetching by hierarchy. Shows this paper only; submit shows result. */
+  initialPaper?: LevelWisePractice;
 }
 
 export function LevelQuiz({
@@ -61,12 +63,13 @@ export function LevelQuiz({
   subtopicId,
   definitionId,
   title,
+  initialPaper,
 }: LevelQuizProps) {
-  /** Single paper loaded for current page (1-based). Next/Prev fetch one at a time. */
-  const [currentPaper, setCurrentPaper] = useState<LevelWisePractice | null>(null);
+  /** Single paper loaded for current page (1-based). Next/Prev fetch one at a time. When initialPaper is set, use it and skip hierarchy fetch. */
+  const [currentPaper, setCurrentPaper] = useState<LevelWisePractice | null>(initialPaper ?? null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPapers, setTotalPapers] = useState(0);
-  const [papersLoading, setPapersLoading] = useState(true);
+  const [totalPapers, setTotalPapers] = useState(initialPaper ? 1 : 0);
+  const [papersLoading, setPapersLoading] = useState(!initialPaper);
   const [error, setError] = useState<string | null>(null);
 
   const [questions, setQuestions] = useState<LevelWisePracticeQuestion[]>([]);
@@ -103,8 +106,16 @@ export function LevelQuiz({
     status: "Active" as const,
   };
 
-  // Initial load: fetch first paper only (page=1, limit=1)
+  // Initial load: when initialPaper is provided use it; otherwise fetch first paper by hierarchy
   useEffect(() => {
+    if (initialPaper) {
+      setCurrentPaper(initialPaper);
+      setTotalPapers(1);
+      setCurrentPage(1);
+      setPapersLoading(false);
+      setError(null);
+      return;
+    }
     let cancelled = false;
     setPapersLoading(true);
     setError(null);
@@ -128,7 +139,7 @@ export function LevelQuiz({
       });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- baseFilters fields are the deps
-  }, [level, examId, subjectId, unitId, chapterId, topicId, subtopicId, definitionId]);
+  }, [initialPaper?.id, level, examId, subjectId, unitId, chapterId, topicId, subtopicId, definitionId]);
 
   // When we have papers, load questions for the current paper
   const loadQuestionsForCurrentPaper = useCallback(async () => {
@@ -298,19 +309,9 @@ export function LevelQuiz({
     return null;
   }
 
-  // No papers: keep a stable slot so layout doesn't shift (avoid CLS)
+  // No papers for this level: hide the Practice quiz section entirely (don't show empty state)
   if (!papersLoading && (totalPapers === 0 || currentPaper === null)) {
-    return (
-      <section className="my-8 sm:my-10 min-h-[180px]" aria-label={sectionTitle}>
-        <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          {sectionTitle}
-        </h2>
-        <div className="flex justify-center items-center min-h-[120px] rounded-2xl border border-dashed border-border/60 bg-muted/10">
-          <p className="text-sm text-muted-foreground">No practice quizzes for this level yet.</p>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   // Loading questions for current paper — stable min-height to avoid CLS

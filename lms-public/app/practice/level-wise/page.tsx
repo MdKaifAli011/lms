@@ -35,19 +35,26 @@ function PracticeTestCard({ paper }: { paper: LevelWisePractice }) {
               {displayLabel}
             </span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">{toTitleCase(paper.title)}</h3>
+          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">
+            {toTitleCase(paper.title)}
+          </h3>
           <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 line-clamp-2">
             {paper.description || "Practice test"}
           </p>
           <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
             <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> {duration}
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />{" "}
+              {duration}
             </span>
             <span className="flex items-center gap-1">
-              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> {paper.totalQuestions} Qs
+              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />{" "}
+              {paper.totalQuestions} Qs
             </span>
           </div>
-          <Button size="sm" className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold">
+          <Button
+            size="sm"
+            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold"
+          >
             Start Test
           </Button>
         </CardContent>
@@ -73,20 +80,27 @@ export default function PracticeLevelWisePage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await getLevelWisePractices({ status: "Active", page: 1, limit: LOAD_MORE_LIMIT });
+        const res = await getLevelWisePractices({
+          status: "Active",
+          page: 1,
+          limit: LOAD_MORE_LIMIT,
+        });
         if (!cancelled) {
           setPapers(res.papers);
           setTotal(res.total);
           setPage(1);
         }
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Failed to load");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const loadMore = useCallback(async () => {
@@ -118,7 +132,7 @@ export default function PracticeLevelWisePage() {
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !loadingMore) loadMore();
       },
-      { rootMargin: "200px" }
+      { rootMargin: "200px" },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -145,16 +159,23 @@ export default function PracticeLevelWisePage() {
             ))}
           </div>
           {hasMore && (
-            <div ref={loadMoreRef} className="flex justify-center py-6 min-h-[60px]">
+            <div
+              ref={loadMoreRef}
+              className="flex justify-center py-6 min-h-[60px]"
+            >
               {loadingMore ? (
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               ) : (
-                <span className="text-xs text-muted-foreground">Scroll for more</span>
+                <span className="text-xs text-muted-foreground">
+                  Scroll for more
+                </span>
               )}
             </div>
           )}
           {!loading && papers.length === 0 && (
-            <p className="text-sm text-muted-foreground">No practice tests available yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No practice tests available yet.
+            </p>
           )}
         </>
       )}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Source_Sans_3 } from "next/font/google";
+import { Lexend, Plus_Jakarta_Sans, Source_Sans_3 } from "next/font/google";
 import { NavigationLoadingProvider } from "@/context";
 import "./globals.css";
 
@@ -12,6 +12,12 @@ const sourceSans = Source_Sans_3({
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-display",
+  display: "swap",
+});
+
+const lexend = Lexend({
+  subsets: ["latin"],
+  variable: "--font-lexend",
   display: "swap",
 });
 
@@ -29,7 +35,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${sourceSans.variable} ${plusJakarta.variable}`}
+      className={`${sourceSans.variable} ${plusJakarta.variable} ${lexend.variable}`}
     >
       <head>
         <script

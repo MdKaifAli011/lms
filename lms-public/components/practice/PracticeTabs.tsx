@@ -8,7 +8,11 @@ const TABS = [
   { id: "all", label: "All Tests", href: "/practice" },
   { id: "level-wise", label: "Practice Tests", href: "/practice/level-wise" },
   { id: "full-length", label: "Full-Length Mocks", href: "/mock-tests" },
-  { id: "previous-year-paper", label: "Previous Year Papers", href: "/practice/previous-year-paper" },
+  {
+    id: "previous-year-paper",
+    label: "Previous Year Papers",
+    href: "/practice/previous-year-paper",
+  },
 ] as const;
 
 export function PracticeTabs() {
@@ -18,7 +22,8 @@ export function PracticeTabs() {
     if (pathname === "/practice" || pathname === "/practice/") return "all";
     if (pathname.startsWith("/practice/level-wise")) return "level-wise";
     if (pathname.startsWith("/mock-tests")) return "full-length";
-    if (pathname.startsWith("/practice/previous-year-paper")) return "previous-year-paper";
+    if (pathname.startsWith("/practice/previous-year-paper"))
+      return "previous-year-paper";
     return "all";
   })();
 
@@ -35,7 +40,7 @@ export function PracticeTabs() {
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
               isActive
                 ? "bg-blue-600 text-white shadow-md hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
-                : "bg-white dark:bg-card border border-gray-200 dark:border-border text-foreground hover:bg-gray-50 dark:hover:bg-muted/50 hover:border-gray-300 dark:hover:border-border"
+                : "bg-white dark:bg-card border border-gray-200 dark:border-border text-foreground hover:bg-gray-50 dark:hover:bg-muted/50 hover:border-gray-300 dark:hover:border-border",
             )}
           >
             {tab.label}

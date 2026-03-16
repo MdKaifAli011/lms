@@ -25,16 +25,20 @@ interface StudyToolsSidebarProps {
     role?: string;
     avatar?: string;
   };
+  /** When true, sidebar is positioned inside its parent (absolute, full height) so it does not overlap the footer. */
+  contained?: boolean;
+  /** When true (desktop), sidebar is in-flow and sticky so page scroll reveals footer after main content. */
+  sticky?: boolean;
 }
 
-export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
+export function StudyToolsSidebar({ examSlug, user, contained = false, sticky = false }: StudyToolsSidebarProps) {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
   const isSyllabusPage = Boolean(
-    examSlug && pathname && pathname === `/exam/${examSlug}/syllabus`
+    examSlug && pathname && pathname === `/exam/${examSlug}/syllabus`,
   );
 
   /** Base path for current hierarchy (no /syllabus, /quiz, or /flashcards). */
@@ -53,23 +57,25 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
 
   /** Flashcards page for current hierarchy level. */
   const flashcardsHref = basePath ? `${basePath}/flashcards` : null;
-  const isFlashcardsPage = Boolean(flashcardsHref && pathname === flashcardsHref);
+  const isFlashcardsPage = Boolean(
+    flashcardsHref && pathname === flashcardsHref,
+  );
 
   /** Content page (Take Notes): from Syllabus → exam home; else base path. */
   const contentHref =
     examSlug && pathname?.startsWith(`/exam/${examSlug}`)
       ? pathname.endsWith("/syllabus")
         ? `/exam/${examSlug}`
-        : basePath ?? `/exam/${examSlug}`
+        : (basePath ?? `/exam/${examSlug}`)
       : null;
 
   /** On content pages (not Syllabus, Quiz, or Flashcards), show Take Notes as default active. */
   const isNotesDefaultActive = Boolean(
     examSlug &&
-      pathname?.startsWith(`/exam/${examSlug}`) &&
-      !isSyllabusPage &&
-      !isQuizPage &&
-      !isFlashcardsPage
+    pathname?.startsWith(`/exam/${examSlug}`) &&
+    !isSyllabusPage &&
+    !isQuizPage &&
+    !isFlashcardsPage,
   );
 
   useEffect(() => {
@@ -96,7 +102,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
           },
         ]
       : []),
-    ...(flashcardsHref ? [{ icon: BookOpen, label: "Flashcards", href: flashcardsHref }] : [{ icon: BookOpen, label: "Flashcards", onClick: () => {} }]),
+    ...(flashcardsHref
+      ? [{ icon: BookOpen, label: "Flashcards", href: flashcardsHref }]
+      : [{ icon: BookOpen, label: "Flashcards", onClick: () => {} }]),
     ...(examSlug
       ? [
           {
@@ -124,12 +132,64 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
 
   if (isMobile) {
     const mobileTools = [
-      ...(contentHref ? [{ icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false, href: contentHref }] : [{ icon: StickyNote, label: "Notes", onClick: () => {}, isPrimary: false }]),
+      ...(contentHref
+        ? [
+            {
+              icon: StickyNote,
+              label: "Notes",
+              onClick: () => {},
+              isPrimary: false,
+              href: contentHref,
+            },
+          ]
+        : [
+            {
+              icon: StickyNote,
+              label: "Notes",
+              onClick: () => {},
+              isPrimary: false,
+            },
+          ]),
       ...(quizHref
-        ? [{ icon: FileQuestion, label: "Quiz", onClick: () => {}, isPrimary: false, href: quizHref }]
+        ? [
+            {
+              icon: FileQuestion,
+              label: "Quiz",
+              onClick: () => {},
+              isPrimary: false,
+              href: quizHref,
+            },
+          ]
         : []),
-      ...(flashcardsHref ? [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false, href: flashcardsHref }] : [{ icon: BookOpen, label: "Cards", onClick: () => {}, isPrimary: false }]),
-      ...(examSlug ? [{ icon: ClipboardList, label: "Syllabus", onClick: () => {}, isPrimary: false, href: `/exam/${examSlug}/syllabus` }] : []),
+      ...(flashcardsHref
+        ? [
+            {
+              icon: BookOpen,
+              label: "Cards",
+              onClick: () => {},
+              isPrimary: false,
+              href: flashcardsHref,
+            },
+          ]
+        : [
+            {
+              icon: BookOpen,
+              label: "Cards",
+              onClick: () => {},
+              isPrimary: false,
+            },
+          ]),
+      ...(examSlug
+        ? [
+            {
+              icon: ClipboardList,
+              label: "Syllabus",
+              onClick: () => {},
+              isPrimary: false,
+              href: `/exam/${examSlug}/syllabus`,
+            },
+          ]
+        : []),
       { icon: Settings, label: "More", onClick: () => {}, isPrimary: false },
     ];
     return (
@@ -139,7 +199,7 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
         className={cn(
           "fixed bottom-0 left-0 right-0 z-[100]",
           "bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-border",
-          "shadow-[0_-2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_-2px_12px_rgba(0,0,0,0.25)]"
+          "shadow-[0_-2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_-2px_12px_rgba(0,0,0,0.25)]",
         )}
         style={{
           paddingLeft: "max(0.5rem, env(safe-area-inset-left, 0px))",
@@ -164,7 +224,7 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                     "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors duration-200 ease-out rounded-lg mx-0.5",
                     isActive
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90"
-                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
+                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary",
                   )}
                   aria-label={tool.label}
                   aria-current={isActive ? "page" : undefined}
@@ -172,7 +232,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                   <div className="flex items-center justify-center w-8 h-8 rounded-md shrink-0">
                     <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
                   </div>
-                  <span className="text-[10px] font-medium truncate max-w-[60px] sm:max-w-[52px] text-center px-0.5">{tool.label}</span>
+                  <span className="text-[10px] font-medium truncate max-w-[60px] sm:max-w-[52px] text-center px-0.5">
+                    {tool.label}
+                  </span>
                 </Link>
               );
             }
@@ -186,7 +248,7 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                   "flex flex-col items-center justify-center gap-0.5 min-h-[40px] py-1.5 flex-1 min-w-0 transition-colors duration-200 ease-out rounded-lg mx-0.5",
                   notesActive
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90"
-                    : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
+                    : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary",
                 )}
                 aria-label={tool.label}
                 aria-current={notesActive ? "page" : undefined}
@@ -194,7 +256,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                 <div className="flex items-center justify-center w-8 h-8 rounded-md shrink-0">
                   <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
                 </div>
-                <span className="text-[10px] font-medium truncate max-w-[60px] sm:max-w-[52px] text-center px-0.5">{tool.label}</span>
+                <span className="text-[10px] font-medium truncate max-w-[60px] sm:max-w-[52px] text-center px-0.5">
+                  {tool.label}
+                </span>
               </button>
             );
           })}
@@ -206,10 +270,14 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed right-0 top-[72px] sm:top-[84px] h-[calc(100vh-72px)] sm:h-[calc(100vh-84px)] z-30",
-        "bg-white dark:bg-gray-900 border-l border-border",
+        "z-30 bg-white dark:bg-gray-900 border-l border-border",
         "transition-all duration-300 ease-in-out flex flex-col shrink-0 shadow-sm",
-        isExpanded ? "w-64 shadow-lg" : "w-16"
+        isExpanded ? "w-64 shadow-lg" : "w-16",
+        contained
+          ? "absolute right-0 top-0 bottom-0 h-full"
+          : sticky
+            ? "sticky top-[80px] sm:top-[92px] h-[calc(100vh-80px)] sm:h-[calc(100vh-92px)] self-start"
+            : "fixed right-0 top-[80px] sm:top-[92px] h-[calc(100vh-80px)] sm:h-[calc(100vh-92px)]",
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -244,15 +312,24 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                       !isExpanded && "justify-center px-0",
                       isActive
                         ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 dark:hover:text-primary-foreground"
-                        : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
+                        : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary",
                     )}
                     title={!isExpanded ? tool.label : undefined}
                     aria-label={tool.label}
                     asChild
                   >
-                    <Link href={href} className="flex w-full items-center gap-3 py-2.5 px-2 min-h-10" aria-label={tool.label} aria-current={isActive ? "page" : undefined}>
+                    <Link
+                      href={href}
+                      className="flex w-full items-center gap-3 py-2.5 px-2 min-h-10"
+                      aria-label={tool.label}
+                      aria-current={isActive ? "page" : undefined}
+                    >
                       <Icon className="h-5 w-5 shrink-0" aria-hidden />
-                      {isExpanded && <span className="text-sm font-normal">{tool.label}</span>}
+                      {isExpanded && (
+                        <span className="text-sm font-normal">
+                          {tool.label}
+                        </span>
+                      )}
                     </Link>
                   </Button>
                 );
@@ -266,14 +343,16 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                     !isExpanded && "justify-center px-0",
                     tool.label === "Take Notes" && isNotesDefaultActive
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 dark:hover:text-primary-foreground"
-                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
+                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary",
                   )}
                   onClick={(tool as { onClick?: () => void }).onClick}
                   title={!isExpanded ? tool.label : undefined}
                   aria-label={tool.label}
                 >
                   <Icon className="h-5 w-5 shrink-0" aria-hidden />
-                  {isExpanded && <span className="text-sm font-normal">{tool.label}</span>}
+                  {isExpanded && (
+                    <span className="text-sm font-normal">{tool.label}</span>
+                  )}
                 </Button>
               );
             })}
@@ -296,7 +375,9 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
                       aria-label={action.label}
                     >
                       <Icon className="h-5 w-5 shrink-0" aria-hidden />
-                      <span className="text-sm font-normal">{action.label}</span>
+                      <span className="text-sm font-normal">
+                        {action.label}
+                      </span>
                     </Button>
                   );
                 })}
@@ -316,8 +397,12 @@ export function StudyToolsSidebar({ examSlug, user }: StudyToolsSidebarProps) {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{displayName}</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{userRole}</p>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                {displayName}
+              </p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
+                {userRole}
+              </p>
             </div>
             <Button
               variant="ghost"

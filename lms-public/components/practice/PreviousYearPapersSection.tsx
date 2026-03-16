@@ -4,8 +4,18 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, PlayCircle, History, ArrowRight, HelpCircle } from "lucide-react";
-import { getPreviousYearPapersPaginated, getExams, type PreviousYearPaper } from "@/lib/api";
+import {
+  Download,
+  PlayCircle,
+  History,
+  ArrowRight,
+  HelpCircle,
+} from "lucide-react";
+import {
+  getPreviousYearPapersPaginated,
+  getExams,
+  type PreviousYearPaper,
+} from "@/lib/api";
 import { toTitleCase } from "@/lib/titleCase";
 
 const PREVIEW_LIMIT = 5;
@@ -74,16 +84,24 @@ export function PreviousYearPapersSection() {
       setLoading(true);
       try {
         const [prevRes, examsRes] = await Promise.all([
-          getPreviousYearPapersPaginated({ status: "Active", page: 1, limit: PREVIEW_LIMIT }),
+          getPreviousYearPapersPaginated({
+            status: "Active",
+            page: 1,
+            limit: PREVIEW_LIMIT,
+          }),
           getExams(true),
         ]);
         if (!cancelled) {
           setPapers(Array.isArray(prevRes.papers) ? prevRes.papers : []);
           setTotal(prevRes.total ?? 0);
-          setExams(Array.isArray(examsRes) ? (examsRes as { id: string; name?: string }[]) : []);
+          setExams(
+            Array.isArray(examsRes)
+              ? (examsRes as { id: string; name?: string }[])
+              : [],
+          );
         }
       } catch {
-        if (!cancelled) setPapers([]), setTotal(0);
+        if (!cancelled) (setPapers([]), setTotal(0));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -106,7 +124,10 @@ export function PreviousYearPapersSection() {
     return (
       <section className="pb-4">
         <div className="flex items-center gap-3 mb-6">
-          <span className="h-8 w-1 rounded-full bg-primary shrink-0" aria-hidden />
+          <span
+            className="h-8 w-1 rounded-full bg-primary shrink-0"
+            aria-hidden
+          />
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
             Previous Year Papers
           </h2>
@@ -126,7 +147,10 @@ export function PreviousYearPapersSection() {
   return (
     <section className="pb-4">
       <div className="flex items-center gap-3 mb-6">
-        <span className="h-8 w-1 rounded-full bg-primary shrink-0" aria-hidden />
+        <span
+          className="h-8 w-1 rounded-full bg-primary shrink-0"
+          aria-hidden
+        />
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-foreground">
           Previous Year Papers
         </h2>
@@ -135,7 +159,9 @@ export function PreviousYearPapersSection() {
         {papers.map((paper) => (
           <PreviousYearCard
             key={paper.id}
-            examName={toTitleCase(paper.examName ?? examNameById[paper.examId] ?? "Exam")}
+            examName={toTitleCase(
+              paper.examName ?? examNameById[paper.examId] ?? "Exam",
+            )}
             year={paper.year ?? new Date().getFullYear()}
             paper={paper}
           />
@@ -147,7 +173,9 @@ export function PreviousYearPapersSection() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
             <HelpCircle className="h-7 w-7" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">No previous year papers yet</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-1">
+            No previous year papers yet
+          </h3>
           <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
             Past exam papers will appear here when added.
           </p>

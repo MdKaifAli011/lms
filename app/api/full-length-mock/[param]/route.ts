@@ -24,6 +24,13 @@ export async function GET(
       return NextResponse.json({ error: "Mock test not found" }, { status: 404 });
     }
 
+    // Read regulations from raw collection so it's always present (avoids Mongoose omitting if schema was cached)
+    const rawDoc = await FullLengthMock.collection.findOne({ _id: (doc as { _id: mongoose.Types.ObjectId })._id });
+    const regulations =
+      rawDoc && typeof (rawDoc as { regulations?: string }).regulations === "string"
+        ? (rawDoc as { regulations: string }).regulations
+        : "";
+
     return NextResponse.json({
       id: (doc._id as { toString: () => string }).toString(),
       examId: (doc.examId as { _id?: { toString: () => string }; name?: string; slug?: string })?._id?.toString() || doc.examId,
@@ -41,6 +48,7 @@ export async function GET(
       mockId: (doc as { mockId?: string }).mockId ?? "",
       locked: doc.locked || false,
       image: doc.image || "",
+      regulations,
       createdAt: doc.createdAt
         ? new Date(doc.createdAt as Date).toLocaleString("en-US", {
             year: "numeric",
@@ -79,8 +87,12 @@ export async function PUT(
     const { param } = await params;
     const body = await request.json();
 
-    const isObjectId = mongoose.Types.ObjectId.isValid(param);
-    const query = isObjectId ? { _id: param } : { slug: param };
+    const isObjectId =
+      typeof param === "string" &&
+      param.length === 24 &&
+      /^[0-9a-fA-F]{24}$/.test(param) &&
+      mongoose.Types.ObjectId.isValid(param);
+    const query = isObjectId ? { _id: new mongoose.Types.ObjectId(param) } : { slug: param };
 
     const existingDoc = await FullLengthMock.findOne(query).lean();
     if (!existingDoc) {
@@ -121,8 +133,18 @@ export async function PUT(
     if (body.locked !== undefined) updateData.locked = body.locked === true;
     if (body.image !== undefined) updateData.image = body.image.trim();
     if (body.mockId !== undefined) updateData.mockId = String(body.mockId).trim() || "";
+    if (body.regulations !== undefined) updateData.regulations = typeof body.regulations === "string" ? body.regulations : "";
 
     updateData.updatedAt = new Date();
+
+    // When updating regulations, write via native driver so it always persists (avoids Mongoose schema cache omitting the field)
+    if (body.regulations !== undefined) {
+      const regulationsValue = typeof body.regulations === "string" ? body.regulations : "";
+      await FullLengthMock.collection.updateOne(
+        { _id: (existingDoc as { _id: mongoose.Types.ObjectId })._id },
+        { $set: { regulations: regulationsValue, updatedAt: new Date() } }
+      );
+    }
 
     const doc = await FullLengthMock.findOneAndUpdate(
       query,
@@ -136,10 +158,17 @@ export async function PUT(
       return NextResponse.json({ error: "Mock test not found" }, { status: 404 });
     }
 
+    // Re-fetch from DB so regulations is always present (Mongoose .lean() returns raw doc from DB)
+    const rawDoc = await FullLengthMock.collection.findOne({ _id: (doc as { _id: mongoose.Types.ObjectId })._id });
+    const regulationsFromDb = rawDoc && typeof (rawDoc as { regulations?: string }).regulations === "string"
+      ? (rawDoc as { regulations: string }).regulations
+      : "";
+
     return NextResponse.json({
       id: (doc._id as { toString: () => string }).toString(),
-      examId: (doc.examId as { _id?: { toString: () => string }; name?: string })?._id?.toString() || doc.examId,
+      examId: (doc.examId as { _id?: { toString: () => string }; name?: string; slug?: string })?._id?.toString() || doc.examId,
       examName: (doc.examId as { name?: string })?.name || "",
+      examSlug: (doc.examId as { slug?: string })?.slug || "",
       title: doc.title,
       slug: doc.slug,
       description: doc.description || "",
@@ -152,6 +181,7 @@ export async function PUT(
       mockId: (doc as { mockId?: string }).mockId ?? "",
       locked: doc.locked || false,
       image: doc.image || "",
+      regulations: regulationsFromDb,
       updatedAt: doc.updatedAt
         ? new Date(doc.updatedAt as Date).toLocaleString("en-US", {
             year: "numeric",

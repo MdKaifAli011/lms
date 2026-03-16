@@ -32,7 +32,12 @@ export interface PracticePageViewProps {
   filteredPapers: PracticePaper[];
   recommendedPapers: PracticePaper[];
   fullLengthPapers: PracticePaper[];
-  previousYearsByYear: { year: number; examId: string; examName: string; papers: PracticePaper[] }[];
+  previousYearsByYear: {
+    year: number;
+    examId: string;
+    examName: string;
+    papers: PracticePaper[];
+  }[];
   setActiveTab: (id: string) => void;
   practiceTotal: number;
   isLoadingMore: boolean;
@@ -52,9 +57,21 @@ function StatCard({
 }) {
   return (
     <div className="p-3 sm:p-4 rounded-xl bg-muted/40 dark:bg-muted/20 border border-border">
-      <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">{label}</p>
-      <p className={cn("text-lg sm:text-xl md:text-2xl font-bold tabular-nums", color)}>
-        {value} {suffix != null ? <span className="text-xs sm:text-sm font-normal opacity-70">{suffix}</span> : null}
+      <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "text-lg sm:text-xl md:text-2xl font-bold tabular-nums",
+          color,
+        )}
+      >
+        {value}{" "}
+        {suffix != null ? (
+          <span className="text-xs sm:text-sm font-normal opacity-70">
+            {suffix}
+          </span>
+        ) : null}
       </p>
     </div>
   );
@@ -71,7 +88,9 @@ function PracticeTestCard({ paper }: { paper: PracticePaper }) {
   const duration = formatDuration(paper.durationMinutes);
   const subjectName = (paper as { subjectName?: string }).subjectName;
   const examName = (paper as { examName?: string }).examName;
-  const displayLabel = subjectName ? `${examName} · ${subjectName}` : (examName ?? "Practice");
+  const displayLabel = subjectName
+    ? `${examName} · ${subjectName}`
+    : (examName ?? "Practice");
   return (
     <Link href={`/practice/${paper.slug}`}>
       <Card className="bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer hover:border-blue-500/30">
@@ -84,19 +103,26 @@ function PracticeTestCard({ paper }: { paper: PracticePaper }) {
               {displayLabel}
             </span>
           </div>
-          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">{paper.title}</h3>
+          <h3 className="text-base sm:text-lg font-bold mb-1.5 sm:mb-2 text-foreground">
+            {paper.title}
+          </h3>
           <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 line-clamp-2">
             {paper.description || "Practice test"}
           </p>
           <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
             <span className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> {duration}
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />{" "}
+              {duration}
             </span>
             <span className="flex items-center gap-1">
-              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> {paper.totalQuestions} Qs
+              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />{" "}
+              {paper.totalQuestions} Qs
             </span>
           </div>
-          <Button size="sm" className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold">
+          <Button
+            size="sm"
+            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold"
+          >
             Start Test
           </Button>
         </CardContent>
@@ -116,13 +142,17 @@ function MockTestCard({ id, paper }: { id: string; paper: PracticePaper }) {
             <div
               className={cn(
                 "h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base shrink-0",
-                locked ? "bg-blue-500/20 text-blue-600 dark:text-blue-400" : "bg-muted text-muted-foreground"
+                locked
+                  ? "bg-blue-500/20 text-blue-600 dark:text-blue-400"
+                  : "bg-muted text-muted-foreground",
               )}
             >
               {id}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-base sm:text-lg text-foreground truncate">{paper.title}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-foreground truncate">
+                {paper.title}
+              </h3>
               <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                 {paper.description || "Full-length mock test"}
               </p>
@@ -134,21 +164,30 @@ function MockTestCard({ id, paper }: { id: string; paper: PracticePaper }) {
                 <Clock className="h-3.5 w-3.5 shrink-0" /> {duration}
               </span>
               <span className="flex items-center gap-1">
-                <HelpCircle className="h-3.5 w-3.5 shrink-0" /> {paper.totalQuestions} Qs
+                <HelpCircle className="h-3.5 w-3.5 shrink-0" />{" "}
+                {paper.totalQuestions} Qs
               </span>
               {paper.difficulty != null && paper.difficulty !== "" ? (
                 <span className="flex items-center gap-1">
-                  <TrendingUp className="h-3.5 w-3.5 shrink-0" /> {paper.difficulty}
+                  <TrendingUp className="h-3.5 w-3.5 shrink-0" />{" "}
+                  {paper.difficulty}
                 </span>
               ) : null}
             </div>
             {locked ? (
-              <Button size="sm" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 sm:px-8">
+              <Button
+                size="sm"
+                className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 sm:px-8"
+              >
                 Unlock & Start
               </Button>
             ) : (
               <Link href={`/practice/${paper.slug}`}>
-                <Button size="sm" variant="outline" className="rounded-xl font-semibold text-xs sm:text-sm px-6 sm:px-8 border-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl font-semibold text-xs sm:text-sm px-6 sm:px-8 border-2"
+                >
                   Start Test
                 </Button>
               </Link>
@@ -160,12 +199,22 @@ function MockTestCard({ id, paper }: { id: string; paper: PracticePaper }) {
   );
 }
 
-function PreviousYearPaperCard({ exam, year, paper }: { exam: string; year: number; paper: PracticePaper }) {
+function PreviousYearPaperCard({
+  exam,
+  year,
+  paper,
+}: {
+  exam: string;
+  year: number;
+  paper: PracticePaper;
+}) {
   return (
     <Link href={`/practice/${paper.slug}`}>
       <Card className="bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border p-4 text-center hover:shadow-lg hover:border-blue-500/30 transition-all cursor-pointer">
         <CardContent className="p-0">
-          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5">{exam}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground uppercase font-semibold mb-0.5">
+            {exam}
+          </p>
           <p className="text-lg sm:text-xl font-bold text-foreground">{year}</p>
           <div className="mt-2 sm:mt-3 flex justify-center gap-2 text-blue-600 dark:text-blue-400">
             <Download className="h-4 w-4" />
@@ -195,12 +244,19 @@ export function PracticePageView({
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Get practice papers based on active tab
-  const practicePapers = activeTab === "practice" ? filteredPapers : recommendedPapers;
+  const practicePapers =
+    activeTab === "practice" ? filteredPapers : recommendedPapers;
   const hasMore = practicePapers.length < practiceTotal;
 
   // Intersection observer for infinite scroll
   useEffect(() => {
-    if (!loadMoreRef.current || !hasMore || activeTab !== "practice" || isLoadingMore) return;
+    if (
+      !loadMoreRef.current ||
+      !hasMore ||
+      activeTab !== "practice" ||
+      isLoadingMore
+    )
+      return;
 
     const element = loadMoreRef.current;
     let timeoutId: NodeJS.Timeout | null = null;
@@ -214,7 +270,7 @@ export function PracticePageView({
           }, 300);
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "200px" },
     );
 
     observer.observe(element);
@@ -230,7 +286,11 @@ export function PracticePageView({
       <ExamCategoriesBar />
       <div className="h-[80px]" aria-hidden />
 
-      <GradientBg variant="subtle" intensity="low" className="relative overflow-x-hidden">
+      <GradientBg
+        variant="subtle"
+        intensity="low"
+        className="relative overflow-x-hidden"
+      >
         <div
           className="absolute inset-0 -z-30 bg-[radial-gradient(hsl(var(--muted))_1px,transparent_1px)] bg-size-[18px_18px] sm:bg-size-[22px_22px]"
           aria-hidden
@@ -248,7 +308,8 @@ export function PracticePageView({
                       Performance Analytics
                     </h1>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Track your progress and readiness for the upcoming NEET 2024 exam.
+                      Track your progress and readiness for the upcoming NEET
+                      2024 exam.
                     </p>
                   </div>
                   <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
@@ -257,9 +318,18 @@ export function PracticePageView({
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                  <StatCard label="Average Score" value="642" suffix="/ 720" color="text-foreground" />
+                  <StatCard
+                    label="Average Score"
+                    value="642"
+                    suffix="/ 720"
+                    color="text-foreground"
+                  />
                   <StatCard label="Current Rank" value="#1,240" />
-                  <StatCard label="Accuracy" value="92%" color="text-blue-600 dark:text-blue-400" />
+                  <StatCard
+                    label="Accuracy"
+                    value="92%"
+                    color="text-blue-600 dark:text-blue-400"
+                  />
                   <StatCard label="Tests Taken" value="48" />
                 </div>
               </CardContent>
@@ -272,7 +342,9 @@ export function PracticePageView({
                     <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0" />
                     Weekly Growth
                   </h3>
-                  <span className="text-blue-600 dark:text-blue-400 font-bold text-lg sm:text-xl">+18.5%</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-bold text-lg sm:text-xl">
+                    +18.5%
+                  </span>
                 </div>
                 <div className="flex items-end gap-1 sm:gap-2 h-20 sm:h-24 mb-4">
                   {[40, 55, 45, 70, 60, 85, 100].map((height, i) => (
@@ -280,13 +352,19 @@ export function PracticePageView({
                       key={i}
                       className={cn(
                         "flex-1 rounded-t transition-all min-w-0",
-                        i === 6 ? "bg-blue-600 dark:bg-blue-500" : "bg-blue-600/40 dark:bg-blue-500/40"
+                        i === 6
+                          ? "bg-blue-600 dark:bg-blue-500"
+                          : "bg-blue-600/40 dark:bg-blue-500/40",
                       )}
                       style={{ height: `${height}%` }}
                     />
                   ))}
                 </div>
-                <Button variant="outline" size="sm" className="w-full rounded-xl border-2 text-xs sm:text-sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full rounded-xl border-2 text-xs sm:text-sm"
+                >
                   View Detailed Report
                 </Button>
               </CardContent>
@@ -306,7 +384,7 @@ export function PracticePageView({
                   "px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all",
                   activeTab === tab.id
                     ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
-                    : "bg-card border border-border text-foreground hover:bg-muted/50 hover:border-blue-500/30"
+                    : "bg-card border border-border text-foreground hover:bg-muted/50 hover:border-blue-500/30",
                 )}
               >
                 {tab.label}
@@ -329,7 +407,7 @@ export function PracticePageView({
         ) : null}
         {!loading && !error ? (
           <div className="contents">
-            {(activeTab === "all" || activeTab === "practice") ? (
+            {activeTab === "all" || activeTab === "practice" ? (
               <section className="pt-6 sm:pt-8">
                 <div className="mb-6 sm:mb-8 text-center sm:text-left">
                   <div className="inline-flex items-center justify-center mb-3 sm:mb-4">
@@ -337,14 +415,17 @@ export function PracticePageView({
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h2 className="text-2xl min-[480px]:text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-                      {activeTab === "practice" ? "All Practice Tests" : "Recommended Practice Tests"}
+                      {activeTab === "practice"
+                        ? "All Practice Tests"
+                        : "Recommended Practice Tests"}
                     </h2>
                     {activeTab === "all" && practiceTotal > 3 ? (
                       <button
                         onClick={() => setActiveTab("practice")}
                         className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium inline-flex items-center gap-1 hover:underline"
                       >
-                        View all <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        View all{" "}
+                        <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </button>
                     ) : null}
                   </div>
@@ -356,24 +437,31 @@ export function PracticePageView({
                 </div>
                 {/* Infinite scroll loader */}
                 {activeTab === "practice" && hasMore && (
-                  <div ref={loadMoreRef} className="flex justify-center py-6 min-h-[60px]">
+                  <div
+                    ref={loadMoreRef}
+                    className="flex justify-center py-6 min-h-[60px]"
+                  >
                     {isLoadingMore ? (
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Loader2 className="h-5 w-5 animate-spin" />
                         <span className="text-sm">Loading more...</span>
                       </div>
                     ) : (
-                      <div className="text-xs text-muted-foreground">Scroll for more</div>
+                      <div className="text-xs text-muted-foreground">
+                        Scroll for more
+                      </div>
                     )}
                   </div>
                 )}
                 {practicePapers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No practice tests available yet.</p>
+                  <p className="text-sm text-muted-foreground">
+                    No practice tests available yet.
+                  </p>
                 ) : null}
               </section>
             ) : null}
 
-            {(activeTab === "all" || activeTab === "mock") ? (
+            {activeTab === "all" || activeTab === "mock" ? (
               <section className="py-4 sm:py-6">
                 <div className="mb-6 sm:mb-8">
                   <div className="inline-flex items-center justify-center mb-3 sm:mb-4">
@@ -383,21 +471,33 @@ export function PracticePageView({
                     <h2 className="text-2xl min-[480px]:text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
                       Full-Length Mock Tests
                     </h2>
-                    <span className="text-xs sm:text-sm text-muted-foreground">New tests added every Sunday</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">
+                      New tests added every Sunday
+                    </span>
                   </div>
                 </div>
                 <div className="space-y-3 sm:space-y-4">
-                  {(activeTab === "mock" ? filteredPapers : fullLengthPapers).map((paper, idx) => (
-                    <MockTestCard key={paper.id} id={String(idx + 1)} paper={paper} />
+                  {(activeTab === "mock"
+                    ? filteredPapers
+                    : fullLengthPapers
+                  ).map((paper, idx) => (
+                    <MockTestCard
+                      key={paper.id}
+                      id={String(idx + 1)}
+                      paper={paper}
+                    />
                   ))}
                 </div>
-                {(activeTab === "mock" ? filteredPapers : fullLengthPapers).length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No full-length mock tests available yet.</p>
+                {(activeTab === "mock" ? filteredPapers : fullLengthPapers)
+                  .length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No full-length mock tests available yet.
+                  </p>
                 ) : null}
               </section>
             ) : null}
 
-            {(activeTab === "all" || activeTab === "previous") ? (
+            {activeTab === "all" || activeTab === "previous" ? (
               <section className="py-4 sm:py-6 pb-8">
                 <div className="mb-6 sm:mb-8">
                   <div className="inline-flex items-center justify-center mb-3 sm:mb-4">
@@ -422,7 +522,9 @@ export function PracticePageView({
                       );
                     })}
                   {previousYearsByYear.length === 0 ? (
-                    <p className="col-span-full text-sm text-muted-foreground">No previous year papers available yet.</p>
+                    <p className="col-span-full text-sm text-muted-foreground">
+                      No previous year papers available yet.
+                    </p>
                   ) : null}
                 </div>
               </section>

@@ -20,6 +20,8 @@ export interface IFullLengthMock {
   locked?: boolean;
   /** Optional image URL for card */
   image?: string;
+  /** Exam regulations HTML (rich text), shown before candidate starts the mock */
+  regulations?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -43,6 +45,7 @@ const fullLengthMockSchema = new Schema<IFullLengthMock>(
     mockId: { type: String, default: "", trim: true },
     locked: { type: Boolean, default: false },
     image: { type: String, default: "" },
+    regulations: { type: String, default: "" },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

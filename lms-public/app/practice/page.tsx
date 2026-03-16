@@ -39,18 +39,21 @@ function formatDuration(minutes: number): string {
   return m !== 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-/* Skeleton for loading state */
+/* Skeleton for loading state — matches PracticeTestCard dimensions to avoid CLS */
 function PracticeCardSkeleton() {
   return (
-    <div className="h-full rounded-2xl border border-border bg-card/60 p-4 sm:p-5 md:p-6 animate-pulse">
-      <div className="flex justify-between items-start mb-4">
-        <div className="h-12 w-12 rounded-xl bg-muted" />
-        <div className="h-5 w-16 rounded-lg bg-muted" />
+    <div
+      className="h-full min-h-[240px] rounded-2xl border border-border bg-card/60 p-4 sm:p-5 md:p-6 animate-pulse motion-reduce:animate-none"
+      aria-hidden
+    >
+      <div className="flex justify-between items-start mb-3 sm:mb-4">
+        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-muted" />
+        <div className="h-5 w-16 sm:w-20 rounded-lg bg-muted" />
       </div>
-      <div className="h-5 w-3/4 rounded-lg bg-muted mb-2" />
-      <div className="h-4 w-full rounded bg-muted/80 mb-4" />
-      <div className="h-4 w-1/2 rounded bg-muted/80 mb-6" />
-      <div className="flex gap-3 mb-6">
+      <div className="h-5 w-full max-w-[85%] rounded-lg bg-muted mb-2" />
+      <div className="h-4 w-full rounded bg-muted/80 mb-1" />
+      <div className="h-4 w-[80%] max-w-full rounded bg-muted/80 mb-4 sm:mb-6" />
+      <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="h-4 w-12 rounded bg-muted/80" />
         <div className="h-4 w-14 rounded bg-muted/80" />
       </div>
@@ -152,11 +155,13 @@ function MockTestCardRow({ id, paper }: { id: string; paper: FullLengthMock }) {
               ) : null}
             </div>
             {locked ? (
-              <Button size="sm" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 sm:px-8 shadow-md shadow-blue-600/20">
-                Unlock & Start
-              </Button>
+              <Link href={`/mock-tests/${paper.slug}`}>
+                <Button size="sm" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 sm:px-8 shadow-md shadow-blue-600/20">
+                  Unlock & Start
+                </Button>
+              </Link>
             ) : (
-              <Link href={`/practice/${paper.slug}`}>
+              <Link href={`/mock-tests/${paper.slug}`}>
                 <Button size="sm" variant="outline" className="rounded-xl font-semibold text-xs sm:text-sm px-6 sm:px-8 border-2 hover:bg-blue-500/10 hover:border-blue-500/50">
                   Start Test
                 </Button>
@@ -314,38 +319,66 @@ export default function PracticePage() {
         </div>
       </GradientBg>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 space-y-14 sm:space-y-16 pb-16 sm:pb-20 md:pb-24">
+      {/* Content — stable min-heights and aria-live for CLS + a11y */}
+      <div
+        className="max-w-7xl mx-auto w-full min-w-0 px-3 min-[480px]:px-4 sm:px-5 md:px-6 space-y-14 sm:space-y-16 pb-16 sm:pb-20 md:pb-24"
+        aria-live="polite"
+        aria-busy={loading}
+        aria-atomic="true"
+      >
         {loading ? (
-          <div className="pt-8 space-y-14">
-            <div>
-              <div className="h-8 w-48 rounded-lg bg-muted animate-pulse mb-6" />
+          <div className="pt-8 space-y-14" role="status" aria-label="Loading practice content">
+            <section className="pt-8 min-h-[320px]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="h-8 w-1 rounded-full bg-primary shrink-0" aria-hidden />
+                  <div className="h-8 w-48 sm:w-56 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                 {[1, 2, 3].map((i) => (
                   <PracticeCardSkeleton key={i} />
                 ))}
               </div>
-            </div>
-            <div>
-              <div className="h-8 w-56 rounded-lg bg-muted animate-pulse mb-6" />
-              <div className="space-y-3">
+            </section>
+            <section className="min-h-[220px]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="h-8 w-1 rounded-full bg-primary shrink-0" aria-hidden />
+                  <div className="h-8 w-56 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
+                </div>
+                <div className="h-4 w-36 rounded bg-muted/80 animate-pulse motion-reduce:animate-none" />
+              </div>
+              <div className="space-y-3 sm:space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-24 sm:h-28 rounded-2xl bg-muted/60 animate-pulse motion-reduce:animate-none border border-border"
+                  />
                 ))}
               </div>
-            </div>
-            <div>
-              <div className="h-8 w-52 rounded-lg bg-muted animate-pulse mb-6" />
+            </section>
+            <section className="min-h-[180px]">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="h-8 w-1 rounded-full bg-primary shrink-0" aria-hidden />
+                <div className="h-8 w-52 rounded-lg bg-muted animate-pulse motion-reduce:animate-none" />
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="h-28 rounded-2xl bg-muted animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-28 rounded-2xl bg-muted/60 animate-pulse motion-reduce:animate-none border border-border"
+                  />
                 ))}
               </div>
-            </div>
+            </section>
           </div>
         ) : error ? (
-          <div className="pt-8 rounded-2xl bg-destructive/10 border border-destructive/30 p-6 text-destructive text-sm flex items-center gap-3">
-            <HelpCircle className="h-5 w-5 shrink-0" />
+          <div
+            className="pt-8 rounded-2xl bg-destructive/10 border border-destructive/30 p-6 text-destructive text-sm flex items-center gap-3"
+            role="alert"
+          >
+            <HelpCircle className="h-5 w-5 shrink-0" aria-hidden />
             {error}
           </div>
         ) : (
@@ -422,27 +455,30 @@ export default function PracticePage() {
         )}
 
         {/* Floating action buttons */}
-        <div className="fixed right-4 sm:right-6 bottom-28 sm:bottom-32 z-40 hidden xl:flex flex-col gap-3">
+        <div className="fixed right-4 sm:right-6 bottom-28 sm:bottom-32 z-40 hidden xl:flex flex-col gap-3" aria-label="Quick actions">
           <button
             type="button"
-            className="w-12 h-12 sm:w-14 sm:h-14 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 hover:scale-105 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-12 h-12 sm:w-14 sm:h-14 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 hover:scale-105 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:hover:scale-100"
             title="Ask AI Tutor"
+            aria-label="Ask AI Tutor"
           >
-            <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
+            <Bot className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
           </button>
           <button
             type="button"
-            className="w-12 h-12 sm:w-14 sm:h-14 bg-card border border-border rounded-2xl flex items-center justify-center shadow-md hover:shadow-lg hover:border-primary/30 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-12 h-12 sm:w-14 sm:h-14 bg-card border border-border rounded-2xl flex items-center justify-center shadow-md hover:shadow-lg hover:border-primary/30 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:hover:scale-100"
             title="Take Notes"
+            aria-label="Take Notes"
           >
-            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
+            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" aria-hidden />
           </button>
           <button
             type="button"
-            className="w-12 h-12 sm:w-14 sm:h-14 bg-card border border-border rounded-2xl flex items-center justify-center shadow-md hover:shadow-lg hover:border-primary/30 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-12 h-12 sm:w-14 sm:h-14 bg-card border border-border rounded-2xl flex items-center justify-center shadow-md hover:shadow-lg hover:border-primary/30 hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:hover:scale-100"
             title="Flashcards"
+            aria-label="Flashcards"
           >
-            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" aria-hidden />
           </button>
         </div>
       </div>

@@ -101,6 +101,27 @@
     background: hsl(var(--muted) / 0.5);
   }
 
+  /* Exam palette / sidebar scrollbar – thin, primary-tinted (JEE-style reference) */
+  .exam-palette-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .exam-palette-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .exam-palette-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.25);
+    border-radius: 10px;
+  }
+  .exam-palette-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.4);
+  }
+  .dark .exam-palette-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+  }
+  .dark .exam-palette-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+
   /* Consistent heading typography — display font for all headings */
   h1,
   h2,

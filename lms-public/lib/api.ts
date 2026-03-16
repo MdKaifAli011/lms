@@ -188,6 +188,8 @@ export interface FullLengthMock {
   mockId?: string;
   locked: boolean;
   image?: string;
+  /** Exam regulations HTML (rich text), shown before candidate starts */
+  regulations?: string;
 }
 
 export async function getFullLengthMocks(filters?: { examId?: string; status?: string }): Promise<FullLengthMock[]> {
@@ -230,7 +232,7 @@ export async function getFullLengthMocksPaginated(filters: {
   }
 }
 
-/** Fetch a single full-length mock by slug (for mock-tests/[testSlug] page). */
+/** Fetch a single full-length mock by slug or id (for mock-tests/[testSlug] page). */
 export async function getFullLengthMockBySlug(slug: string): Promise<FullLengthMock | null> {
   try {
     const data = await fetchApi<FullLengthMock>(`/api/full-length-mock/${encodeURIComponent(slug)}`);
@@ -238,6 +240,41 @@ export async function getFullLengthMockBySlug(slug: string): Promise<FullLengthM
   } catch (e) {
     if (typeof window === "undefined") console.error("[getFullLengthMockBySlug]", e);
     return null;
+  }
+}
+
+/** Single question in a full-length mock test (for exam page). */
+export interface FullLengthMockQuestion {
+  id: string;
+  mockId: string;
+  subject: string;
+  questionText: string;
+  type: "MCQ" | "NVQ";
+  options: string[];
+  correctOptionIndex: number;
+  numericalAnswer: string;
+  numericalTolerance: number;
+  numericalUnit: string;
+  marksCorrect: number;
+  marksIncorrect: number;
+  imageUrl: string;
+  imageCaption: string;
+  orderNumber: number;
+  difficulty: string;
+  explanation?: string;
+  explanationImageUrl?: string;
+}
+
+/** GET /api/full-length-mock/[param]/questions – list questions for a mock test (param = slug or id). */
+export async function getFullLengthMockQuestions(mockSlugOrId: string): Promise<FullLengthMockQuestion[]> {
+  try {
+    const list = await fetchApi<FullLengthMockQuestion[]>(
+      `/api/full-length-mock/${encodeURIComponent(mockSlugOrId)}/questions`
+    );
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getFullLengthMockQuestions]", e);
+    return [];
   }
 }
 

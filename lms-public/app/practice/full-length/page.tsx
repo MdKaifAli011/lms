@@ -58,11 +58,13 @@ function MockTestCard({ id, paper }: { id: string; paper: FullLengthMock }) {
               ) : null}
             </div>
             {locked ? (
-              <Button size="sm" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 sm:px-8">
-                Unlock & Start
-              </Button>
+              <Link href={`/mock-tests/${paper.slug}`}>
+                <Button size="sm" className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-6 sm:px-8">
+                  Unlock & Start
+                </Button>
+              </Link>
             ) : (
-              <Link href={`/practice/${paper.slug}`}>
+              <Link href={`/mock-tests/${paper.slug}`}>
                 <Button size="sm" variant="outline" className="rounded-xl font-semibold text-xs sm:text-sm px-6 sm:px-8 border-2">
                   Start Test
                 </Button>
