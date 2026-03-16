@@ -270,14 +270,13 @@ export function StudyToolsSidebar({ examSlug, user, contained = false, sticky = 
   return (
     <aside
       className={cn(
-        "z-30 bg-white dark:bg-gray-900 border-l border-border",
+        "z-40 bg-white dark:bg-gray-900 border-l border-border",
         "transition-all duration-300 ease-in-out flex flex-col shrink-0 shadow-sm",
+        "rounded-l-lg",
         isExpanded ? "w-64 shadow-lg" : "w-16",
         contained
           ? "absolute right-0 top-0 bottom-0 h-full"
-          : sticky
-            ? "sticky top-[80px] sm:top-[92px] h-[calc(100vh-80px)] sm:h-[calc(100vh-92px)] self-start"
-            : "fixed right-0 top-[80px] sm:top-[92px] h-[calc(100vh-80px)] sm:h-[calc(100vh-92px)]",
+          : "sticky top-[80px] sm:top-[92px] h-[calc(100vh-80px)] sm:h-[calc(100vh-92px)] self-start",
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}

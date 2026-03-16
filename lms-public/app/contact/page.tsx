@@ -33,7 +33,8 @@ export default function ContactPage() {
             Contact Us
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-2xl">
-            Have a question or feedback? We&apos;d love to hear from you. Reach out and we&apos;ll get back as soon as we can.
+            Have a question or feedback? We&apos;d love to hear from you. Reach
+            out and we&apos;ll get back as soon as we can.
           </p>
         </header>
 
@@ -47,12 +48,14 @@ export default function ContactPage() {
                     <Mail className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Email</h3>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      Email
+                    </h3>
                     <a
-                      href="mailto:contact@lmsdoors.com"
+                      href="mailto:info@lmsdoors.com"
                       className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm"
                     >
-                      contact@lmsdoors.com
+                      info@lmsdoors.com
                     </a>
                   </div>
                 </div>
@@ -65,7 +68,9 @@ export default function ContactPage() {
                     <Phone className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Phone</h3>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      Phone
+                    </h3>
                     <a
                       href="tel:+1234567890"
                       className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-sm"
@@ -83,7 +88,9 @@ export default function ContactPage() {
                     <MapPin className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Address</h3>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      Address
+                    </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       123 Education Street, Learning City, LC 12345
                     </p>
@@ -97,41 +104,74 @@ export default function ContactPage() {
           <div className="lg:col-span-2">
             <Card className="border border-border bg-card">
               <CardContent className="p-5 sm:p-6 md:p-8">
-                <h2 className="text-lg font-bold text-foreground mb-1">Send a message</h2>
+                <h2 className="text-lg font-bold text-foreground mb-1">
+                  Send a message
+                </h2>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Fill out the form below and we&apos;ll respond within 24–48 hours.
+                  Fill out the form below and we&apos;ll respond within 24–48
+                  hours.
                 </p>
                 {submitted ? (
                   <div className="py-8 text-center rounded-xl bg-blue-500/10 border border-blue-500/20">
-                    <p className="text-foreground font-medium">Thank you for reaching out.</p>
+                    <p className="text-foreground font-medium">
+                      Thank you for reaching out.
+                    </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      We&apos;ve received your message and will get back to you soon.
+                      We&apos;ve received your message and will get back to you
+                      soon.
                     </p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1.5">
+                        <label
+                          htmlFor="name"
+                          className="block text-sm font-medium text-foreground mb-1.5"
+                        >
                           Name
                         </label>
-                        <Input id="name" name="name" placeholder="Your name" required />
+                        <Input
+                          id="name"
+                          name="name"
+                          placeholder="Your name"
+                          required
+                        />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-foreground mb-1.5"
+                        >
                           Email
                         </label>
-                        <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          required
+                        />
                       </div>
                     </div>
                     <div>
-                      <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-1.5">
+                      <label
+                        htmlFor="subject"
+                        className="block text-sm font-medium text-foreground mb-1.5"
+                      >
                         Subject
                       </label>
-                      <Input id="subject" name="subject" placeholder="What is this regarding?" />
+                      <Input
+                        id="subject"
+                        name="subject"
+                        placeholder="What is this regarding?"
+                      />
                     </div>
                     <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-foreground mb-1.5">
+                      <label
+                        htmlFor="message"
+                        className="block text-sm font-medium text-foreground mb-1.5"
+                      >
                         Message
                       </label>
                       <textarea
@@ -143,7 +183,10 @@ export default function ContactPage() {
                         className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] resize-y"
                       />
                     </div>
-                    <Button type="submit" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button
+                      type="submit"
+                      className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                    >
                       <Send className="h-4 w-4 mr-2" />
                       Send message
                     </Button>

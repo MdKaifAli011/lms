@@ -19,7 +19,8 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-2xl">
-            How we collect, use, and protect your information when you use LMS Doors.
+            How we collect, use, and protect your information when you use LMS
+            Doors.
           </p>
           <p className="text-xs text-muted-foreground mt-4">
             Last updated: January 2025
@@ -33,7 +34,11 @@ export default function PrivacyPage() {
               1. Information We Collect
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              We collect information you provide when you register, use our services, or contact us. This may include your name, email address, phone number, exam preferences, and study progress. We also collect usage data such as pages visited, time spent, and device information to improve our platform.
+              We collect information you provide when you register, use our
+              services, or contact us. This may include your name, email
+              address, phone number, exam preferences, and study progress. We
+              also collect usage data such as pages visited, time spent, and
+              device information to improve our platform.
             </p>
           </section>
 
@@ -43,7 +48,11 @@ export default function PrivacyPage() {
               2. How We Use Your Information
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-4">
-              We use your information to deliver and personalize our services, process payments, send important updates, and improve our content and features. We may use aggregated, anonymized data for analytics and research. We do not sell your personal information to third parties.
+              We use your information to deliver and personalize our services,
+              process payments, send important updates, and improve our content
+              and features. We may use aggregated, anonymized data for analytics
+              and research. We do not sell your personal information to third
+              parties.
             </p>
           </section>
 
@@ -53,7 +62,11 @@ export default function PrivacyPage() {
               3. Data Security
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              We implement industry-standard security measures to protect your data, including encryption in transit and at rest, access controls, and regular security reviews. While we strive to protect your information, no method of transmission over the internet is 100% secure.
+              We implement industry-standard security measures to protect your
+              data, including encryption in transit and at rest, access
+              controls, and regular security reviews. While we strive to protect
+              your information, no method of transmission over the internet is
+              100% secure.
             </p>
           </section>
 
@@ -63,7 +76,10 @@ export default function PrivacyPage() {
               4. Cookies and Similar Technologies
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              We use cookies and similar technologies to keep you signed in, remember your preferences, and understand how you use our platform. You can manage cookie settings in your browser, though some features may not work correctly if cookies are disabled.
+              We use cookies and similar technologies to keep you signed in,
+              remember your preferences, and understand how you use our
+              platform. You can manage cookie settings in your browser, though
+              some features may not work correctly if cookies are disabled.
             </p>
           </section>
 
@@ -73,7 +89,10 @@ export default function PrivacyPage() {
               5. Your Rights
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Depending on your location, you may have the right to access, correct, or delete your personal data, or to object to or restrict certain processing. You can update your account details in settings or contact us at contact@lmsdoors.com for requests.
+              Depending on your location, you may have the right to access,
+              correct, or delete your personal data, or to object to or restrict
+              certain processing. You can update your account details in
+              settings or contact us at info@lmsdoors.com for requests.
             </p>
           </section>
 
@@ -83,9 +102,13 @@ export default function PrivacyPage() {
               6. Contact Us
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              For questions about this Privacy Policy or our data practices, please contact us at{" "}
-              <a href="mailto:contact@lmsdoors.com" className="text-blue-600 dark:text-blue-400 hover:underline">
-                contact@lmsdoors.com
+              For questions about this Privacy Policy or our data practices,
+              please contact us at{" "}
+              <a
+                href="mailto:info@lmsdoors.com"
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                info@lmsdoors.com
               </a>
               .
             </p>

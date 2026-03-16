@@ -11,6 +11,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ContentRenderer } from "@/components/ContentRenderer";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { FooterComponent } from "@/components/home/FooterComponent";
+import { PreviousYearPapersSection } from "@/components/practice/PreviousYearPapersSection";
 import { MainContentSkeleton } from "@/components/RouteLoadingSkeletons";
 import { useNavigationLoading } from "@/context";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -102,8 +103,8 @@ export function HierarchyPageLayout({
       {/* Spacer: matches Header (h-12/h-14) + ExamCategoriesBar (h-8/h-9) = 80px/92px — avoids sidebar overlapping header, no CLS */}
       <div className="h-[80px] sm:h-[92px]" aria-hidden />
 
-      {/* Body: sticky left sidebar | main (scrolls) | sticky right sidebar. Both sidebars sticky so full menu visible with main area; when page scrolls to footer, both move with content (no overlap). */}
-      <div className="flex min-h-[calc(100vh-80px)] sm:min-h-[calc(100vh-92px)]">
+      {/* Body: right sidebar in absolute wrapper so it overlays main (no shift); sticky until row ends (before Previous Year Papers). */}
+      <div className="relative flex min-h-[calc(100vh-80px)] sm:min-h-[calc(100vh-92px)]">
         <HierarchySidebar
           examSlug={examSlug}
           subjects={subjects}
@@ -112,8 +113,8 @@ export function HierarchyPageLayout({
           sticky
         />
 
-        {/* Main: from left sidebar to right sidebar; pr-16 = right sidebar collapsed width */}
-        <div className="flex-1 min-w-0 flex flex-col pr-16">
+        {/* Main: full width; right padding on desktop so content doesn't sit under overlay sidebar */}
+        <div className="flex-1 min-w-0 flex flex-col pr-0 sm:pr-16">
           <main
             className={cn(
               "w-full min-h-0 flex-1 bg-background dark:bg-slate-950/50",
@@ -157,15 +158,26 @@ export function HierarchyPageLayout({
           </main>
         </div>
 
-        {/* Right sidebar: sticky so full menu stays visible with main area; scrolls with page so no footer overlap */}
-        <StudyToolsSidebar
-          examSlug={examSlug}
-          user={{
-            name: "Alex Johnson",
-            role: "NEET Aspirant",
-          }}
-          sticky
-        />
+        {/* Right sidebar: absolute wrapper = no layout shift; flex justify-end so expanded menu overlaps main to the left */}
+        <div className="absolute right-0 top-0 bottom-0 w-16 overflow-visible z-30 pointer-events-none flex justify-end">
+          <div className="sticky top-[80px] sm:top-[92px] h-[calc(100vh-80px)] sm:h-[calc(100vh-92px)] overflow-visible pointer-events-auto shrink-0">
+            <StudyToolsSidebar
+              examSlug={examSlug}
+              user={{
+                name: "Alex Johnson",
+                role: "NEET Aspirant",
+              }}
+              sticky
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Previous Year Papers — before footer, after sidebar + main */}
+      <div className="w-full shrink-0 border-t border-border/60 bg-background">
+        <div className="max-w-7xl mx-auto w-full min-w-0 px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-12">
+          <PreviousYearPapersSection />
+        </div>
       </div>
 
       <div className="shrink-0">

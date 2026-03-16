@@ -112,10 +112,10 @@ export function FooterComponent() {
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-blue-600 shrink-0" />
                 <a
-                  href="mailto:contact@lmsdoors.com"
+                  href="mailto:info@lmsdoors.com"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
                 >
-                  contact@lmsdoors.com
+                  info@lmsdoors.com
                 </a>
               </li>
             </ul>
