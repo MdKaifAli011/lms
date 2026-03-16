@@ -11,6 +11,7 @@ import {
   getUnits,
   getUnitById,
   getChapters,
+  getLevelWiseFlashcardDeckAndCards,
 } from "@/lib/api";
 import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -75,6 +76,14 @@ export default async function UnitFlashcardsPage({ params }: PageProps) {
   );
   const firstChapter = chapters.sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))[0];
 
+  const { cards: rawCards } = await getLevelWiseFlashcardDeckAndCards({
+    examId,
+    level: 3,
+    subjectId: subject.id,
+    unitId: unit.id,
+  });
+  const cards = rawCards.map((c) => ({ front: c.front, back: c.back }));
+
   const breadcrumbs = [
     { label: examName, href: `/exam/${examSlug}` },
     { label: subjectName, href: `/exam/${examSlug}/${subjectSlug}` },
@@ -95,7 +104,7 @@ export default async function UnitFlashcardsPage({ params }: PageProps) {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-2 mb-4 sm:mb-6">
         Flashcards – {unitName}
       </h1>
-      <FlashcardDeck title={`Flashcards – ${unitName}`} />
+      <FlashcardDeck title={`Flashcards – ${unitName}`} cards={cards} />
       <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-between gap-4">
         <Button variant="outline" size="sm" className="gap-1" asChild>
           <Link href={prevHref}>

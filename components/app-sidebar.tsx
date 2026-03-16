@@ -91,6 +91,10 @@ const data = {
           url: "/practice-management/level-wise",
         },
         {
+          title: "Level-Wise Flashcards",
+          url: "/practice-management/flashcards",
+        },
+        {
           title: "Previous Year Papers",
           url: "/practice-management/previous-years",
         },

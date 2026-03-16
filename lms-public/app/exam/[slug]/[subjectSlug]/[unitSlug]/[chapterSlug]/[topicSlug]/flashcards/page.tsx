@@ -13,6 +13,7 @@ import {
   getTopics,
   getTopicById,
   getSubtopics,
+  getLevelWiseFlashcardDeckAndCards,
 } from "@/lib/api";
 import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -104,6 +105,16 @@ export default async function TopicFlashcardsPage({ params }: PageProps) {
   );
   const firstSubtopic = subtopics.sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))[0];
 
+  const { cards: rawCards } = await getLevelWiseFlashcardDeckAndCards({
+    examId: String((exam as { id: string }).id),
+    level: 5,
+    subjectId: subject.id,
+    unitId: unit.id,
+    chapterId: chapter.id,
+    topicId: topic.id,
+  });
+  const cards = rawCards.map((c) => ({ front: c.front, back: c.back }));
+
   const breadcrumbs = [
     { label: examName, href: `/exam/${examSlug}` },
     { label: subjectName, href: `/exam/${examSlug}/${subjectSlug}` },
@@ -126,7 +137,7 @@ export default async function TopicFlashcardsPage({ params }: PageProps) {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-2 mb-4 sm:mb-6">
         Flashcards – {topicName}
       </h1>
-      <FlashcardDeck title={`Flashcards – ${topicName}`} />
+      <FlashcardDeck title={`Flashcards – ${topicName}`} cards={cards} />
       <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-between gap-4">
         <Button variant="outline" size="sm" className="gap-1" asChild>
           <Link href={prevHref}>

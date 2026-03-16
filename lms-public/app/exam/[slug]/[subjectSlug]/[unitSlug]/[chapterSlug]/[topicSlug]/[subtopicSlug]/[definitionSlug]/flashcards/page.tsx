@@ -14,6 +14,7 @@ import {
   getSubtopics,
   getDefinitions,
   getDefinitionById,
+  getLevelWiseFlashcardDeckAndCards,
 } from "@/lib/api";
 import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -135,6 +136,18 @@ export default async function DefinitionFlashcardsPage({ params }: PageProps) {
   if (!definitionData || typeof definitionData !== "object") notFound();
   const definitionName = toTitleCase(String((definitionData as { name?: string }).name ?? definitionSlug));
 
+  const { cards: rawCards } = await getLevelWiseFlashcardDeckAndCards({
+    examId: String((exam as { id: string }).id),
+    level: 7,
+    subjectId: subject.id,
+    unitId: unit.id,
+    chapterId: chapter.id,
+    topicId: topic.id,
+    subtopicId: subtopic.id,
+    definitionId: definition.id,
+  });
+  const cards = rawCards.map((c) => ({ front: c.front, back: c.back }));
+
   const breadcrumbs = [
     { label: examName, href: `/exam/${examSlug}` },
     { label: subjectName, href: `/exam/${examSlug}/${subjectSlug}` },
@@ -156,7 +169,7 @@ export default async function DefinitionFlashcardsPage({ params }: PageProps) {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-2 mb-4 sm:mb-6">
         Flashcards – {definitionName}
       </h1>
-      <FlashcardDeck title={`Flashcards – ${definitionName}`} />
+      <FlashcardDeck title={`Flashcards – ${definitionName}`} cards={cards} />
       <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-between gap-4">
         <Button variant="outline" size="sm" className="gap-1" asChild>
           <Link href={prevHref}>

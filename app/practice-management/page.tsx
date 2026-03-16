@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Layers, FileQuestion, Calendar } from "lucide-react";
+import { Layers, FileQuestion, Calendar, BookOpen } from "lucide-react";
 
 const LINKS = [
   {
@@ -20,6 +20,12 @@ const LINKS = [
     description: "Create chapter-wise, unit-wise, or subject-wise mock tests by choosing exam and syllabus level.",
     href: "/practice-management/level-wise",
     icon: Layers,
+  },
+  {
+    title: "Level-Wise Flashcards",
+    description: "Create flashcard decks at any level (exam, subject, unit, chapter, topic, subtopic, definition) and add front/back cards.",
+    href: "/practice-management/flashcards",
+    icon: BookOpen,
   },
   {
     title: "Full-Length Mocks",

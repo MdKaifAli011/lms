@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-import { getExamBySlugOrId, getSubjects, getUnits } from "@/lib/api";
+import { getExamBySlugOrId, getSubjects, getUnits, getLevelWiseFlashcardDeckAndCards } from "@/lib/api";
 import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
@@ -51,6 +51,13 @@ export default async function SubjectFlashcardsPage({ params }: PageProps) {
   );
   const firstUnit = units.sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))[0];
 
+  const { cards: rawCards } = await getLevelWiseFlashcardDeckAndCards({
+    examId: examId,
+    level: 2,
+    subjectId: subject.id,
+  });
+  const cards = rawCards.map((c) => ({ front: c.front, back: c.back }));
+
   const breadcrumbs = [
     { label: examName, href: `/exam/${examSlug}` },
     { label: subjectName, href: `/exam/${examSlug}/${subjectSlug}` },
@@ -68,7 +75,7 @@ export default async function SubjectFlashcardsPage({ params }: PageProps) {
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-2 mb-4 sm:mb-6">
         Flashcards – {subjectName}
       </h1>
-      <FlashcardDeck title={`Flashcards – ${subjectName}`} />
+      <FlashcardDeck title={`Flashcards – ${subjectName}`} cards={cards} />
       <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-between gap-4">
         <Button variant="outline" size="sm" className="gap-1" asChild>
           <Link href={prevHref}>

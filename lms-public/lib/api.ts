@@ -170,6 +170,113 @@ export async function getLevelWisePracticeQuestions(practiceIdOrSlug: string): P
   }
 }
 
+// ——— Level-Wise Flashcards ———
+export interface LevelWiseFlashcardDeck {
+  id: string;
+  examId: string;
+  examName?: string;
+  examSlug?: string;
+  level: number;
+  levelName?: string;
+  subjectId?: string;
+  subjectName?: string;
+  unitId?: string;
+  unitName?: string;
+  chapterId?: string;
+  chapterName?: string;
+  topicId?: string;
+  topicName?: string;
+  subtopicId?: string;
+  subtopicName?: string;
+  definitionId?: string;
+  definitionName?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  orderNumber: number;
+  status: string;
+  locked?: boolean;
+}
+
+export interface LevelWiseFlashcardCardItem {
+  id: string;
+  deckId: string;
+  front: string;
+  back: string;
+  orderNumber: number;
+}
+
+/** GET /api/level-wise-flashcards – list decks with optional filters */
+export async function getLevelWiseFlashcardDecks(filters?: {
+  examId?: string;
+  level?: number;
+  status?: string;
+  subjectId?: string;
+  unitId?: string;
+  chapterId?: string;
+  topicId?: string;
+  subtopicId?: string;
+  definitionId?: string;
+  page?: number;
+  limit?: number;
+}): Promise<{ decks: LevelWiseFlashcardDeck[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.examId) params.set("examId", filters.examId);
+    if (filters?.level != null) params.set("level", String(filters.level));
+    if (filters?.status) params.set("status", filters.status);
+    if (filters?.subjectId) params.set("subjectId", filters.subjectId);
+    if (filters?.unitId) params.set("unitId", filters.unitId);
+    if (filters?.chapterId) params.set("chapterId", filters.chapterId);
+    if (filters?.topicId) params.set("topicId", filters.topicId);
+    if (filters?.subtopicId) params.set("subtopicId", filters.subtopicId);
+    if (filters?.definitionId) params.set("definitionId", filters.definitionId);
+    if (filters?.page != null) params.set("page", String(filters.page));
+    if (filters?.limit != null) params.set("limit", String(filters.limit));
+    const q = params.toString() ? `?${params}` : "";
+    const res = await fetchApi<{ decks: LevelWiseFlashcardDeck[]; total: number }>(`/api/level-wise-flashcards${q}`);
+    return { decks: Array.isArray(res.decks) ? res.decks : [], total: res.total ?? 0 };
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getLevelWiseFlashcardDecks]", e);
+    return { decks: [], total: 0 };
+  }
+}
+
+/** GET /api/level-wise-flashcards/[param]/cards – list cards for a deck */
+export async function getLevelWiseFlashcardCards(deckIdOrSlug: string): Promise<LevelWiseFlashcardCardItem[]> {
+  try {
+    const list = await fetchApi<LevelWiseFlashcardCardItem[]>(
+      `/api/level-wise-flashcards/${encodeURIComponent(deckIdOrSlug)}/cards`
+    );
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    if (typeof window === "undefined") console.error("[getLevelWiseFlashcardCards]", e);
+    return [];
+  }
+}
+
+/** Fetch the first matching Active deck by hierarchy and its cards. Returns { deck, cards } or { deck: null, cards: [] }. */
+export async function getLevelWiseFlashcardDeckAndCards(filters: {
+  examId: string;
+  level: number;
+  subjectId?: string;
+  unitId?: string;
+  chapterId?: string;
+  topicId?: string;
+  subtopicId?: string;
+  definitionId?: string;
+}): Promise<{ deck: LevelWiseFlashcardDeck | null; cards: LevelWiseFlashcardCardItem[] }> {
+  const { decks, total } = await getLevelWiseFlashcardDecks({
+    ...filters,
+    status: "Active",
+    limit: 1,
+  });
+  if (total === 0 || !decks[0]) return { deck: null, cards: [] };
+  const deck = decks[0];
+  const cards = await getLevelWiseFlashcardCards(deck.id);
+  return { deck, cards };
+}
+
 // ——— Full Length Mock Tests ———
 export interface FullLengthMock {
   id: string;
