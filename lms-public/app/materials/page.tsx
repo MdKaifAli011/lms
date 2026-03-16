@@ -3,49 +3,25 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  FileText,
   Download,
-  Printer,
-  ArrowRight,
   History,
   Bot,
   Sparkles,
-  Atom,
-  Dna,
-  Beaker,
+  BookOpen,
+  ArrowRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { ExamCategoriesBar } from "@/components/ExamCategoriesBar";
 import { FooterComponent } from "@/components/home/FooterComponent";
 import { cn } from "@/lib/utils";
-import { getFormulaToolkits, getPreviousYearPapers, type FormulaToolkit as ApiFormulaToolkit, type PreviousYearPaper as ApiPreviousYearPaper } from "@/lib/api";
+import { getExams, getPreviousYearPapers, type PreviousYearPaper as ApiPreviousYearPaper } from "@/lib/api";
 
-interface FormulaToolkitProps {
-  subject: string;
-  title: string;
-  description: string;
-  pages: number;
-  size: string;
-  fileUrl?: string;
-  icon: React.ReactNode;
-  color: "blue" | "red" | "yellow";
-}
-
-function pickIcon(subject: string | null | undefined): React.ReactNode {
-  const s = (subject ?? "").toLowerCase();
-  if (s.includes("physics")) return <Atom size={24} />;
-  if (s.includes("biology")) return <Dna size={24} />;
-  if (s.includes("chem")) return <Beaker size={24} />;
-  return <FileText size={24} />;
-}
-
-function pickColor(subject: string | null | undefined): "blue" | "red" | "yellow" {
-  const s = (subject ?? "").toLowerCase();
-  if (s.includes("physics")) return "blue";
-  if (s.includes("biology")) return "red";
-  if (s.includes("chem")) return "yellow";
-  return "blue";
+interface ExamItem {
+  id: string;
+  name?: string;
+  slug?: string;
+  status?: string;
+  orderNumber?: number;
 }
 
 interface PreviousYearPaperProps {
@@ -54,17 +30,21 @@ interface PreviousYearPaperProps {
 
 export default function MaterialsPage() {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [toolkits, setToolkits] = useState<ApiFormulaToolkit[]>([]);
-  const [toolkitsLoading, setToolkitsLoading] = useState(true);
+  const [exams, setExams] = useState<ExamItem[]>([]);
+  const [flashcardsLoading, setFlashcardsLoading] = useState(true);
   const [previousPapers, setPreviousPapers] = useState<ApiPreviousYearPaper[]>([]);
   const [previousPapersLoading, setPreviousPapersLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    getFormulaToolkits({ status: "Active" }).then((list) => {
-      if (!cancelled) setToolkits(list);
+    getExams(true).then((raw) => {
+      if (cancelled) return;
+      const list = (Array.isArray(raw) ? raw : []) as ExamItem[];
+      const active = list.filter((e) => e.status === "Active");
+      active.sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
+      setExams(active);
     }).finally(() => {
-      if (!cancelled) setToolkitsLoading(false);
+      if (!cancelled) setFlashcardsLoading(false);
     });
     return () => { cancelled = true; };
   }, []);
@@ -85,7 +65,7 @@ export default function MaterialsPage() {
     { id: "physics", label: "Physics" },
     { id: "chemistry", label: "Chemistry" },
     { id: "mathematics", label: "Mathematics" },
-    { id: "formula", label: "Formula Toolkits" },
+    { id: "flashcards", label: "Flashcards" },
   ];
 
   return (
@@ -100,7 +80,7 @@ export default function MaterialsPage() {
             Study Materials &amp; Archives
           </h1>
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl">
-            Premium repository of year-wise papers, curated formula toolkits,
+            Premium repository of year-wise papers, flashcards by exam & syllabus,
             and AI-assisted revision guides.
           </p>
         </header>
@@ -129,45 +109,39 @@ export default function MaterialsPage() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">
-                  Formula Toolkits
+                  Flashcards
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  High-yield revision sheets for quick last-minute preparation.
+                  Browse and practice flashcards by exam—from subject level down to definitions.
                 </p>
               </div>
-              <a
-                href="#"
-                className="text-blue-600 dark:text-blue-400 font-semibold text-sm flex items-center group"
+              <Link
+                href="/exam"
+                className="text-primary font-semibold text-sm flex items-center group"
               >
-                View all toolkits
+                Browse exams
                 <ArrowRight
                   className="ml-1 group-hover:translate-x-1 transition-transform"
                   size={16}
                 />
-              </a>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {toolkitsLoading ? (
+              {flashcardsLoading ? (
                 <div className="col-span-full text-center py-12 text-muted-foreground">
-                  Loading formula toolkits…
+                  Loading flashcards…
                 </div>
-              ) : toolkits.length === 0 ? (
+              ) : exams.length === 0 ? (
                 <div className="col-span-full text-center py-12 text-muted-foreground rounded-2xl border border-dashed border-border bg-muted/30">
-                  No formula toolkits available yet. Check back later.
+                  No exams available for flashcards yet. Check back later.
                 </div>
               ) : (
-                toolkits.map((item) => (
-                  <FormulaToolkitCard
-                    key={item.id}
-                    subject={item.subjectLabel || item.subjectName || "Resource"}
-                    title={item.title}
-                    description={item.description || ""}
-                    pages={item.pages ?? 0}
-                    size={item.size || ""}
-                    fileUrl={item.fileUrl}
-                    icon={pickIcon(item.subjectLabel || item.subjectName)}
-                    color={pickColor(item.subjectLabel || item.subjectName)}
+                exams.map((exam) => (
+                  <FlashcardExamCard
+                    key={exam.id}
+                    name={exam.name ?? "Exam"}
+                    slug={exam.slug ?? exam.id}
                   />
                 ))
               )}
@@ -223,13 +197,13 @@ export default function MaterialsPage() {
               Ask AI Revision Guide
             </span>
           </button>
-          <button
+          <Link
+            href="/exam"
             className="w-14 h-14 bg-card border border-border text-foreground rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform active:scale-95"
-            title="Flashcards"
-            type="button"
+            title="Browse exams and flashcards"
           >
             <Sparkles size={24} />
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -238,99 +212,26 @@ export default function MaterialsPage() {
   );
 }
 
-function FormulaToolkitCard({
-  subject,
-  title,
-  description,
-  pages,
-  size,
-  fileUrl,
-  icon,
-  color,
-}: FormulaToolkitProps) {
-  const colorClasses = {
-    blue: {
-      bg: "bg-blue-50 dark:bg-blue-950/30",
-      text: "text-blue-600 dark:text-blue-400",
-      badge: "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400",
-    },
-    red: {
-      bg: "bg-rose-50 dark:bg-rose-950/30",
-      text: "text-rose-600 dark:text-rose-400",
-      badge: "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400",
-    },
-    yellow: {
-      bg: "bg-yellow-50 dark:bg-yellow-950/30",
-      text: "text-yellow-600 dark:text-yellow-500",
-      badge:
-        "bg-yellow-50 dark:bg-yellow-950/50 text-yellow-600 dark:text-yellow-500",
-    },
-  }[color];
-
+function FlashcardExamCard({ name, slug }: { name: string; slug: string }) {
+  const href = `/exam/${slug}/flashcards`;
   return (
-    <div className="bg-card/80 dark:bg-gray-800/60 rounded-2xl p-6 border border-border shadow-sm hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-gray-900/50 transition-all group">
-      <div className="flex justify-between items-start mb-6">
-        <div
-          className={cn(
-            "w-12 h-12 rounded-xl flex items-center justify-center",
-            colorClasses.bg,
-            colorClasses.text,
-          )}
-        >
-          {icon}
+    <Link href={href} className="block group">
+      <div className="h-full bg-card/80 dark:bg-card/60 rounded-2xl p-6 border border-border shadow-sm hover:shadow-lg hover:border-primary/30 dark:hover:border-primary/40 transition-all flex flex-col">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-5 text-primary">
+          <BookOpen size={24} aria-hidden />
         </div>
-        <span
-          className={cn(
-            "text-xs font-bold px-2 py-1 rounded uppercase tracking-widest",
-            colorClasses.badge,
-          )}
-        >
-          {subject}
+        <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+          {name} Flashcards
+        </h3>
+        <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">
+          Practice flashcards by subject, unit, chapter, and topic for {name}.
+        </p>
+        <span className="inline-flex items-center text-sm font-semibold text-primary">
+          Open flashcards
+          <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
         </span>
       </div>
-
-      <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-        {title}
-      </h3>
-      <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-        {description}
-      </p>
-
-      <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground mb-6">
-        <div className="flex items-center gap-4">
-          {pages > 0 && (
-            <span className="flex items-center">
-              <FileText size={14} className="mr-1" /> {pages} Pages
-            </span>
-          )}
-          {size && (
-            <span className="flex items-center">
-              <Download size={14} className="mr-1" /> {size}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <Button
-          variant="outline"
-          className="py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center"
-        >
-          <Printer size={16} className="mr-2" /> Print
-        </Button>
-        {fileUrl ? (
-          <Button className="py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-lg shadow-blue-600/20" asChild>
-            <a href={fileUrl} target="_blank" rel="noopener noreferrer">
-              Start Review
-            </a>
-          </Button>
-        ) : (
-          <Button className="py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-lg shadow-blue-600/20">
-            Start Review
-          </Button>
-        )}
-      </div>
-    </div>
+    </Link>
   );
 }
 
