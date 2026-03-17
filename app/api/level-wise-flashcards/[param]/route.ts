@@ -49,6 +49,8 @@ function mapDocToResponse(doc: Record<string, unknown>) {
     status: doc.status,
     locked: doc.locked || false,
     seo: (doc.seo as Record<string, unknown>) ?? undefined,
+    visits: (doc.visits as number) ?? 0,
+    today: (doc.today as number) ?? 0,
     createdAt: doc.createdAt
       ? new Date(doc.createdAt as Date).toLocaleString("en-US", {
           year: "numeric",

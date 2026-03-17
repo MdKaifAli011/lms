@@ -86,6 +86,8 @@ interface Deck {
   description?: string;
   orderNumber: number;
   status: string;
+  visits?: number;
+  today?: number;
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
@@ -1039,6 +1041,81 @@ export default function PracticeManagementFlashcardsPage() {
           </header>
 
           <div className="min-h-0 flex-1 space-y-4 overflow-auto p-4">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">
+                    Total Decks
+                  </CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-blue-100 dark:bg-blue-950 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-blue-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none">
+                    {decks.length}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    All flashcard decks
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">
+                    Active Decks
+                  </CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-green-100 dark:bg-green-950 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-green-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none">
+                    {decks.filter((d) => d.status === "Active").length}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Currently active
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">
+                    Total Visits
+                  </CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-purple-100 dark:bg-purple-950 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-purple-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none">
+                    {decks.reduce((sum, d) => sum + (d.visits ?? 0), 0)}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    All time visits
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="relative overflow-hidden">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-4">
+                  <CardTitle className="text-[13px] font-medium">
+                    Today&apos;s Visits
+                  </CardTitle>
+                  <div className="h-7 w-7 rounded-full bg-orange-100 dark:bg-orange-950 flex items-center justify-center">
+                    <div className="h-3 w-3 rounded-full bg-orange-500" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0 pb-4">
+                  <div className="text-xl font-bold leading-none">
+                    {decks.reduce((sum, d) => sum + (d.today ?? 0), 0)}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Visits today
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
             <Card className="min-w-0 shrink-0 border-border/60 shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex flex-col gap-4">
@@ -1334,6 +1411,7 @@ export default function PracticeManagementFlashcardsPage() {
                           <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Level</TableHead>
                           <TableHead className="min-w-[200px] py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Scope</TableHead>
                           <TableHead className="w-20 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                          <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Visits</TableHead>
                           <TableHead className="w-16 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Meta</TableHead>
                           <TableHead className="w-36 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
                         </TableRow>
@@ -1362,6 +1440,15 @@ export default function PracticeManagementFlashcardsPage() {
                               <Badge variant={deck.status === "Active" ? "default" : "secondary"}>
                                 {deck.status}
                               </Badge>
+                            </TableCell>
+                            <TableCell className="py-2 text-sm text-muted-foreground tabular-nums">
+                              {(deck.visits ?? 0) > 0 || (deck.today ?? 0) > 0 ? (
+                                <span title="All time / Today">
+                                  {deck.visits ?? 0} <span className="text-muted-foreground/80">/ {deck.today ?? 0}</span>
+                                </span>
+                              ) : (
+                                "—"
+                              )}
                             </TableCell>
                             <TableCell className="py-2 text-muted-foreground">
                               {(() => {

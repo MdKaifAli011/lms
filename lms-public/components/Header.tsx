@@ -136,7 +136,7 @@ export function Header() {
       </header>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed top-12 sm:top-14 inset-x-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <div className="lg:hidden fixed top-12 sm:top-14 inset-x-0 z-[45] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-lg">
           <nav className="px-4 py-4 space-y-3">
             {navigationItems.map((item) => {
               const isActive =

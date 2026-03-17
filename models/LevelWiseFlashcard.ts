@@ -44,6 +44,9 @@ export interface ILevelWiseFlashcard {
     noIndex?: boolean;
     noFollow?: boolean;
   };
+  /** Visit counts (public deck page views). Blocked IPs do not increment. */
+  visits?: number;
+  today?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -74,6 +77,8 @@ const levelWiseFlashcardSchema = new Schema<ILevelWiseFlashcard>(
       type: Schema.Types.Mixed,
       default: undefined,
     },
+    visits: { type: Number, default: 0 },
+    today: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },

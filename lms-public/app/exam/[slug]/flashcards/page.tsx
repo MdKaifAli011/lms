@@ -9,6 +9,7 @@ import { getExamBySlugOrId, getSubjects, getLevelWiseFlashcardDeckAndCards } fro
 import { toTitleCase } from "@/lib/titleCase";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FlashcardDeck } from "@/components/FlashcardDeck";
+import { RecordVisit } from "@/components/RecordVisit";
 import { Button } from "@/components/ui/button";
 import { generateFlashcardDeckMetadata } from "@/lib/metadata";
 
@@ -43,7 +44,7 @@ export default async function ExamFlashcardsPage({ params }: PageProps) {
   );
   const firstSubject = subjects.sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))[0];
 
-  const { cards: rawCards } = await getLevelWiseFlashcardDeckAndCards({
+  const { deck, cards: rawCards } = await getLevelWiseFlashcardDeckAndCards({
     examId: String((exam as { id: string }).id),
     level: 1,
   });
@@ -59,6 +60,7 @@ export default async function ExamFlashcardsPage({ params }: PageProps) {
 
   return (
     <>
+      {deck?.id && <RecordVisit resource="level-wise-flashcards" param={deck.id} />}
       <div className="mb-3 sm:mb-4">
         <Breadcrumbs items={breadcrumbs} />
       </div>

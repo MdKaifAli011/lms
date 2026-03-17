@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { recordVisit } from "@/lib/api";
 
-type Resource = "exams" | "subjects" | "units" | "chapters" | "topics" | "subtopics" | "definitions";
+type Resource = "exams" | "subjects" | "units" | "chapters" | "topics" | "subtopics" | "definitions" | "level-wise-flashcards";
 
 interface RecordVisitProps {
   resource: Resource;

@@ -71,6 +71,8 @@ interface FlashcardDeck {
   levelName?: string;
   orderNumber: number;
   status: string;
+  visits?: number;
+  today?: number;
 }
 
 interface FlashcardCard {
@@ -677,6 +679,9 @@ export function LevelWiseDirectDetailsPageFlashcard(
                                 </h3>
                                 <p className="text-xs text-muted-foreground">
                                   {sortedCards.length} card{sortedCards.length !== 1 ? "s" : ""}
+                                  {(deck.visits != null && deck.visits > 0) || (deck.today != null && deck.today > 0)
+                                    ? ` · ${deck.visits ?? 0} visit${(deck.visits ?? 0) !== 1 ? "s" : ""}${(deck.today ?? 0) > 0 ? ` (${deck.today} today)` : ""}`
+                                    : ""}
                                 </p>
                               </div>
                               <Button

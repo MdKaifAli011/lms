@@ -751,7 +751,7 @@ export async function getSyllabusTree(examId: string): Promise<{ exam?: { id: st
 
 // ——— Visit (optional, for analytics) ———
 export async function recordVisit(
-  resource: "exams" | "subjects" | "units" | "chapters" | "topics" | "subtopics" | "definitions",
+  resource: "exams" | "subjects" | "units" | "chapters" | "topics" | "subtopics" | "definitions" | "level-wise-flashcards",
   param: string
 ): Promise<{ ok: boolean; visits?: number; today?: number }> {
   return fetchApi(`/api/${resource}/${encodeURIComponent(param)}/visit`, {
