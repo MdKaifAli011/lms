@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import LevelWiseFlashcard from "@/models/LevelWiseFlashcard";
+import LevelWiseFlashcardCard from "@/models/LevelWiseFlashcardCard";
 import "@/models/Exam";
 import "@/models/Subject";
 import "@/models/Unit";
@@ -78,9 +79,17 @@ export async function GET(request: NextRequest) {
     }
 
     const decks = await dbQuery.lean();
+    const deckIds = decks.map((d) => (d as { _id: mongoose.Types.ObjectId })._id);
+    const cardCounts = await LevelWiseFlashcardCard.aggregate([
+      { $match: { deckId: { $in: deckIds } } },
+      { $group: { _id: "$deckId", count: { $sum: 1 } } },
+    ]).then((rows) => new Map(rows.map((r) => [r._id.toString(), r.count])));
 
-    const list = decks.map((doc: Record<string, unknown>) => ({
-      id: (doc._id as { toString: () => string }).toString(),
+    const list = decks.map((doc: Record<string, unknown>) => {
+      const id = (doc._id as { toString: () => string }).toString();
+      return {
+      id,
+      cardCount: cardCounts.get(id) ?? 0,
       examId: (doc.examId as { _id?: { toString: () => string }; name?: string; slug?: string })?._id?.toString() || doc.examId,
       examName: (doc.examId as { name?: string })?.name || "",
       examSlug: (doc.examId as { slug?: string })?.slug || "",
@@ -125,7 +134,8 @@ export async function GET(request: NextRequest) {
             minute: "2-digit",
           })
         : undefined,
-    }));
+    };
+    });
 
     return NextResponse.json({ decks: list, total }, { headers: corsHeaders });
   } catch (err) {

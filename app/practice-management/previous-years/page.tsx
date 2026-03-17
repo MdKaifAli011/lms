@@ -52,8 +52,11 @@ import {
   Trash2,
   Search,
   Loader2,
+  GripVertical,
+  Power,
 } from "lucide-react"
 import { toast } from "sonner"
+import { toTitleCase } from "@/lib/titleCase"
 
 interface PreviousYearPaper {
   id: string
@@ -87,7 +90,11 @@ export default function PreviousYearPapersPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [yearFilter, setYearFilter] = useState<string>("all")
-  
+  const [isReorderingEnabled, setIsReorderingEnabled] = useState(false)
+  const [reorderSaving, setReorderSaving] = useState(false)
+  const [togglingStatusId, setTogglingStatusId] = useState<string | null>(null)
+  const [dragOverPaper, setDragOverPaper] = useState<PreviousYearPaper | null>(null)
+
   // Dialog state
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
@@ -144,14 +151,15 @@ export default function PreviousYearPapersPage() {
     return years
   }, [papers])
 
-  // Filter papers
+  // Filter and sort papers
   const filteredPapers = useMemo(() => {
-    return papers.filter((paper) => {
+    const list = papers.filter((paper) => {
       const matchesSearch = paper.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         paper.examName?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesYear = yearFilter === "all" || paper.year === parseInt(yearFilter)
       return matchesSearch && matchesYear
     })
+    return [...list].sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))
   }, [papers, searchTerm, yearFilter])
 
   // Stats
@@ -162,7 +170,7 @@ export default function PreviousYearPapersPage() {
     locked: papers.filter((p) => p.locked).length,
   }), [papers])
 
-  // Handle add
+  // Handle add (only required/simple fields; API uses defaults for rest)
   const handleAdd = async () => {
     setAddSaving(true)
     try {
@@ -170,11 +178,12 @@ export default function PreviousYearPapersPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          year: parseInt(formData.year),
-          durationMinutes: parseInt(formData.durationMinutes),
-          totalMarks: parseInt(formData.totalMarks),
-          totalQuestions: parseInt(formData.totalQuestions),
+          examId: formData.examId,
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          year: parseInt(formData.year, 10),
+          session: formData.session.trim(),
+          status: formData.status,
         }),
       })
       
@@ -234,6 +243,80 @@ export default function PreviousYearPapersPage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete")
     }
+  }
+
+  // Toggle status (Active/Inactive)
+  const handleToggleStatus = async (id: string) => {
+    const paper = papers.find((p) => p.id === id)
+    if (!paper) return
+    const nextStatus = paper.status === "Active" ? "Inactive" : "Active"
+    setTogglingStatusId(id)
+    try {
+      const res = await fetch(`/api/previous-year-paper/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      })
+      if (!res.ok) throw new Error("Failed to update status")
+      const updated = await res.json()
+      setPapers((prev) => prev.map((p) => (p.id === id ? updated : p)))
+      toast.success(`Status set to ${nextStatus}`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update status")
+    } finally {
+      setTogglingStatusId(null)
+    }
+  }
+
+  // Reorder
+  const enableReordering = () => setIsReorderingEnabled(true)
+  const disableReordering = () => setIsReorderingEnabled(false)
+  const saveReorderedPapers = async () => {
+    setReorderSaving(true)
+    try {
+      const items = filteredPapers.map((p, i) => ({ id: p.id, orderNumber: i + 1 }))
+      const res = await fetch("/api/previous-year-paper/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      })
+      if (!res.ok) throw new Error("Failed to save order")
+      const updated = papers.map((p) => {
+        const idx = filteredPapers.findIndex((f) => f.id === p.id)
+        return idx >= 0 ? { ...p, orderNumber: idx + 1 } : p
+      })
+      setPapers(updated)
+      setIsReorderingEnabled(false)
+      toast.success("Order saved")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save order")
+    } finally {
+      setReorderSaving(false)
+    }
+  }
+  const handleDragStart = (e: React.DragEvent, paper: PreviousYearPaper) => {
+    e.dataTransfer.setData("text/plain", paper.id)
+    e.dataTransfer.effectAllowed = "move"
+  }
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault()
+  const handleDragEnter = (paper: PreviousYearPaper) => setDragOverPaper(paper)
+  const handleDragLeave = () => setDragOverPaper(null)
+  const handleDrop = (e: React.DragEvent, targetPaper: PreviousYearPaper) => {
+    e.preventDefault()
+    setDragOverPaper(null)
+    const sourceId = e.dataTransfer.getData("text/plain")
+    if (!sourceId || sourceId === targetPaper.id) return
+    const fromIdx = filteredPapers.findIndex((p) => p.id === sourceId)
+    const toIdx = filteredPapers.findIndex((p) => p.id === targetPaper.id)
+    if (fromIdx < 0 || toIdx < 0) return
+    const reordered = [...filteredPapers]
+    const [removed] = reordered.splice(fromIdx, 1)
+    reordered.splice(toIdx, 0, removed)
+    setPapers((prev) => {
+      const byId = new Map(prev.map((p) => [p.id, p]))
+      reordered.forEach((p, i) => byId.set(p.id, { ...p, orderNumber: i + 1 }))
+      return prev.map((p) => byId.get(p.id) ?? p).sort((a, b) => a.orderNumber - b.orderNumber)
+    })
   }
 
   // Open edit dialog
@@ -334,7 +417,7 @@ export default function PreviousYearPapersPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {exams.map((exam) => (
-                        <SelectItem key={exam.id} value={exam.id}>{exam.name}</SelectItem>
+                        <SelectItem key={exam.id} value={exam.id}>{toTitleCase(exam.name)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -345,7 +428,7 @@ export default function PreviousYearPapersPage() {
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Enter paper title"
+                    placeholder="e.g. JEE Main, NEET, IB, AP – Yearly paper"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -364,7 +447,7 @@ export default function PreviousYearPapersPage() {
                       id="session"
                       value={formData.session}
                       onChange={(e) => setFormData({ ...formData, session: e.target.value })}
-                      placeholder="e.g., Morning, Evening"
+                      placeholder="e.g. Morning, Evening"
                     />
                   </div>
                 </div>
@@ -374,64 +457,8 @@ export default function PreviousYearPapersPage() {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Enter description"
+                    placeholder="Optional description"
                   />
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="duration">Duration (min)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      value={formData.durationMinutes}
-                      onChange={(e) => setFormData({ ...formData, durationMinutes: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="marks">Total Marks</Label>
-                    <Input
-                      id="marks"
-                      type="number"
-                      value={formData.totalMarks}
-                      onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="questions">Total Questions</Label>
-                    <Input
-                      id="questions"
-                      type="number"
-                      value={formData.totalQuestions}
-                      onChange={(e) => setFormData({ ...formData, totalQuestions: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="difficulty">Difficulty</Label>
-                    <Select value={formData.difficulty} onValueChange={(v) => setFormData({ ...formData, difficulty: v })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select difficulty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DIFFICULTY_OPTIONS.map((d) => (
-                          <SelectItem key={d} value={d}>{d}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Inactive">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -502,9 +529,27 @@ export default function PreviousYearPapersPage() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
                     <CardTitle>Previous Year Papers</CardTitle>
-                    <CardDescription>Manage previous year papers by exam and year.</CardDescription>
+                    <CardDescription>Manage previous year papers by exam and year. Click a paper title to add questions (JEE, NEET, IB, AP, etc.).</CardDescription>
                   </div>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {!isReorderingEnabled ? (
+                      <Button variant="outline" size="sm" className="h-9 px-3" onClick={enableReordering}>
+                        <GripVertical className="mr-2 h-4 w-4" />
+                        Enable Reordering
+                      </Button>
+                    ) : (
+                      <>
+                        <Button variant="outline" size="sm" className="h-9 px-3" onClick={disableReordering}>
+                          Cancel Reordering
+                        </Button>
+                        <Button size="sm" className="h-9 px-3" onClick={saveReorderedPapers} disabled={reorderSaving}>
+                          {reorderSaving ? "Saving…" : "Save Order"}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div className="relative flex-1 max-w-sm">
                       <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
@@ -526,7 +571,6 @@ export default function PreviousYearPapersPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
               </CardHeader>
               <CardContent className="min-w-0 overflow-hidden">
                 <div className="overflow-x-auto rounded-md border">
@@ -539,39 +583,67 @@ export default function PreviousYearPapersPage() {
                   <TableHead>Year</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead>Questions</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
+                  <TableHead className="w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredPapers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       No previous year papers found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredPapers.map((paper) => (
-                    <TableRow key={paper.id}>
-                      <TableCell>{paper.orderNumber}</TableCell>
-                      <TableCell className="font-medium">{paper.title}</TableCell>
-                      <TableCell>{paper.examName}</TableCell>
+                    <TableRow
+                      key={paper.id}
+                      className={isReorderingEnabled ? "cursor-move" : ""}
+                      draggable={isReorderingEnabled}
+                      onDragStart={(e) => handleDragStart(e, paper)}
+                      onDragOver={handleDragOver}
+                      onDragEnter={() => handleDragEnter(paper)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, paper)}
+                    >
+                      <TableCell className="w-[50px]">
+                        {isReorderingEnabled ? (
+                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          paper.orderNumber
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <Link
+                          href={`/practice-management/previous-years/${paper.id}/questions`}
+                          className="text-primary hover:underline"
+                        >
+                          {toTitleCase(paper.title)}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{toTitleCase(paper.examName ?? "")}</TableCell>
                       <TableCell>{paper.year}</TableCell>
                       <TableCell>{paper.durationMinutes} min</TableCell>
                       <TableCell>{paper.totalQuestions}</TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          paper.status === "Active" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                        }`}>
-                          {paper.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(paper)}>
+                        <div className="flex items-center gap-0.5">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            title={paper.status === "Active" ? "Set Inactive" : "Set Active"}
+                            disabled={togglingStatusId === paper.id}
+                            onClick={() => handleToggleStatus(paper.id)}
+                          >
+                            {togglingStatusId === paper.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Power className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(paper)} title="Edit">
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(paper.id)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(paper.id)} title="Delete">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

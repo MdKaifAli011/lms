@@ -44,10 +44,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Plus, Pencil, Trash2, Loader2, BookOpen, Search, FilterX, ChevronLeft, ChevronRight, Check, Globe, GlobeLock, Power } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Search, FilterX, ChevronLeft, ChevronRight, Check, Globe, GlobeLock, Power } from "lucide-react";
 import { toast } from "sonner";
 import { toTitleCase } from "@/lib/titleCase";
 
@@ -86,6 +85,7 @@ interface Deck {
   description?: string;
   orderNumber: number;
   status: string;
+  cardCount?: number;
   visits?: number;
   today?: number;
   seo?: {
@@ -1410,7 +1410,7 @@ export default function PracticeManagementFlashcardsPage() {
                           <TableHead className="min-w-[180px] py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Title</TableHead>
                           <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Level</TableHead>
                           <TableHead className="min-w-[200px] py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Scope</TableHead>
-                          <TableHead className="w-20 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                          <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold  tracking-wider text-muted-foreground">No. of cards</TableHead>
                           <TableHead className="w-24 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Visits</TableHead>
                           <TableHead className="w-16 shrink-0 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Meta</TableHead>
                           <TableHead className="w-36 shrink-0 text-right py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
@@ -1436,10 +1436,8 @@ export default function PracticeManagementFlashcardsPage() {
                             <TableCell className="py-2 text-sm text-muted-foreground">
                               {scopeLabel(deck)}
                             </TableCell>
-                            <TableCell className="py-2">
-                              <Badge variant={deck.status === "Active" ? "default" : "secondary"}>
-                                {deck.status}
-                              </Badge>
+                            <TableCell className="py-2 text-sm text-muted-foreground tabular-nums">
+                              {deck.cardCount ?? 0}
                             </TableCell>
                             <TableCell className="py-2 text-sm text-muted-foreground tabular-nums">
                               {(deck.visits ?? 0) > 0 || (deck.today ?? 0) > 0 ? (
@@ -1501,11 +1499,6 @@ export default function PracticeManagementFlashcardsPage() {
                                   ) : (
                                     <Power className="h-4 w-4" />
                                   )}
-                                </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" asChild>
-                                  <Link href={`/practice-management/flashcards/${deck.id}/cards`} title="Cards">
-                                    <BookOpen className="h-4 w-4" />
-                                  </Link>
                                 </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => openEdit(deck)} title="Edit">
                                   <Pencil className="h-4 w-4" />
