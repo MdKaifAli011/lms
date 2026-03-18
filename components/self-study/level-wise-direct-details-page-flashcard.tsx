@@ -523,19 +523,9 @@ export function LevelWiseDirectDetailsPageFlashcard(
               <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
               <span className="text-sm">Loading…</span>
             </div>
-          ) : decks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
-              <p className="text-sm text-muted-foreground">
-                No flashcard deck for this {levelName.toLowerCase()} yet.
-              </p>
-              <Button onClick={() => setCreateOpen(true)} variant="outline" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Create first deck
-              </Button>
-            </div>
           ) : (
             <div className="space-y-4">
-              {/* Create deck + cards inline form */}
+              {/* Create form must show when createOpen even if decks.length === 0 (was only inside decks.length > 0 branch before) */}
               {createOpen && (
                 <Card className="border-2 border-primary/20 bg-muted/10">
                   <CardHeader className="pb-2 pt-4 px-4">
@@ -642,7 +632,20 @@ export function LevelWiseDirectDetailsPageFlashcard(
                 </Card>
               )}
 
+              {decks.length === 0 && !createOpen && (
+                <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    No flashcard deck for this {levelName.toLowerCase()} yet.
+                  </p>
+                  <Button onClick={() => setCreateOpen(true)} variant="outline" size="sm">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create first deck
+                  </Button>
+                </div>
+              )}
+
               {/* List of decks */}
+              {decks.length > 0 && (
               <div className="space-y-2">
                 {[...decks]
                   .sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0))
@@ -907,6 +910,7 @@ export function LevelWiseDirectDetailsPageFlashcard(
                     );
                   })}
               </div>
+              )}
             </div>
           )}
         </CardContent>
