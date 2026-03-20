@@ -8,7 +8,8 @@
     "start": "npx next start",
     "lint": "eslint",
     "import:content": "node scripts/import-content-tree.mjs",
-    "import:pdf": "node scripts/pdf-to-content-tree.mjs"
+    "import:pdf": "node scripts/pdf-to-content-tree.mjs",
+    "import:biology": "node scripts/import-biology.mjs"
   },
   "dependencies": {
     "@atlaskit/drag-and-drop-indicator": "^0.12.0",
